@@ -1,0 +1,21 @@
+.login-wrapper {
+	@include font-size(22px, 32px);
+	margin-top: 80px;
+
+	.auth-row {
+		width: 23.5vw;
+		font-size: 14px;
+		font-family: 'Open Sans';
+		color: #0a2540;
+		margin-bottom: 25px;
+	}
+
+	.forgot-pwd-link {
+		margin-top: 17px;
+		opacity: 0.37;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+}

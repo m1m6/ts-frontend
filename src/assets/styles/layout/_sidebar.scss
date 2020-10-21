@@ -1,0 +1,120 @@
+.sidebar-wrapper {
+	overflow: auto;
+	height: 100vh;
+	position: fixed;
+	left: 0;
+	background-color: #ffffff;
+	border: solid 1px rgba(227, 232, 238, 0.74);;
+
+    .header-logo{
+        margin-left: 37px;
+        margin-top: 14px;
+		margin-bottom: 45px;
+		
+		.onboarding-header > g > g {
+			fill: rgb(10,37,64);
+		}
+	}
+
+	.onboarding-wrapper{
+		margin-left: 48px;
+		margin-top: 67px;
+		.onboarding-title {
+			font-family: 'Open Sans';
+			font-size: 22px;
+			font-weight: bold;
+			color: $dark-indigo;
+			margin-bottom: 55px;
+			width: 184px;
+		}
+
+
+		.onboarding-steps {
+			
+			.ant-steps{ 
+				line-height: 6rem;
+
+				.ant-steps-item-tail:after{
+					background-color: #fff;
+					height: 100%;
+					border-left: 1.5px dashed rgba(10, 37, 64, 0.08);
+				}
+
+				.ant-steps-item-icon {
+					width: 6px;
+					height: 6px;
+				}
+
+				.ant-steps-item-content{
+					width: 178px;
+
+					.ant-steps-item-title{
+						vertical-align: top;
+					}
+				}
+
+				.ant-steps-item-finish {
+					.ant-steps-icon-dot {
+						background:#0a2540;
+					}
+
+					.ant-steps-item-title{
+						font-family: 'Open Sans';
+						font-size: 16px;
+						font-weight: bold;
+						color: $dark-indigo;
+					}
+
+					.ant-steps-item-icon {
+						margin-top: 11px;
+    					margin-left: 1px;
+					}
+
+				}
+
+				.ant-steps-item-process{
+					.ant-steps-icon-dot {
+						background:$periwinkle-two;
+					}
+
+					.ant-steps-item-title{
+						font-family: 'Open Sans';
+						font-size: 16px;
+						font-weight: bold;
+						color: $periwinkle-two;
+					}
+
+					.ant-steps-item-icon {
+						margin-top: 11px;
+    					margin-left: 2px;
+					}
+				}
+
+				.ant-steps-item-wait{
+					.ant-steps-icon-dot {
+						background:transparent;
+						border: 1px solid #8794a1;
+					}
+
+					.ant-steps-item-title{
+						opacity: 0.49;
+						font-family: 'Open Sans';
+						font-size: 16px;
+						color: $dark-indigo;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+.steps{
+	background-color: #fff;
+    /* background-color: green; */
+    /* height: 1px; */
+    /* width: 50%; */
+    height: 100%;
+    border-left: 1px dashed rgba(10, 37, 64, 0.08);
+}

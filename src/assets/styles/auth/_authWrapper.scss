@@ -1,0 +1,21 @@
+.auth-page-layout {
+	top: 0px;
+	background: #ffffff 0% 0% no-repeat padding-box;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-content: flex-start;
+	height: 100vh;
+	overflow-y: hidden;
+	.responsive {
+		width: 100%;
+	}
+	.auth-page-container {
+		display: flex;
+		flex-direction: column;
+		width: calc(50% - 152px);
+		margin-left: 152px;
+		height: 100vh;
+		margin-top: 90px;
+	}
+}

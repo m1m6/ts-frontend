@@ -1,0 +1,16 @@
+.btn-link {
+	font-family: "Open Sans";
+	font-size: 14px;
+	font-weight: 500;
+	color: $dark-indigo;
+
+	&:hover {
+		color: $dark-indigo;
+	}
+
+	&.black {
+		font-size: 12px;
+		font-weight: 500;
+		color: $black;
+	}
+}

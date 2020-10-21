@@ -1,0 +1,127 @@
+.input-field-wrapper {
+	.ant-input {
+		border-radius: 0 !important;
+		border: solid 1px #e3e8ee;
+		background-color: #ffffff;
+		font-family: "Open Sans";
+		font-size: 14px;
+		font-weight: 500;
+		color: $black;
+		height: 65px;
+	}
+
+	.form-label {
+		font-family: "Open Sans";
+		@include font-size(14px);
+		color: $dark-indigo;
+		display: inline-flex;
+		margin-bottom: 14px;
+	}
+
+	.error-message {
+		color: red;
+		font-size: 12px;
+		margin-left: 5px;
+	}
+
+	.required {
+		> input {
+			border: 1px solid red;
+		}
+	}
+}
+
+
+.checkbox-field-wrapper {
+	display: flex;
+
+	.form-label {
+		font-family: "Open Sans";
+		@include font-size(12px);
+		color: $dark-indigo;
+		display: inline-flex;
+		// margin-bottom: 14px;
+		margin-left: 9px;
+	}
+
+	.checkbox-input {
+		width: 17px;
+		height: 17px;
+
+		> input[type=checkbox] {
+			width: 17px;
+			height: 17px;
+			vertical-align: middle;
+			margin: 0 0.4em 0.4em 0;
+			border: 1px solid #e3e8ee;
+			-webkit-appearance: none;
+			-webkit-border-radius:2px;
+			border-radius:2px;
+		}
+
+		> input[type="checkbox"]:not(:disabled):hover {
+			border-color:#e3e8ee;
+		}
+
+		> input[type="checkbox"]:active:not(:disabled) {
+			border-color:#e3e8ee;
+		}
+
+		> input[type="checkbox"]:focus {
+			outline:none;
+		}
+
+		> input[type="checkbox"]:checked {
+			border-color:#e3e8ee;
+			background-color: #a172ff;
+			opacity: 0.32;
+		}
+
+		> input[type="checkbox"]:checked:before {
+			content: '';
+			display: block;
+			width: 6px;
+			height: 10px;
+			border: solid #fff;
+			border-width: 0 2px 2px 0;
+			-webkit-transform: rotate(45deg);
+			transform: rotate(45deg);
+			margin-left: 4px;
+			margin-top: 1px;
+			}
+
+		> .required {	
+			outline: 1px solid #F00;		
+			border: 1px solid #e3e8ee;
+			-webkit-appearance: none;
+			-webkit-border-radius:2px;
+			border-radius:2px;
+		}
+	}
+
+}
+
+.ts-input {
+	width: 517px;
+	height: 83px;
+	border: solid 1px $pale-grey-42;
+	background-color: $white;
+	font-family: 'Open Sans';
+	font-size: 26px;
+	font-weight: bold;
+	line-height: 1.81;
+	letter-spacing: normal;
+	color: $dark-indigo;
+	padding-left: 29px;
+	padding-right: 10px;
+
+	&::placeholder{
+		opacity: 0.13;
+		font-family: 'Open Sans';
+		font-size: 26px;
+		font-weight: bold;
+		line-height: 1.81;
+		letter-spacing: normal;
+		color: $dark-indigo;
+	}
+}

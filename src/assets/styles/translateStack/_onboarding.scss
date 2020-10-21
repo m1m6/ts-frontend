@@ -1,0 +1,87 @@
+.onboarding-step-wrapper{
+    margin-top: 226px;
+    margin-left: 120px;
+
+    &.last {
+        margin-top: 84px;
+        a.btn-link {
+            opacity: 0.4;
+            font-family: 'Open Sans';
+            font-size: 14px;
+            line-height: 3.36;
+            color: $dark-indigo;
+            margin-left: 23px;
+        }
+    }
+
+    .onboarding-step-count {
+        font-family: 'Open Sans';
+        font-size: 16px;
+        font-weight: bold;
+        color: $periwinkle-two;
+    }
+
+    .onboarding-step-title{
+        font-family: 'Open Sans';
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 2.35;
+        color: $dark-indigo;
+    }
+
+    .onboarding-step-description {
+        font-family: 'Open Sans';
+        font-size: 14px;
+        color: $dark-indigo;
+        width: 22.5vw;
+
+        &.last {
+            width: 39.5vw;
+        }
+    }
+
+    .onboarding-step-code-wrapper{ 
+        width: 100%;
+        margin-top: 39px;
+        margin-bottom: 30px;
+
+        .onboarding-step-code{
+            background-color: $dark-indigo-two;
+            border-radius: 3px;
+            margin-right: 180px;
+            font-size: 14px;
+            color: $white;
+            > code {
+                margin-left: 41px;
+                display: block;
+                padding-bottom: 20px;
+                color: #ccc;
+                padding-top: 10px;
+            }
+            > button {
+                float: right;
+                margin-top: 8px;
+                margin-right: 10px;
+                border-radius: 3px;
+                box-shadow: 0 0 4px 0 #06223c;
+                background-color: $white;
+                font-family: 'Open Sans';
+                font-size: 12px;
+                font-weight: bold;
+                color: $dark-indigo-two;
+                width: 47px;
+                height: 25px;
+                border: 0;
+                text-align: center;
+                padding-top: 1px;
+
+                &:focus {
+                    outline: 1;
+                }
+            }
+
+            
+        }
+    }
+    
+}

@@ -1,0 +1,35 @@
+.ant-layout-has-sider,
+.ant-layout {
+	height: 100%;
+	margin-left: 270px;
+
+	&.app-page-wrapper,
+	&.ant-layout-content {
+		height: 100%;
+		width: 100%;
+		background-color: $pale-grey;
+	}
+
+	.page-layout {
+		margin-left: 67px;
+		margin-top: 40px;
+
+		.page-title {
+			font-family: "Open Sans";
+			font-size: 32px;
+			font-weight: 500;
+			color: #ccc;
+		}
+	}
+
+	.onboarding-page-layout{
+		margin-left: 20px;
+		margin-top: 14px;
+		border: 1px rgba(227, 232, 238, 0.42) solid ;
+		background-color: $white;
+		box-shadow: 0 2px 14px 0 rgba(255, 255, 255, 0.01);
+		width: 98%;
+		height: 100%;
+		margin-bottom: 13px;
+	}
+}

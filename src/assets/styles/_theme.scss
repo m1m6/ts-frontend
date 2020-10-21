@@ -1,0 +1,66 @@
+$dark-indigo: #0a2540;
+$periwinkle: #a172ff;
+$pale-grey: #e3e8ee;
+$white: #ffffff;
+$periwinkle-two: #9966ff;
+$pale-grey-42: rgba(227, 232, 238, 0.42);
+$black: #000000;
+$dark-indigo-two: #0c2e4e;
+
+$font-lock-min: 400px !default;
+$font-lock-max: 1000px !default;
+
+@mixin font-size(
+	$min,
+	$max: null,
+	$lock-min: $font-lock-min,
+	$lock-max: $font-lock-max
+) {
+	& {
+		font-size: $min;
+	}
+	@if $max {
+		@media (min-width: $lock-min) and (max-width: $lock-max) {
+			& {
+				font-size: calc(
+					#{$min} + #{num($max) - num($min)} * (100vw - #{$lock-min}) / #{num(
+							$lock-max
+						) - num($lock-min)}
+				);
+			}
+		}
+		@media (min-width: $lock-max) {
+			& {
+				font-size: $max;
+			}
+		}
+	}
+}
+
+@function num($input) {
+	@return $input/($input * 0 + 1);
+}
+
+p {
+	font-family: "Open Sans";
+	@include font-size(14px);
+	font-size: 14px;
+	font-weight: 500;
+	color: $black;
+}
+
+.anticon-arrow-right {
+	vertical-align: middle;
+	margin-left: 7px;
+}
+
+.ant-calendar-picker {
+	> .ant-calendar-picker-input {
+		height: 50px;
+		font-size: 16px;
+		> .ant-calendar-range-picker-separator {
+			display: inline-block;
+			padding-top: 8px;
+		}
+	}
+}
