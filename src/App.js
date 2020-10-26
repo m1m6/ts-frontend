@@ -32,11 +32,10 @@ const App = () => {
         setUserDataAsync();
     }
 
-    console.log('data', data);
     const isNew = data && data.me ? data.me.isNew : false;
     if (token) {
         return (
-            <Layout style={{ marginLeft: isNew ? '323px' : '270px', backgroundColor: 'rgba(247, 250, 252, 0.5)' }}>
+            <Layout style={{ marginLeft: isNew ? '323px' : '205px', backgroundColor: 'rgba(247, 250, 252, 0.5)' }}>
                 <Sidebar userRole={userRole} />
                 <Content className="app-page-wrapper" id="app-page-wrapper-id">
                     <Routes userRole={userRole} isNew={isNew} />

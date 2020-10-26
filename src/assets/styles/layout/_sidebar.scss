@@ -5,6 +5,40 @@
 	left: 0;
 	background-color: #ffffff;
 	border: solid 1px rgba(227, 232, 238, 0.74);;
+	z-index: 1;
+	
+	.menu-wrapper {
+		width: 100%;
+		.menu-item {
+			border-radius: 2px;
+			height: 72px;
+	
+			> a {
+				font-family: 'Open Sans';
+				font-size: 16px;
+				color: $dark-indigo;
+				padding-left: 54px;
+				padding-top: 25px;
+				display: inline-block;
+
+				&:hover{
+					color: $periwinkle-two;
+					font-size: 16px;
+					font-weight: bold;
+				}
+			}
+
+			&:hover{ 
+				  background-color: #f9f6ff;
+			}
+		}
+
+		.bottom-items{
+			position: absolute;
+			bottom: 30px;
+			width: 100%;
+		}
+	}
 
     .header-logo{
         margin-left: 37px;
@@ -15,6 +49,7 @@
 			fill: rgb(10,37,64);
 		}
 	}
+
 
 	.onboarding-wrapper{
 		margin-left: 48px;
@@ -118,3 +153,4 @@
     height: 100%;
     border-left: 1px dashed rgba(10, 37, 64, 0.08);
 }
+

@@ -10,8 +10,11 @@
 
 @import "./layout/layout";
 @import "./layout/sidebar";
+@import "./layout/popup";
 
 @import "./translateStack/onboarding";
+@import "./translateStack/projects";
+@import "./translateStack/setupPopup";
 
 body,
 #root {

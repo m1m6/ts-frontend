@@ -1,27 +1,9 @@
-.onboarding-step-wrapper{
-    margin-top: 226px;
-    margin-left: 120px;
+.setup-popup-wrapper {
+    margin-left: 11.9vw;
+    margin-right: 11.9vw;
+    margin-top: 38px;
 
-    &.last {
-        margin-top: 84px;
-        a.btn-link {
-            opacity: 0.4;
-            font-family: 'Open Sans';
-            font-size: 14px;
-            line-height: 3.36;
-            color: $dark-indigo;
-            margin-left: 23px;
-        }
-    }
-
-    .onboarding-step-count {
-        font-family: 'Open Sans';
-        font-size: 16px;
-        font-weight: bold;
-        color: $periwinkle-two;
-    }
-
-    .onboarding-step-title{
+    .setup-p-title {
         font-family: 'Open Sans';
         font-size: 20px;
         font-weight: bold;
@@ -29,26 +11,21 @@
         color: $dark-indigo;
     }
 
-    .onboarding-step-description {
+    .setup-p-description {
         font-family: 'Open Sans';
         font-size: 14px;
         color: $dark-indigo;
-        width: 22.5vw;
-
-        &.last {
-            width: 39.5vw;
-        }
+        margin-bottom: 31px;
     }
 
-    .onboarding-step-code-wrapper{ 
+    .setup-p-code{
         width: 100%;
         margin-top: 39px;
-        margin-bottom: 30px;
+        margin-bottom: 27px;
 
-        .onboarding-step-code{
+        .setup-code{
             background-color: $dark-indigo-two;
             border-radius: 3px;
-            margin-right: 180px;
             font-size: 14px;
             color: $white;
 
@@ -94,6 +71,22 @@
             }
         }
     }
-    
-}
 
+    .setup-p-d-w {
+        .setup-p-d-t {
+            font-family: 'Open Sans';
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 2.35;
+            color: $dark-indigo;
+            margin-bottom: 5px;
+        }
+
+        .setup-p-d-d {
+            font-family: 'Open Sans';
+            font-size: 14px;
+            color: $dark-indigo;
+            margin-bottom: 27px;
+        }
+    }
+}

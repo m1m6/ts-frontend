@@ -12,6 +12,7 @@ import { auth } from './signupLogin/auth';
 import UserProfile from './userProfile/profile/components/UserProfile';
 import ResetPassword from './signupLogin/resetPassword/components/ResetPassword';
 import Onboarding from './translateStack/onboarding/components/Onboarding';
+import Projects from './translateStack/projects/components/Projects';
 
 export const ROUTE_PATHS = {
     home: '/',
@@ -37,7 +38,7 @@ const Routes = ({ userRole, isNew }) => {
                 path={ROUTE_PATHS.home}
                 exact
                 component={(matchProps) => (
-                    <PageLayout Component={Home} {...matchProps} title="Home page" />
+                    <PageLayout Component={Projects} {...matchProps} title="Projects" />
                 )}
                 roles={[ROLES.ADMIN]}
                 userRole={userRole}
@@ -51,6 +52,7 @@ const Routes = ({ userRole, isNew }) => {
                 )}
                 roles={[ROLES.ADMIN]}
                 userRole={userRole}
+                isNew={isNew}
             />
             <Route
                 path={ROUTE_PATHS.auth.signup}

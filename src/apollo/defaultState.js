@@ -6,5 +6,9 @@ export default {
 		email: "",
 		role: "",
 		isNew: true
+	},
+	onboarding: {
+		__typename: "onboarding",
+		currentStep: 1
 	}
 };
