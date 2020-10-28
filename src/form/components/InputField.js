@@ -1,7 +1,8 @@
 import React from "react";
 import { useField, Field } from "formik";
-import { Input, Icon } from "antd";
+import { Input } from "antd";
 import classNames from "classnames";
+import Icon from "@ant-design/icons/lib/components/Icon";
 
 const InputField = ({ label, iconType, ...props }) => {
 	const [field, meta, helpers] = useField(props);

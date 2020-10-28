@@ -1,6 +1,21 @@
 import React from 'react';
 import { useLanugagesListQuery } from '../../rootUseQuery';
 
+/*
+
+de: "German"
+en: "English"
+es: "Spanish"
+fr: "French"
+hi: "Indian"
+it: "Italian"
+ja: "Japanese"
+ko: "Korean"
+pt: "Portuguese"
+tw: "Chinese Traditional"
+zh: "Chinese Simplified"
+
+*/
 export const getLanguagesList = () => {
     const { data, loading, error } = useLanugagesListQuery();
 
@@ -11,8 +26,6 @@ export const getLanguagesList = () => {
     if (loading) {
         return [];
     }
-
-    console.log('Data LanguagesList', data);
 
     const { languagesList } = data;
 

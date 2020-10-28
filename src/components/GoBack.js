@@ -1,6 +1,6 @@
 import React from 'react';
 
-const GoBack = ({ routerHistory }) => {
+const GoBack = ({ routerHistory, style }) => {
     return (
         <p
             style={{
@@ -10,6 +10,7 @@ const GoBack = ({ routerHistory }) => {
                 color: '#9966ff',
                 cursor: 'pointer',
                 marginBottom: '21px',
+                ...style,
             }}
             onClick={() => routerHistory.goBack()}
         >

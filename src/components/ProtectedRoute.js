@@ -6,7 +6,13 @@ const hasAccess = (roles, userRole) => {
     return roles.includes(userRole);
 };
 
-const ProtectedRoute = ({ component: Component, userRole, isNew, roles, ...rest }) => {
+const ProtectedRoute = ({
+    component: Component,
+    userRole,
+    isNew,
+    roles,
+    ...rest
+}) => {
     const token = auth.getAccessToken();
     const [isAuth, setIsAuth] = useState(false);
     let isAuthorizedToAccess;

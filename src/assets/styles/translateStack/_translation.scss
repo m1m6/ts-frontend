@@ -1,0 +1,134 @@
+.translation-page-wrapper{ 
+
+    .translation-page-header {
+        width: 100%;
+        height: 142px;
+        border: solid 1px $pale-grey-42;
+        background-color: $white;
+        padding-left: 62px;
+        padding-top: 18px;
+        display: flex;
+        width: 100%;
+
+        .ls {
+            width: calc(100% - 120px);
+            .translation-inner-title{
+                font-family: 'Open Sans';
+                font-size: 14px;
+                font-weight: bold;
+                line-height: 3.36;
+                color: $dark-indigo;
+                opacity: 0.24;
+            }
+
+            .translation-name{
+                font-family: 'Open Sans';
+                font-size: 30px;
+                font-weight: bold;
+                line-height: 1.57;
+                color: $dark-indigo;
+                float: left;
+                margin-top: -10px;
+            }
+        }
+
+        .rs {
+            margin-right: 67px;
+            margin-bottom: 56px;
+
+            > .wf-btn-primary {
+                width: 111px;
+                opacity: 1;
+            }
+        }
+    }
+
+    .translation-page-sub-header {
+        height: 103px;
+        border: solid 1px $pale-grey-42;
+        background-color: $white;
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+
+        .t-an-w {
+            .t-an-l {
+                opacity: 0.24;
+                font-family: 'Open Sans';
+                font-size: 14px;
+                font-weight: bold;
+                line-height: 3.36;
+                color: $dark-indigo;
+            }
+
+            .t-an-v {
+                font-family: 'Open Sans';
+                font-size: 26px;
+                font-weight: bold;
+                line-height: 1.81;
+                color: $dark-indigo;
+                margin-top: -10px;
+
+                &.last{
+                    color: $periwinkle-two;
+                }
+            }
+        }
+    }
+
+    .translation-page-table {
+        margin-left: 32px;
+        margin-top: 25px;
+        margin-right: 22px;
+        border: solid 1px $pale-grey-42;
+        background-color: $white;
+
+        .ant-table-wrapper{
+            border: solid 1px $pale-grey-42;
+            background-color: $white;
+
+            .ant-table .ant-table-tbody > tr:hover > td {
+                border-radius: 2px;
+                background-color: #f9f6ff;
+              }
+
+            th {
+                padding-left: 60px;
+                background: white;
+                border-bottom: unset;
+                opacity: 0.36;
+                font-family: 'Open Sans';
+                font-size: 12px;
+                font-weight: bold;
+                letter-spacing: 0.43px;
+                color: $dark-indigo;
+            }
+
+            th:nth-child(3) {
+                opacity: 1;
+                > span {
+                    width:40%;
+                    height: 34px;
+                }
+            }
+
+            .ant-table-placeholder{
+                border: unset;
+            }
+
+            .ant-table-row{
+                td {
+                    padding-left: 60px;
+                    font-family: 'Open Sans';
+                    font-size: 14px;
+                    font-weight: bold;
+                    color: $dark-indigo;
+                }
+
+                .light-cells { 
+                    opacity: 0.59;
+                }
+            }
+        }
+    }
+}

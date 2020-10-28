@@ -9,13 +9,13 @@ export const ONBOARDING_QUERY_CLIENT = gql`
 `;
 
 export const ONBOARDING_MUTATION = gql`
-	mutation onboarding($pageUrl: String!, $translationLanguages: [Int!]!) {
-		onboarding(pageUrl: $pageUrl, translationLanguages: $translationLanguages)
-	}
+    mutation onboarding($pageUrl: String!, $translationLanguages: [Int!]!) {
+        onboarding(pageUrl: $pageUrl, translationLanguages: $translationLanguages)
+    }
 `;
 
 export const UPDATE_USER_MUTATION = gql`
-	mutation updateUser($isNew: Boolean!) {
-		updateUser(isNew: $isNew)
-	}
+    mutation updateUser($isNew: Boolean, $skippedOnboarding: Boolean) {
+        updateUser(isNew: $isNew, skippedOnboarding: $skippedOnboarding)
+    }
 `;

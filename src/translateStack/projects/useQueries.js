@@ -1,4 +1,7 @@
-import { useQuery } from '@apollo/react-hooks';
+import { useLazyQuery, useQuery } from '@apollo/react-hooks';
 import { userPagesQuery } from './gql';
 
-export const useUserPagesQuery = () => useQuery(userPagesQuery);
+export const useUserPagesQuery = () =>
+    useQuery(userPagesQuery, {
+        fetchPolicy: 'network-only',
+    });

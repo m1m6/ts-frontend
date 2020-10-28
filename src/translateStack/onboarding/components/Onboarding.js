@@ -13,6 +13,7 @@ import { useOnboardingMutationClient } from '../useMutations';
 import { useOnboardingQueryClient } from '../useQueries';
 import { useOnboardingMutation, useUpdateUserMutation } from '../../../user/useMutations';
 import { Redirect } from 'react-router-dom';
+import { copyToClipboard } from '../../../utils/generalUtils';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -77,7 +78,6 @@ const CustomStyle = (selectedValues) => {
 
 const Step1 = ({ currentStep, onboardingMutation, selectedLanguages, setSelectedLanguages }) => {
     const changeHandler = (value) => {
-        console.log('changeHandler', value);
         setSelectedLanguages(value);
     };
 
@@ -165,6 +165,7 @@ const Step3 = ({
     selectedLanguages,
     hasError,
     setHasError,
+    routerHistory
 }) => {
     const [onboarding] = useOnboardingMutation();
     const [updateUser] = useUpdateUserMutation();
@@ -179,21 +180,18 @@ const Step3 = ({
             </div>
             <div className="onboarding-step-code-wrapper">
                 <div className="onboarding-step-code">
-                    <Button children="COPY" />
-                    <SyntaxHighlighter language="javascript" style={dark}>
+                    <Button children="COPY" onClick={(e) => copyToClipboard('code-snippet')} />
+                    <SyntaxHighlighter language="javascript" style={dark} id="code-snippet">
                         {`
-    const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc');
-
-    const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [{
-        price: 'price_1HKiSf2eZvKYlo2CxjF9qwbr',
-        quantity: 1,
-        }],
-        mode: 'subscription',
-        success_url: 'https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
-        cancel_url: 'https://example.com/cancel',
-    });`}
+    <script type="text/javascript">
+        var tsstack = function () {
+            var tss = document.createElement('script'); tss.type = 'text/javascript'; tss.async = true;
+            tss.src = 'http://localhost:5500/index.js?apiKey=d037c40228044607871b72909c2ccb74';
+            tss.id = "tss-script";
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(tss);
+        }
+        window.onload = tsstack
+    </script>`}
                     </SyntaxHighlighter>
                 </div>
             </div>
@@ -240,15 +238,15 @@ const Step3 = ({
                 <Link
                     label="SKIP FOR NOW"
                     onClick={async (e) => {
-                        await updateUser({ variables: { isNew: false } });
-                        window.location.assign('/');
+                        await updateUser({ variables: { skippedOnboarding: true } });
+                        routerHistory.push("/")
                     }}
                 />
             </div>
         </div>
     );
 };
-const Onboarding = ({ isNew }) => {
+const Onboarding = ({ isNew, routerHistory }) => {
     let [selectedLanguages, setSelectedLanguages] = useState([]);
     let [pageUrl, setPageUrl] = useState(undefined);
     let [isValidating, setIsValidating] = useState(undefined);
@@ -261,12 +259,11 @@ const Onboarding = ({ isNew }) => {
         return <Redirect to="/" />;
     }
     if (loading) {
-        return 'loading...';
+        return '';
     }
 
     let currentStep = data && data.onboarding ? data.onboarding.currentStep : 1;
 
-    console.log('Values', selectedLanguages, pageUrl);
     if (currentStep === 1) {
         return (
             <Step1
@@ -297,6 +294,7 @@ const Onboarding = ({ isNew }) => {
                 selectedLanguages={selectedLanguages}
                 hasError={hasError}
                 setHasError={setHasError}
+                routerHistory={routerHistory}
             />
         );
     }

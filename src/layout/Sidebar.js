@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
 import { Rings } from 'svg-loaders-react';
-import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
-import jsx from 'react-syntax-highlighter/dist/esm/languages/prism/jsx';
-import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Layout, Skeleton, Steps } from 'antd';
 import { ReactComponent as Logo } from '../assets/logo.svg';
 import { useMeQuery, useMeQueryClient } from '../rootUseQuery';
 import { useOnboardingQueryClient } from '../translateStack/onboarding/useQueries';
 import { Link } from 'react-router-dom';
-import Popup from '../components/Popup';
-import Button from '../form/components/Button';
-import InputField from '../form/components/InputField';
-import Input from '../form/components/Input';
-
-SyntaxHighlighter.registerLanguage('jsx', jsx);
+import { useOnboardingMutationClient } from '../translateStack/onboarding/useMutations';
+import { browserHistory } from '../browserHistory';
+import { useUpdateUserMutation } from '../user/useMutations';
 
 const { Sider } = Layout;
 const { Step } = Steps;
@@ -41,99 +35,59 @@ const OnboardingSteps = ({ currentStep }) => {
     );
 };
 
-const SetupPopup = () => {
-    return (
-        <div className="setup-popup-wrapper">
-            <div className="setup-p-title">Set up</div>
-            <div className="setup-p-description">
-                Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
-                Journals und Research Paper stützt. Verwende dafür fundierte Quellen und Online
-                Bibliotheken, die wir dir unten aufgeführt haben.
-            </div>
-            <div className="setup-p-code">
-                <div className="setup-code">
-                    <Button children="COPY" />
-                    <SyntaxHighlighter language="javascript" style={dark}>
-                        {`
-    const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc');
-
-    const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [{
-        price: 'price_1HKiSf2eZvKYlo2CxjF9qwbr',
-        quantity: 1,
-        }],
-        mode: 'subscription',
-        success_url: 'https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
-        cancel_url: 'https://example.com/cancel',
-    });`}
-                    </SyntaxHighlighter>
-                </div>
-            </div>
-            <div className="setup-p-d-w">
-                <div className="setup-p-d-t">Choose your domain</div>
-                <div className="setup-p-d-d">
-                    Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
-                    Journals und Research Paper stützt. Verwend
-                </div>
-                <div className="setup-p-d-i">
-                    <Input placeholder="https://yourwebsite.com"/>
-                </div>
-                <div className="setup-p-d-s">
-                    <Button className="wf-btn-primary" children="TEST SETUP" />
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const Sidebar = ({ routerHistory }) => {
+const Sidebar = (props) => {
     const [showPopup, setShowPopup] = useState(false);
+
     const { data, loading, error } = useMeQuery();
     const { data: onboardingData } = useOnboardingQueryClient();
+    const [updateUser] = useUpdateUserMutation();
+    const [updateOnboardingClient] = useOnboardingMutationClient();
 
     if (loading) {
         return <Skeleton active loading paragraph />;
     }
 
     const {
-        me: { isNew, pages },
+        me: { isNew, skippedOnboarding, pages },
     } = data;
 
     let currentStep =
         onboardingData && onboardingData.onboarding ? onboardingData.onboarding.currentStep : 1;
 
     return (
-        <Sider width={isNew ? 323 : 205} className="sidebar-wrapper">
+        <Sider width={isNew && !skippedOnboarding ? 323 : 205} className="sidebar-wrapper">
             <HeaderLogo />
-            {isNew && <OnboardingSteps currentStep={currentStep} />}
-            {!isNew && (
+            {isNew && !skippedOnboarding ? (
+                <OnboardingSteps currentStep={currentStep} />
+            ) : (
                 <div className="menu-wrapper">
                     <div className="menu-item">
-                        <Link to="/projects" title="Projects">
+                        <Link to="/" title="Projects">
                             Projects
                         </Link>
                     </div>
-                    {/* {!pages && !pages.length && ( */}
-                    <div className="menu-item">
-                        <Link
-                            title="Setup"
-                            onClick={(e) => {
-                                setShowPopup(true);
-                            }}
-                        >
-                            Setup
-                            <Rings
-                                style={{
-                                    width: '20px',
-                                    height: '20px',
-                                    stroke: '#9966ff',
-                                    verticalAlign: 'middle',
+                    {skippedOnboarding && isNew && (
+                        <div className="menu-item">
+                            <Link
+                                title="Setup"
+                                onClick={async (e) => {
+                                    await updateOnboardingClient({ variables: { currentStep: 1 } });
+                                    await updateUser({ variables: { skippedOnboarding: false } });
+                                    browserHistory.push('/onboarding');
                                 }}
-                            />
-                        </Link>
-                    </div>
-                    {/* )} */}
+                            >
+                                Setup
+                                <Rings
+                                    style={{
+                                        width: '20px',
+                                        height: '20px',
+                                        stroke: '#9966ff',
+                                        verticalAlign: 'middle',
+                                    }}
+                                />
+                            </Link>
+                        </div>
+                    )}
 
                     <div className="menu-item">
                         <Link to="/customizer" title="Customizer">
@@ -156,9 +110,7 @@ const Sidebar = ({ routerHistory }) => {
                 </div>
             )}
 
-            {showPopup && (
-                <Popup text="test" component={SetupPopup} closePopup={(e) => setShowPopup(false)} />
-            )}
+           
         </Sider>
     );
 };

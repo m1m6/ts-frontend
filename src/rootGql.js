@@ -8,6 +8,7 @@ export const ME_QUERY = gql`
             fullName
             role
             isNew
+            skippedOnboarding
             languages {
                 Languages {
                     id

@@ -1,10 +1,22 @@
-import { Table, Tag } from 'antd';
-import React from 'react';
+import { message, Skeleton, Table, Tag } from 'antd';
+import React, { useState } from 'react';
 import { Rings } from 'svg-loaders-react';
 import Button from '../../../form/components/Button';
 import { useUserPagesQuery } from '../useQueries';
 import { ReactComponent as CheckLogo } from '../../../assets/check.svg';
 import { useMeQuery } from '../../../rootUseQuery';
+import { useUpdateUserMutation } from '../../../user/useMutations';
+import { useOnboardingMutationClient } from '../../onboarding/useMutations';
+import { browserHistory } from '../../../browserHistory';
+import { copyToClipboard } from '../../../utils/generalUtils';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import jsx from 'react-syntax-highlighter/dist/esm/languages/prism/jsx';
+import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import Input from '../../../form/components/Input';
+import Popup from '../../../components/Popup';
+import { useAddSinglePageMutation } from '../useMutations';
+
+SyntaxHighlighter.registerLanguage('jsx', jsx);
 
 const columns = [
     {
@@ -39,6 +51,81 @@ const placeHolderRow = [
     },
 ];
 
+const SetupPopup = ({ setShowPopup }) => {
+    let [pageUrl, setPageUrl] = useState(undefined);
+    let [isSubmitting, setIsSubmitting] = useState(false);
+    const [useAddSinglePage] = useAddSinglePageMutation();
+    return (
+        <div className="setup-popup-wrapper">
+            <div className="setup-p-title">Set up</div>
+            <div className="setup-p-description">
+                Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
+                Journals und Research Paper stützt. Verwende dafür fundierte Quellen und Online
+                Bibliotheken, die wir dir unten aufgeführt haben.
+            </div>
+            <div className="setup-p-code">
+                <div className="setup-code">
+                    <Button children="COPY" onClick={(e) => copyToClipboard('code-snippet')} />
+                    <SyntaxHighlighter language="javascript" style={dark} id="code-snippet">
+                        {`
+    <script type="text/javascript">
+        var tsstack = function () {
+            var tss = document.createElement('script'); tss.type = 'text/javascript'; tss.async = true;
+            tss.src = 'http://localhost:5500/index.js?apiKey=d037c40228044607871b72909c2ccb74';
+            tss.id = "tss-script";
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(tss);
+        }
+        window.onload = tsstack
+    </script>`}
+                    </SyntaxHighlighter>
+                </div>
+            </div>
+            <div className="setup-p-d-w">
+                <div className="setup-p-d-t">Choose your page</div>
+                <div className="setup-p-d-d">
+                    Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
+                    Journals und Research Paper stützt. Verwend
+                </div>
+                <div className="setup-p-d-i">
+                    <Input
+                        placeholder="https://yourwebsite.com"
+                        value={pageUrl}
+                        onChange={(e) => {
+                            setPageUrl(e.target.value);
+                        }}
+                    />
+                </div>
+                <div className="setup-p-d-s">
+                    <Button
+                        className="wf-btn-primary"
+                        children="TEST SETUP"
+                        disabled={isSubmitting}
+                        onClick={async () => {
+                            setIsSubmitting(true);
+                            if (pageUrl && /^(http|https):\/\/[^ "]+$/.test(pageUrl)) {
+                                const results = await useAddSinglePage({
+                                    variables: { pageUrl },
+                                });
+
+                                if (results && results.data && results.data.addSinglePage) {
+                                    message.success('Page successfully added');
+                                    setShowPopup(false);
+                                } else {
+                                    message.warn('Unable to verify the page!');
+                                }
+                            } else {
+                                message.error('Please enter a valid page url');
+                            }
+
+                            setIsSubmitting(false);
+                        }}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const mapRows = (pages) => {
     let rows = [];
 
@@ -51,6 +138,7 @@ const mapRows = (pages) => {
             row.strings = page.strings.length;
             row.translated = `10%`;
             row.lastEdit = page.updatedAt;
+            row.pageId = page.id;
 
             rows.push(row);
         });
@@ -58,22 +146,26 @@ const mapRows = (pages) => {
     return rows;
 };
 
-const Projects = () => {
+const Projects = ({ routerHistory }) => {
+    const [showPopup, setShowPopup] = useState(false);
+
     const { data, loading, error } = useUserPagesQuery();
     const { data: userData, loading: userLoading, error: userError } = useMeQuery();
+    const [updateUser] = useUpdateUserMutation();
+    const [updateOnboardingClient] = useOnboardingMutationClient();
 
-    console.log('Projects', data);
-    let dataSource = [];
-    let hasFinishedSetup = false;
+    let dataSource = placeHolderRow;
 
-    if (loading) {
-        dataSource = placeHolderRow;
+    if (loading || userLoading) {
+        return '';
     } else {
-        if (data.userPages) {
+        if (data && data.userPages) {
             dataSource = mapRows(data.userPages);
-            hasFinishedSetup = true;
         }
     }
+
+    let hasFinishedSetup = userData && userData.me ? !userData.me.isNew : false;
+
     return (
         <div className="projects-page-wrapper">
             <div className="projects-page-header">
@@ -119,6 +211,15 @@ const Projects = () => {
                     <Button
                         className="wf-btn-primary"
                         children={hasFinishedSetup ? 'ADD PAGE' : 'START NOW'}
+                        onClick={async (e) => {
+                            if (hasFinishedSetup) {
+                                setShowPopup(true);
+                            } else {
+                                await updateOnboardingClient({ variables: { currentStep: 1 } });
+                                await updateUser({ variables: { skippedOnboarding: false } });
+                                browserHistory.push('/onboarding');
+                            }
+                        }}
                     />
                 </div>
             </div>
@@ -156,9 +257,29 @@ const Projects = () => {
                     <div className="p-an-v last">95%</div>
                 </div>
             </div>
+
             <div className="projects-page-table">
-                <Table columns={columns} dataSource={dataSource} pagination={false} />
+                <Table
+                    columns={columns}
+                    dataSource={dataSource}
+                    pagination={false}
+                    onRow={(row) => {
+                        return {
+                            onClick: () => routerHistory.push(`/translation/${row.pageId}`),
+                        };
+                    }}
+                />
             </div>
+
+            {showPopup && (
+                <Popup
+                    text="test"
+                    component={() => {
+                        return <SetupPopup setShowPopup={setShowPopup} />;
+                    }}
+                    closePopup={(e) => setShowPopup(false)}
+                />
+            )}
         </div>
     );
 };

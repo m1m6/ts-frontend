@@ -1,7 +1,7 @@
 import React from 'react';
 
-const PageLayout = ({ history, Component, title, isNew, ...rest }) => {
-    if (isNew) {
+const PageLayout = ({ history, Component, title, isNew, skippedOnboarding, ...rest }) => {
+    if (isNew && !skippedOnboarding) {
         return (
             <div className="onboarding-page-layout">
                 <Component routerHistory={history} isNew={isNew} {...rest} />

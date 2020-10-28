@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Col, Divider, Row, Icon, Button } from 'antd';
+import { Col, Divider, Row, Button } from 'antd';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { showAllGraphQLErrors } from '../../../helper/graphqlErrors';
@@ -7,6 +7,7 @@ import InputField from '../../../form/components/InputField';
 import { useChangePasswordMutation } from '../useMutations';
 import { auth } from '../../../signupLogin/auth';
 import { useMeQueryClient } from '../../../rootUseQuery';
+import Icon from '@ant-design/icons/lib/components/Icon';
 
 const formItemLayout = {
     labelCol: { lg: 5, xs: 8, sm: 8 },

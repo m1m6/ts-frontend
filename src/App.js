@@ -7,6 +7,8 @@ import { auth } from './signupLogin/auth';
 import { useMeQuery } from './rootUseQuery';
 import { Spin } from 'antd';
 import { useUserData } from './signupLogin/login/useUserDataMutations';
+import { useOnboardingMutationClient } from './translateStack/onboarding/useMutations';
+import { useOnboardingQueryClient } from './translateStack/onboarding/useQueries';
 
 const token = auth.getAccessToken();
 
@@ -33,12 +35,19 @@ const App = () => {
     }
 
     const isNew = data && data.me ? data.me.isNew : false;
+    const skippedOnboarding = data && data.me ? data.me.skippedOnboarding: false;
+
     if (token) {
         return (
-            <Layout style={{ marginLeft: isNew ? '323px' : '205px', backgroundColor: 'rgba(247, 250, 252, 0.5)' }}>
+            <Layout
+                style={{
+                    marginLeft: isNew && !skippedOnboarding ? '323px' : '205px',
+                    backgroundColor: 'rgba(247, 250, 252, 0.5)',
+                }}
+            >
                 <Sidebar userRole={userRole} />
                 <Content className="app-page-wrapper" id="app-page-wrapper-id">
-                    <Routes userRole={userRole} isNew={isNew} />
+                    <Routes userRole={userRole} isNew={isNew} skippedOnboarding={skippedOnboarding} />
                 </Content>
             </Layout>
         );

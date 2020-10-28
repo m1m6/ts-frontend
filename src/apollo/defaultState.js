@@ -9,6 +9,7 @@ export default {
 	},
 	onboarding: {
 		__typename: "onboarding",
-		currentStep: 1
+		currentStep: 1,
+		// skippedSetup: false	
 	}
 };

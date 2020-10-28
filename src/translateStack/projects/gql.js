@@ -24,3 +24,9 @@ export const userPagesQuery = gql`
         }
     }
 `;
+
+export const ADD_SINGLE_PAGE = gql`
+    mutation addSinglePage($pageUrl: String!) {
+        addSinglePage(pageUrl: $pageUrl)
+    }
+`;

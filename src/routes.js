@@ -13,12 +13,14 @@ import UserProfile from './userProfile/profile/components/UserProfile';
 import ResetPassword from './signupLogin/resetPassword/components/ResetPassword';
 import Onboarding from './translateStack/onboarding/components/Onboarding';
 import Projects from './translateStack/projects/components/Projects';
+import Translation from './translateStack/translation/components/Translation';
 
 export const ROUTE_PATHS = {
     home: '/',
     notFound: '*',
     app: {
         onboarding: '/onboarding',
+        translation: '/translation/:pageId',
     },
     auth: {
         me: '/me', // TODO add
@@ -31,7 +33,7 @@ export const ROUTE_PATHS = {
     },
 };
 
-const Routes = ({ userRole, isNew }) => {
+const Routes = ({ userRole, isNew, skippedOnboarding }) => {
     return (
         <Switch>
             <ProtectedRoute
@@ -48,12 +50,30 @@ const Routes = ({ userRole, isNew }) => {
                 path={ROUTE_PATHS.app.onboarding}
                 exact
                 component={(matchProps) => (
-                    <PageLayout Component={Onboarding} {...matchProps} title="" isNew={isNew} />
+                    <PageLayout
+                        Component={Onboarding}
+                        {...matchProps}
+                        title=""
+                        isNew={isNew}
+                        skippedOnboarding={skippedOnboarding}
+                    />
                 )}
                 roles={[ROLES.ADMIN]}
                 userRole={userRole}
                 isNew={isNew}
+                skippedOnboarding={skippedOnboarding}
             />
+
+            <ProtectedRoute
+                path={ROUTE_PATHS.app.translation}
+                exact
+                component={(matchProps) => (
+                    <PageLayout Component={Translation} {...matchProps} title="" />
+                )}
+                roles={[ROLES.ADMIN]}
+                userRole={userRole}
+            />
+
             <Route
                 path={ROUTE_PATHS.auth.signup}
                 exact
