@@ -12,10 +12,17 @@ export const getPageQuery = gql`
                 updatedAt
                 translations {
                     id
+                    languagesId
                     translatedString
                     updatedAt
                 }
             }
         }
+    }
+`;
+
+export const PUBLISH_TRANSLATIONS_MUTATION = gql`
+    mutation addTranslations($input: [TranslationInput!]!) {
+        addTranslations(input: $input)
     }
 `;

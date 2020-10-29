@@ -63,7 +63,6 @@ const ResetPassword = ({ routerHistory }) => {
                                 name="email"
                                 type="text"
                                 label="Email"
-                                placeholder="email@youremail.com"
                             />
                         </Row>
                         <Row>

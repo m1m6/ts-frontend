@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { useOnboardingMutationClient } from '../translateStack/onboarding/useMutations';
 import { browserHistory } from '../browserHistory';
 import { useUpdateUserMutation } from '../user/useMutations';
+import { auth } from '../signupLogin/auth';
 
 const { Sider } = Layout;
 const { Step } = Steps;
@@ -36,15 +37,13 @@ const OnboardingSteps = ({ currentStep }) => {
 };
 
 const Sidebar = (props) => {
-    const [showPopup, setShowPopup] = useState(false);
-
     const { data, loading, error } = useMeQuery();
     const { data: onboardingData } = useOnboardingQueryClient();
     const [updateUser] = useUpdateUserMutation();
     const [updateOnboardingClient] = useOnboardingMutationClient();
 
     if (loading) {
-        return <Skeleton active loading paragraph />;
+        return <></>;
     }
 
     const {
@@ -102,15 +101,21 @@ const Sidebar = (props) => {
                             </Link>
                         </div>
                         <div className="menu-item">
-                            <Link to="/logout" title="Log out">
+                            <Link
+                                to="#"
+                                title="Log out"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    auth.removeAccessToken();
+                                    window.location.reload();
+                                }}
+                            >
                                 Log out
                             </Link>
                         </div>
                     </div>
                 </div>
             )}
-
-           
         </Sider>
     );
 };

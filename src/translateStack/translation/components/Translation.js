@@ -1,58 +1,56 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { Table, Input, Button, Popconfirm, Form } from 'antd';
+import { Table, Input, Form, message } from 'antd';
 import GoBack from '../../../components/GoBack';
 import { useGetPageQuery } from '../useQueries';
 import Select from 'react-select';
 import { useMeQuery } from '../../../rootUseQuery';
+import Button from '../../../form/components/Button';
+import { getStringTranslation } from '../utils';
+import { usePublishStringsMutation } from '../useMutations';
 
 const EditableContext = React.createContext();
 
 const CustomStyle = () => {
     return {
-        // option: (base, data) => {
-        //     return { ...base };
-        // },
-        // menu: (provided, state) => ({
-        //     ...provided,
-        //     width: state.selectProps.width,
-        //     borderBottom: '1px dotted pink',
-        //     color: state.selectProps.menuColor,
-        //     padding: 20,
-        // }),
+        option: (base, data) => {
+            return {
+                ...base,
+                backgroundColor: '#e8eaef',
+                color: '#0a2540',
+                fontSize: '12px',
+                letterSpacing: '0.43px',
+                fontWeight: 'bold',
+                '&:active': { backgroundColor: 'rgba(227, 232, 238, 0.42)' },
+            };
+        },
         container: (base, { selectProps: { width, height } }) => ({
             ...base,
             width: '40%',
-            // marginTop: '33px',
-            // minHeight: '83px',
-            // height: '83px',
         }),
         control: (base, state) => ({
             ...base,
             border: 'solid 1px rgba(227, 232, 238, 0.42)',
             borderRadius: '2px',
+            boxShadow: 'none',
+            '&:hover': { borderColor: '#a172ff' },
         }),
-        // indicatorSeparator: (base, state) => ({
-        //     ...base,
-        //     display: 'none',
-        // }),
-        // multiValue: (base, state) => ({
-        //     ...base,
-        //     height: '47px',
-        //     borderRadius: '3px',
-        //     border: 'solid 1px rgba(227, 232, 238, 0.42)',
-        //     backgroundColor: 'rgba(227, 232, 238, 0.42)',
-        //     paddingLeft: '13px',
-        //     paddingTop: '10px',
-        //     paddingBottom: '8px',
-        // }),
+        singleValue: (base, state) => ({
+            ...base,
+            opacity: '0.29',
+            fontFamily: 'Open Sans',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            letterSpacing: '0.43px',
+        }),
     };
 };
 
 const EditableRow = ({ index, ...props }) => {
     const [form] = Form.useForm();
+
     return (
         <Form form={form} component={false}>
-            <EditableContext.Provider value={form} >
+            <EditableContext.Provider value={form}>
                 <tr {...props} />
             </EditableContext.Provider>
         </Form>
@@ -69,6 +67,7 @@ const EditableCell = ({
     ...restProps
 }) => {
     const [editing, setEditing] = useState(false);
+
     const inputRef = useRef();
     const form = useContext(EditableContext);
     useEffect(() => {
@@ -105,12 +104,40 @@ const EditableCell = ({
                 name={dataIndex}
                 rules={[
                     {
-                        required: true,
-                        message: `${title} is required.`,
+                        validator: (_, value) => {
+                            let tbodyWrapper = document.getElementsByClassName('ant-table-tbody');
+
+                            if (value) {
+                                if (tbodyWrapper) {
+                                    if (tbodyWrapper[0]) {
+                                        tbodyWrapper[0].children[
+                                            record.key
+                                        ].children[0].style.borderLeft = 'none';
+                                    }
+                                }
+                                return Promise.resolve();
+                            } else {
+                                if (tbodyWrapper) {
+                                    if (tbodyWrapper[0]) {
+                                        tbodyWrapper[0].children[
+                                            record.key
+                                        ].children[0].style.borderLeft = '2px solid red';
+                                    }
+                                }
+                                return Promise.reject();
+                            }
+                        },
                     },
                 ]}
             >
-                <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+                <Input.TextArea
+                    cols="10"
+                    rows="3"
+                    ref={inputRef}
+                    onPressEnter={save}
+                    onBlur={save}
+                    className="translated-string-input"
+                />
             </Form.Item>
         ) : (
             <div
@@ -124,7 +151,6 @@ const EditableCell = ({
             </div>
         );
     }
-
     return <td {...restProps}>{childNode}</td>;
 };
 
@@ -149,7 +175,7 @@ const mapLanguages = (languagesList) => {
     }));
 };
 
-const columns = (userLanguages) => {
+const columns = (userLanguages, setSelectedLanguageId) => {
     const mappedLanguages = mapLanguages(userLanguages);
 
     return [
@@ -158,15 +184,15 @@ const columns = (userLanguages) => {
             dataIndex: 'id',
             key: 'id',
             width: '5%',
-            className: "light-cells"
+            className: 'light-cells',
+            shouldCellUpdate: () => true,
         },
         {
             title: 'ORIGINAL',
             dataIndex: 'original',
             key: 'original',
             width: '20%',
-            className: "light-cells"
-
+            className: 'light-cells',
         },
         {
             title: () => (
@@ -174,6 +200,7 @@ const columns = (userLanguages) => {
                     <Select
                         options={mappedLanguages}
                         defaultValue={mappedLanguages[0]}
+                        onChange={(e) => setSelectedLanguageId(e.value)}
                         styles={CustomStyle()}
                         isSearchable={false}
                     />
@@ -189,36 +216,30 @@ const columns = (userLanguages) => {
             dataIndex: 'lastEdit',
             key: 'lastEdit',
             width: '15%',
-            className: "light-cells"
-
+            className: 'light-cells',
         },
     ];
 };
 
-const placeHolderRow = [
-    {
-        key: '1',
-        id: '1',
-        original: 'n. a.',
-        translated: 'n. a.',
-        lastEdit: 'n. a.',
-    },
-];
-
-const mapRows = (strings) => {
+const mapRows = (strings, selectedLanguageId) => {
     let rows = [];
 
     if (strings && strings.length) {
         strings.forEach((string, i) => {
             let row = {};
 
+            const { translatedStringValue, updatedAtValue } = getStringTranslation(
+                string,
+                selectedLanguageId
+            );
+
             row.key = i;
             row.id = string.id;
             row.original = string.original;
-            row.translated = `10%`;
-            row.lastEdit = string.updatedAt;
+            row.translated = translatedStringValue;
+            row.lastEdit = updatedAtValue;
             row.stringId = string.id;
-
+            row.selectedLanguageId = selectedLanguageId;
             rows.push(row);
         });
     }
@@ -226,8 +247,6 @@ const mapRows = (strings) => {
 };
 
 const Translation = (props) => {
-    let dataSource = placeHolderRow;
-
     let pageId;
     if (props.match && props.match.params) {
         pageId = parseInt(props.match.params.pageId);
@@ -235,8 +254,9 @@ const Translation = (props) => {
 
     const { data, loading, error } = useGetPageQuery(pageId);
     const { data: meData, loading: meLoading } = useMeQuery();
+    const [publishTranslations] = usePublishStringsMutation();
 
-    console.log('Translation', data, error, loading);
+    let [rowsData, setRowsData] = useState([]);
 
     if (loading || meLoading) {
         return <></>;
@@ -245,31 +265,6 @@ const Translation = (props) => {
     const pageData = data.getPage;
     const userLanguages = meData && meData.me ? meData.me.languages : [];
 
-    dataSource = mapRows(pageData.strings);
-
-    const components = {
-        body: {
-            row: EditableRow,
-            cell: EditableCell,
-        },
-    };
-
-    const finalColumns = columns(userLanguages).map((col) => {
-        if (!col.editable) {
-            return col;
-        }
-
-        return {
-            ...col,
-            onCell: (record) => ({
-                record,
-                editable: col.editable,
-                dataIndex: col.dataIndex,
-                title: col.title,
-                handleSave: () => console.log('editted'),
-            }),
-        };
-    });
     return (
         <div className="translation-page-wrapper">
             <div className="translation-page-header">
@@ -282,6 +277,35 @@ const Translation = (props) => {
                         </span>
                         <span>{pageData.pageUrl.substring(pageData.pageUrl.indexOf('/'))}</span>
                     </div>
+                </div>
+                <div className="rs">
+                    <Button
+                        className="wf-btn-primary"
+                        children={'Publish Changes'}
+                        onClick={async (e) => {
+                            // get all updated strings only
+                            const updatedRows = rowsData
+                                .filter((row) => row.isUpdated)
+                                .map(({ translated, stringId, selectedLanguageId }) => {
+                                    return { translated, stringId, selectedLanguageId };
+                                });
+
+                            console.log('updatedRows', updatedRows);
+
+                            if (updatedRows) {
+                                const results = await publishTranslations({
+                                    variables: { input: updatedRows },
+                                });
+                                if (results && results.data && results.data.addTranslations) {
+                                    message.success('Translations saved successfully!');
+                                } else {
+                                    message.success(
+                                        "Unable to save the translations, we've received the error, and we're working on it."
+                                    );
+                                }
+                            }
+                        }}
+                    />
                 </div>
             </div>
             <div className="translation-page-sub-header">
@@ -307,15 +331,74 @@ const Translation = (props) => {
             </div>
 
             <div className="translation-page-table">
-                <Table
-                    columns={finalColumns}
-                    dataSource={dataSource}
-                    pagination={false}
-                    components={components}
+                <TableWrapper
+                    strings={data.getPage ? data.getPage.strings : placeHolderRow}
+                    userLanguages={userLanguages}
+                    setRowsData={setRowsData}
                 />
             </div>
         </div>
     );
 };
 
+const placeHolderRow = [
+    {
+        key: '1',
+        id: '1',
+        original: 'n. a.',
+        translated: 'n. a.',
+        lastEdit: 'n. a.',
+    },
+];
+
+const TableWrapper = ({ strings, userLanguages, setRowsData }) => {
+    let [selectedLanguageId, setSelectedLanguageId] = useState(userLanguages[0].Languages.id);
+    let [rows, setRows] = useState(mapRows(strings, selectedLanguageId));
+
+    useEffect(() => {
+        setRowsData(rows);
+    });
+
+    const handleSave = (row) => {
+        const newData = [...rows];
+        const index = newData.findIndex((item) => row.key === item.key);
+        const item = newData[index];
+        newData.splice(index, 1, { ...item, ...row, isUpdated: true });
+        setRows(newData);
+    };
+
+    const finalColumns = columns(userLanguages, setSelectedLanguageId).map((col) => {
+        if (!col.editable) {
+            return col;
+        }
+
+        return {
+            ...col,
+            onCell: (record) => ({
+                record,
+                editable: col.editable,
+                dataIndex: col.dataIndex,
+                title: col.title,
+                handleSave: handleSave,
+            }),
+        };
+    });
+
+    const components = {
+        body: {
+            row: EditableRow,
+            cell: EditableCell,
+        },
+    };
+
+    return (
+        <Table
+            id="translations-table"
+            columns={finalColumns}
+            dataSource={rows}
+            pagination={false}
+            components={components}
+        />
+    );
+};
 export default Translation;

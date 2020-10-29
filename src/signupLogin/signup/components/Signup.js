@@ -38,10 +38,15 @@ const Signup = ({ routerHistory, role }) => {
                 onSubmit={async (values, { setSubmitting }) => {
                     try {
                         const result = await signup({
-                            variables: { ...values },
+                            variables: {
+                                fullName: values.fullName,
+                                email: values.email,
+                                password: values.password,
+                            },
                         });
                         if (result) {
-                            window.location.assign(ROUTE_PATHS.app.onboarding);
+                            auth.setAccessToken(result.data.signup.token);
+                            window.location.assign(ROUTE_PATHS.app.onboarding)
                         }
                     } catch (error) {
                         setSubmitting(false);

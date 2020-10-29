@@ -53,7 +53,6 @@ const Login = ({ routerHistory }) => {
                                 name="email"
                                 type="text"
                                 label="Email"
-                                placeholder="email@youremail.com"
                             />
                         </Row>
                         <Row className="auth-row">
@@ -61,7 +60,6 @@ const Login = ({ routerHistory }) => {
                                 name="password"
                                 type="password"
                                 label="Password"
-                                placeholder="***********"
                             />
                         </Row>
                         <Row className="forgot-pwd-link">

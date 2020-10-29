@@ -1,5 +1,8 @@
 .input-field-wrapper {
-	.ant-input {
+
+	.ant-input-affix-wrapper {
+		width: 23.4vw;
+
 		border-radius: 0 !important;
 		border: solid 1px #e3e8ee;
 		background-color: #ffffff;
@@ -8,6 +11,15 @@
 		font-weight: 500;
 		color: $black;
 		height: 65px;
+		padding: unset;
+		
+		.ant-input-prefix {
+			margin-right: 0px;
+		}
+
+		input.ant-input {
+			padding-left: 10px;
+		}
 	}
 
 	.form-label {
@@ -25,9 +37,9 @@
 	}
 
 	.required {
-		> input {
+		// > input {
 			border: 1px solid red;
-		}
+		// }
 	}
 }
 

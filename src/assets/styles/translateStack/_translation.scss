@@ -37,7 +37,12 @@
             margin-bottom: 56px;
 
             > .wf-btn-primary {
-                width: 111px;
+                font-family: 'Open Sans';
+                font-size: 14px;
+                font-weight: bold;
+                line-height: 3.36;
+                color: $white;
+                width: 152px;
                 opacity: 1;
             }
         }
@@ -123,6 +128,7 @@
                     font-size: 14px;
                     font-weight: bold;
                     color: $dark-indigo;
+                    word-break: break-all;
                 }
 
                 .light-cells { 
@@ -130,5 +136,84 @@
                 }
             }
         }
+    }
+}
+
+.ant-form-item-explain, .ant-form-item-explain-error{
+    display: none
+}
+
+
+
+
+
+.ant-form-item { 
+
+    &.ant-form-item-has-error { 
+        border-radius: 2px;
+        border: solid 1px #ff7166;
+        background-color: rgba(255, 113, 102, 0.06);
+
+        .ant-input {
+            border-radius: 2px;
+            border: solid 1px #ff7166;
+            background-color: rgba(255, 113, 102, 0.06);
+            &:focus {
+                outline: none;
+                outline-color: none;
+                border: none;
+            }
+        }
+    }
+
+    &.ant-form-item-has-success {
+        border-radius: 2px;
+        border: solid 1px $periwinkle-two;
+        background-color: rgba(153, 102, 255, 0.13);
+
+        .ant-input { 
+            border-radius: 2px;
+            border: solid 1px $periwinkle-two;
+            background-color: rgba(153, 102, 255, 0.13);
+            &:focus {
+                outline: none;
+                outline-color: none;
+                border: none;
+            }
+        }
+
+        &:focus {
+            outline: none;
+            outline-color: none;
+            border: none;
+        }
+    }
+
+
+}
+
+#translated { 
+   .ant-input-focused{ 
+    border-radius: 2px;
+
+        border: solid 1px $pale-grey-42;
+        outline: 0;
+        box-shadow: none;
+    }
+
+    &.ant-input-focused{ 
+        border-radius: 2px;
+
+        border: solid 1px $pale-grey-42;
+        outline: 0;
+        box-shadow: none;
+    }
+
+    &:focus{ 
+        border-radius: 2px;
+
+        border: solid 1px $pale-grey-42;
+        outline: 0;
+        box-shadow: none;
     }
 }
