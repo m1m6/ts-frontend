@@ -38,7 +38,7 @@ export const ME_QUERY_CLIENT = gql`
 
 export const LANGUAGES_LIST_QUERY = gql`
     query MeQuery {
-        languagesList {
+        languagesList @client {
             id
             abbreviation
             language
@@ -47,3 +47,4 @@ export const LANGUAGES_LIST_QUERY = gql`
         }
     }
 `;
+

@@ -5,7 +5,7 @@ import { useGetPageQuery } from '../useQueries';
 import Select from 'react-select';
 import { useMeQuery } from '../../../rootUseQuery';
 import Button from '../../../form/components/Button';
-import { getStringTranslation } from '../utils';
+import { getStringTranslation, mapLanguages } from '../utils';
 import { usePublishStringsMutation } from '../useMutations';
 
 const EditableContext = React.createContext();
@@ -154,27 +154,6 @@ const EditableCell = ({
     return <td {...restProps}>{childNode}</td>;
 };
 
-const mapLanguages = (languagesList) => {
-    return languagesList.map(({ Languages }) => ({
-        label: (
-            <div
-                style={{
-                    fontSize: '14px',
-                    color: '#0a2540',
-                    marginRight: '25px',
-                }}
-            >
-                <img
-                    src={Languages.flag}
-                    style={{ width: '23px', height: '23px', borderRadius: '50px' }}
-                />
-                <span style={{ marginLeft: '13px' }}>{Languages.language}</span>
-            </div>
-        ),
-        value: Languages.id,
-    }));
-};
-
 const columns = (userLanguages, setSelectedLanguageId) => {
     const mappedLanguages = mapLanguages(userLanguages);
 
@@ -285,21 +264,19 @@ const Translation = (props) => {
                         onClick={async (e) => {
                             // get all updated strings only
                             const updatedRows = rowsData
-                                .filter((row) => row.isUpdated)
+                                .filter((row) => row.isUpdated && row.translated !== 'n.a.')
                                 .map(({ translated, stringId, selectedLanguageId }) => {
                                     return { translated, stringId, selectedLanguageId };
                                 });
 
-                            console.log('updatedRows', updatedRows);
-
-                            if (updatedRows) {
+                            if (updatedRows && updatedRows.length > 0) {
                                 const results = await publishTranslations({
                                     variables: { input: updatedRows },
                                 });
                                 if (results && results.data && results.data.addTranslations) {
                                     message.success('Translations saved successfully!');
                                 } else {
-                                    message.success(
+                                    message.error(
                                         "Unable to save the translations, we've received the error, and we're working on it."
                                     );
                                 }

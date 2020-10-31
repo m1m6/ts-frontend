@@ -1,21 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Rings } from 'svg-loaders-react';
-import { Layout, Skeleton, Steps } from 'antd';
+import { Layout, Steps } from 'antd';
 import { ReactComponent as Logo } from '../assets/logo.svg';
-import { useMeQuery, useMeQueryClient } from '../rootUseQuery';
+import { useMeQuery } from '../rootUseQuery';
 import { useOnboardingQueryClient } from '../translateStack/onboarding/useQueries';
 import { Link } from 'react-router-dom';
 import { useOnboardingMutationClient } from '../translateStack/onboarding/useMutations';
 import { browserHistory } from '../browserHistory';
 import { useUpdateUserMutation } from '../user/useMutations';
 import { auth } from '../signupLogin/auth';
+import { useCustomizerMutationClient } from '../translateStack/customizer/useMutations';
+import GoBack from '../components/GoBack';
+import { ReactComponent as RightArrow } from '../assets/right-arrow-angle.svg';
+import CustomizerSidebar from './CustomizerSidebar';
 
 const { Sider } = Layout;
 const { Step } = Steps;
 
 const HeaderLogo = () => {
     return (
-        <div className="header-logo pointer" onClick={() => window.location.assign('/')}>
+        <div className="header-logo pointer" onClick={() => browserHistory.push("/")}>
             <Logo className="onboarding-header" fill="#ccc" />
         </div>
     );
@@ -36,11 +40,13 @@ const OnboardingSteps = ({ currentStep }) => {
     );
 };
 
-const Sidebar = (props) => {
+
+const Sidebar = ({ isOpenCustomizer }) => {
     const { data, loading, error } = useMeQuery();
     const { data: onboardingData } = useOnboardingQueryClient();
     const [updateUser] = useUpdateUserMutation();
     const [updateOnboardingClient] = useOnboardingMutationClient();
+    const [updateCustomizerClient] = useCustomizerMutationClient();
 
     if (loading) {
         return <></>;
@@ -54,10 +60,15 @@ const Sidebar = (props) => {
         onboardingData && onboardingData.onboarding ? onboardingData.onboarding.currentStep : 1;
 
     return (
-        <Sider width={isNew && !skippedOnboarding ? 323 : 205} className="sidebar-wrapper">
+        <Sider
+            width={(isNew && !skippedOnboarding) || isOpenCustomizer ? 323 : 205}
+            className="sidebar-wrapper"
+        >
             <HeaderLogo />
             {isNew && !skippedOnboarding ? (
                 <OnboardingSteps currentStep={currentStep} />
+            ) : isOpenCustomizer ? (
+                <CustomizerSidebar />
             ) : (
                 <div className="menu-wrapper">
                     <div className="menu-item">
@@ -89,7 +100,15 @@ const Sidebar = (props) => {
                     )}
 
                     <div className="menu-item">
-                        <Link to="/customizer" title="Customizer">
+                        <Link
+                            to="#"
+                            title="Customizer"
+                            onClick={async (e) => {
+                                e.preventDefault();
+                                await updateCustomizerClient({ variables: { isOpen: true } });
+                                browserHistory.push('/customizer');
+                            }}
+                        >
                             Customizer
                         </Link>
                     </div>

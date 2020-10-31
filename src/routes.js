@@ -14,6 +14,7 @@ import ResetPassword from './signupLogin/resetPassword/components/ResetPassword'
 import Onboarding from './translateStack/onboarding/components/Onboarding';
 import Projects from './translateStack/projects/components/Projects';
 import Translation from './translateStack/translation/components/Translation';
+import Customizer from './translateStack/customizer/components/Customizer';
 
 export const ROUTE_PATHS = {
     home: '/',
@@ -21,6 +22,7 @@ export const ROUTE_PATHS = {
     app: {
         onboarding: '/onboarding',
         translation: '/translation/:pageId',
+        customizer: '/customizer',
     },
     auth: {
         me: '/me', // TODO add
@@ -33,14 +35,19 @@ export const ROUTE_PATHS = {
     },
 };
 
-const Routes = ({ userRole, isNew, skippedOnboarding }) => {
+const Routes = ({ userRole, isNew, skippedOnboarding, isOpenCustomizer }) => {
     return (
         <Switch>
             <ProtectedRoute
                 path={ROUTE_PATHS.home}
                 exact
                 component={(matchProps) => (
-                    <PageLayout Component={Projects} {...matchProps} title="Projects" />
+                    <PageLayout
+                        Component={Projects}
+                        {...matchProps}
+                        title="Projects"
+                        isOpenCustomizer={isOpenCustomizer}
+                    />
                 )}
                 roles={[ROLES.ADMIN]}
                 userRole={userRole}
@@ -56,6 +63,7 @@ const Routes = ({ userRole, isNew, skippedOnboarding }) => {
                         title=""
                         isNew={isNew}
                         skippedOnboarding={skippedOnboarding}
+                        isOpenCustomizer={isOpenCustomizer}
                     />
                 )}
                 roles={[ROLES.ADMIN]}
@@ -68,7 +76,27 @@ const Routes = ({ userRole, isNew, skippedOnboarding }) => {
                 path={ROUTE_PATHS.app.translation}
                 exact
                 component={(matchProps) => (
-                    <PageLayout Component={Translation} {...matchProps} title="" />
+                    <PageLayout
+                        Component={Translation}
+                        {...matchProps}
+                        title=""
+                        isOpenCustomizer={isOpenCustomizer}
+                    />
+                )}
+                roles={[ROLES.ADMIN]}
+                userRole={userRole}
+            />
+
+            <ProtectedRoute
+                path={ROUTE_PATHS.app.customizer}
+                exact
+                component={(matchProps) => (
+                    <PageLayout
+                        Component={Customizer}
+                        {...matchProps}
+                        title=""
+                        isOpenCustomizer={isOpenCustomizer}
+                    />
                 )}
                 roles={[ROLES.ADMIN]}
                 userRole={userRole}

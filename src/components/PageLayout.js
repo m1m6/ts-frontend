@@ -1,7 +1,21 @@
 import React from 'react';
 
-const PageLayout = ({ history, Component, title, isNew, skippedOnboarding, ...rest }) => {
-    if (isNew && !skippedOnboarding) {
+const PageLayout = ({
+    history,
+    Component,
+    title,
+    isNew,
+    skippedOnboarding,
+    isOpenCustomizer,
+    ...rest
+}) => {
+    if (isOpenCustomizer) {
+        return (
+            <div className="customizer-page-layout">
+                <Component routerHistory={history} isNew={isNew} {...rest} />
+            </div>
+        );
+    } else if (isNew && !skippedOnboarding) {
         return (
             <div className="onboarding-page-layout">
                 <Component routerHistory={history} isNew={isNew} {...rest} />

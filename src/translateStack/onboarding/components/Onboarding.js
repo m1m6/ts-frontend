@@ -34,7 +34,7 @@ const OnboardinButton = ({ disabled = false, label, ...props }) => {
     );
 };
 
-const CustomStyle = (selectedValues) => {
+const CustomStyle = () => {
     return {
         option: (base, data) => {
             return { ...base };
@@ -101,7 +101,7 @@ const Step1 = ({ currentStep, onboardingMutation, selectedLanguages, setSelected
                     onChange={changeHandler}
                     width="517px"
                     placeholder="Select languages"
-                    isClearable={true}
+                    isClearable={false}
                 />
             </div>
             <div>

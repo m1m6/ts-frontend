@@ -1,6 +1,6 @@
 import React from 'react';
 
-const GoBack = ({ routerHistory, style }) => {
+const GoBack = ({ onClickCB, routerHistory, style }) => {
     return (
         <p
             style={{
@@ -12,7 +12,13 @@ const GoBack = ({ routerHistory, style }) => {
                 marginBottom: '21px',
                 ...style,
             }}
-            onClick={() => routerHistory.goBack()}
+            onClick={() => {
+                if (onClickCB) {
+                    onClickCB();
+                } else {
+                    routerHistory.goBack();
+                }
+            }}
         >
             &lt; GO BACK
         </p>
