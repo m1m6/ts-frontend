@@ -16,7 +16,6 @@ export default (_, { currentStep }, { cache }) => {
             currentStep,
         },
     };
-    console.log('currentStep', data);
 
     apolloClient.writeData({
         query,

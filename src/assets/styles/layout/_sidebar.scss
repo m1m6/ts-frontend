@@ -219,6 +219,30 @@
 						}
 					}
 				}
+
+				.custom-position-input {
+					display: flex;
+					flex-direction: column;
+					margin-right: 60px;
+
+					.ts-input {
+						width: 100%;
+						font-size: 14px;
+						height: 56px;
+
+						&::placeholder {
+							font-size: 14px;
+						}
+					}
+
+					.hint {
+						opacity: 0.36;
+						font-family: 'Open Sans';
+						font-size: 14px;
+						color: $dark-indigo;
+						margin-top: 16px;
+					}
+				}
 			}
 			.customizer-menu-item {
 			

@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
-import { Radio } from 'antd';
+import { message, Radio } from 'antd';
 import { Link } from 'react-router-dom';
 import { browserHistory } from '../browserHistory';
 import GoBack from '../components/GoBack';
 import { ReactComponent as RightArrow } from '../assets/right-arrow-angle.svg';
-import { useCustomizerMutationClient } from '../translateStack/customizer/useMutations';
+import {
+    useCustomizerMutation,
+    useCustomizerMutationClient,
+} from '../translateStack/customizer/useMutations';
 import { useCustomizerQueryClient } from '../translateStack/customizer/useQueries';
 import Button from '../form/components/Button';
 import { useMeQuery } from '../rootUseQuery';
 import { mapLanguages } from '../translateStack/translation/utils';
 import Select from 'react-select';
+import Input from '../form/components/Input';
 
 const MainComponent = ({ setWhichInnerSidebar }) => {
+    const [updateCustomizerClient] = useCustomizerMutationClient();
+
     return (
         <>
             <div className="customizer-menu-title">Your settings and preferences</div>
@@ -19,8 +25,11 @@ const MainComponent = ({ setWhichInnerSidebar }) => {
                 <Link
                     to="#"
                     title="Projects"
-                    onClick={(e) => {
+                    onClick={async (e) => {
                         setWhichInnerSidebar(1);
+                        await updateCustomizerClient({
+                            variables: { shouldOpenTheSelectOptions: false },
+                        });
                     }}
                 >
                     Position
@@ -28,19 +37,46 @@ const MainComponent = ({ setWhichInnerSidebar }) => {
                 </Link>
             </div>
             <div className="customizer-menu-item">
-                <Link to="#" title="Projects" onClick={(e) => setWhichInnerSidebar(2)}>
+                <Link
+                    to="#"
+                    title="Projects"
+                    onClick={async (e) => {
+                        setWhichInnerSidebar(2);
+                        await updateCustomizerClient({
+                            variables: { shouldOpenTheSelectOptions: true },
+                        });
+                    }}
+                >
                     Languages
                     <RightArrow className="right-arrow" />
                 </Link>
             </div>
             <div className="customizer-menu-item">
-                <Link to="#" title="Projects" onClick={(e) => setWhichInnerSidebar(3)}>
+                <Link
+                    to="#"
+                    title="Projects"
+                    onClick={async (e) => {
+                        setWhichInnerSidebar(3);
+                        await updateCustomizerClient({
+                            variables: { shouldOpenTheSelectOptions: true },
+                        });
+                    }}
+                >
                     Appearance
                     <RightArrow className="right-arrow" />
                 </Link>
             </div>
             <div className="customizer-menu-item">
-                <Link to="#" title="Projects" onClick={(e) => setWhichInnerSidebar(4)}>
+                <Link
+                    to="#"
+                    title="Projects"
+                    onClick={async (e) => {
+                        setWhichInnerSidebar(4);
+                        await updateCustomizerClient({
+                            variables: { shouldOpenTheSelectOptions: false },
+                        });
+                    }}
+                >
                     Text
                     <RightArrow className="right-arrow" />
                 </Link>
@@ -99,13 +135,19 @@ const CustomStyle = () => {
 };
 
 const PositionComponent = ({}) => {
-    const { loading, data } = useCustomizerQueryClient();
-    const [updateCustomizerData] = useCustomizerMutationClient();
+    const { data, loading: meLoading } = useMeQuery();
+    const [updateCustomizer] = useCustomizerMutation();
 
-    if (loading) return <></>;
+    const [userPosition, setUserPosition] = useState(null);
+    const [customPosition, setCustomPosition] = useState(null);
 
-    let position = data && data.customizer ? data.customizer.position : '';
-    console.log('position', position);
+    if (meLoading) return <></>;
+
+    let customizer = data && data.me ? data.me.customizer : {};
+
+    if (customizer && userPosition === null) {
+        setUserPosition(customizer.position || 'LEFT');
+    }
 
     return (
         <>
@@ -116,33 +158,67 @@ const PositionComponent = ({}) => {
 
             <div className="customizer-menu-group">
                 <Radio.Group
-                    value={position}
+                    value={userPosition}
                     onChange={async (e) => {
-                        await updateCustomizerData({
-                            variables: {
-                                ...data.customizer,
-                                position: e.target.value,
-                            },
-                        });
+                        setUserPosition(e.target.value);
                     }}
                 >
                     <Radio.Button value="LEFT">LEFT</Radio.Button>
                     <Radio.Button value="RIGHT">RIGHT</Radio.Button>
                     <Radio.Button value="CUSTOM">CUSTOM</Radio.Button>
                 </Radio.Group>
-                <Button children="SAVE" className="wf-btn-primary" style={{ ...sharedBtnStyles }} />
+                {userPosition === 'CUSTOM' && (
+                    <div className="custom-position-input">
+                        <Input
+                            placeholder="container"
+                            value={customPosition}
+                            onChange={(e) => {
+                                setCustomPosition(e.target.value);
+                            }}
+                        />
+                        <div className="hint">
+                            * If id of element will not be found on the page, default position will
+                            be used
+                        </div>
+                    </div>
+                )}
+
+                <Button
+                    children="SAVE"
+                    className="wf-btn-primary"
+                    onClick={async (e) => {
+                        const results = await updateCustomizer({
+                            variables: {
+                                ...data.me.customizer,
+                                position: userPosition,
+                                customDivId: customPosition
+                            },
+                        });
+
+                        if (results.data && results.data.updateCustomizer) {
+                            message.success('Successfully saved.');
+                        }
+                    }}
+                    style={{ ...sharedBtnStyles }}
+                />
             </div>
         </>
     );
 };
 
 const TextComponent = ({}) => {
-    const { loading, data } = useCustomizerQueryClient();
-    const [updateCustomizerData] = useCustomizerMutationClient();
+    const { data, loading: meLoading } = useMeQuery();
+    const [updateCustomizer] = useCustomizerMutation();
 
-    if (loading) return <></>;
+    const [userText, setUserText] = useState(null);
 
-    let text = data && data.customizer ? data.customizer.text : '';
+    if (meLoading) return <></>;
+
+    let customizer = data && data.me ? data.me.customizer : {};
+
+    if (customizer && userText === null) {
+        setUserText(customizer.text || 'FULL');
+    }
 
     return (
         <>
@@ -153,29 +229,41 @@ const TextComponent = ({}) => {
 
             <div className="customizer-menu-group">
                 <Radio.Group
-                    value={text}
+                    value={userText}
                     onChange={async (e) => {
-                        await updateCustomizerData({
-                            variables: {
-                                ...data.customizer,
-                                text: e.target.value,
-                            },
-                        });
+                        setUserText(e.target.value);
                     }}
                 >
                     <Radio.Button value="FULL">FULL</Radio.Button>
                     <Radio.Button value="SHORTENED">SHORTENED</Radio.Button>
                     <Radio.Button value="FLAG_ONLY">FLAG ONLY</Radio.Button>
                 </Radio.Group>
-                <Button children="SAVE" className="wf-btn-primary" style={{ ...sharedBtnStyles }} />
+                <Button
+                    children="SAVE"
+                    className="wf-btn-primary"
+                    onClick={async (e) => {
+                        const results = await updateCustomizer({
+                            variables: {
+                                ...data.me.customizer,
+                                text: userText,
+                            },
+                        });
+
+                        if (results.data && results.data.updateCustomizer) {
+                            message.success('Successfully saved.');
+                        }
+                    }}
+                    style={{ ...sharedBtnStyles }}
+                />
             </div>
         </>
     );
 };
 
 const LanguagesComponent = ({}) => {
+    const [selectedLanguages, setSelectedLanguages] = useState(null);
     const { data: meData, loading: meLoading } = useMeQuery();
-
+    const [updateCustomizer] = useCustomizerMutation();
 
     if (meLoading) return <></>;
 
@@ -183,6 +271,18 @@ const LanguagesComponent = ({}) => {
 
     let mappedLangs = mapLanguages(userLanguages);
 
+    let customizer = meData && meData.me ? meData.me.customizer : {};
+
+    if (customizer && selectedLanguages === null) {
+        let filteredLangs = mappedLangs.filter((lang) =>
+            customizer.publishedLanguages.includes(lang.value)
+        );
+        setSelectedLanguages(filteredLangs);
+    }
+
+    const changeHandler = (value) => {
+        setSelectedLanguages(value);
+    };
     return (
         <>
             <div className="customizer-menu-title">Languages</div>
@@ -195,13 +295,82 @@ const LanguagesComponent = ({}) => {
                     isLoading={mappedLangs && mappedLangs.length == 0}
                     loadingMessage="Loading..."
                     isMulti={true}
-                    // value={selectedLanguages}
-                    // onChange={changeHandler}
+                    value={selectedLanguages}
+                    onChange={changeHandler}
                     width="200px"
                     placeholder="Select languages"
                     isClearable={false}
                 />
-                <Button children="SAVE" className="wf-btn-primary" style={{ ...sharedBtnStyles }} />
+                <Button
+                    children="SAVE"
+                    className="wf-btn-primary"
+                    onClick={async (e) => {
+                        const results = await updateCustomizer({
+                            variables: {
+                                ...meData.me.customizer,
+                                publishedLanguages: selectedLanguages.map((l) => l.value),
+                            },
+                        });
+
+                        if (results.data && results.data.updateCustomizer) {
+                            message.success('Successfully saved.');
+                        }
+                    }}
+                    style={{ ...sharedBtnStyles }}
+                />
+            </div>
+        </>
+    );
+};
+
+const AppearanceComponent = ({}) => {
+    const { data, loading: meLoading } = useMeQuery();
+    const [updateCustomizer] = useCustomizerMutation();
+
+    const [userBranding, setUserBranding] = useState(null);
+
+    if (meLoading) return <></>;
+
+    let customizer = data && data.me ? data.me.customizer : {};
+
+    if (customizer && userBranding === null) {
+        setUserBranding(customizer.appearance || 'WITH_BRANDING');
+    }
+
+    return (
+        <>
+            <div className="customizer-menu-title">Branding</div>
+            <div className="customizer-menu-sub-title">
+                Choose the position of the switcher below
+            </div>
+
+            <div className="customizer-menu-group">
+                <Radio.Group
+                    value={userBranding}
+                    onChange={async (e) => {
+                        setUserBranding(e.target.value);
+                    }}
+                >
+                    <Radio.Button value="WITH_BRANDING">WITH BRANDING</Radio.Button>
+                    <Radio.Button value="WITHOUT_BRANDING">WITHOUT BRANDING</Radio.Button>
+                </Radio.Group>
+                <Button
+                    children="SAVE"
+                    className="wf-btn-primary"
+                    onClick={async (e) => {
+                        const results = await updateCustomizer({
+                            variables: {
+                                ...data.me.customizer,
+                                appearance: userBranding,
+                            },
+                        });
+
+                        if (results.data && results.data.updateCustomizer) {
+                            message.success('Successfully saved.');
+                        }
+                    }}
+                    style={{ ...sharedBtnStyles }}
+                />
             </div>
         </>
     );
@@ -217,6 +386,9 @@ const whichComponentToRender = (whichInnerSidebar, setWhichInnerSidebar) => {
 
         case 2:
             return <LanguagesComponent />;
+
+        case 3:
+            return <AppearanceComponent />;
         case 4:
             return <TextComponent />;
     }
@@ -229,7 +401,16 @@ const CustomizerSidebar = () => {
     return (
         <div className="customizer-sidebar-wrapper">
             <div className="go-back">
-                <GoBack onClickCB={(e) => setWhichInnerSidebar(0)} routerHistory={browserHistory} />
+                <GoBack
+                    onClickCB={(e) => {
+                        if (whichInnerSidebar === 0) {
+                            browserHistory.push('/');
+                        } else {
+                            setWhichInnerSidebar(0);
+                        }
+                    }}
+                    routerHistory={browserHistory}
+                />
             </div>
             <div className="customizer-menu">
                 {whichComponentToRender(whichInnerSidebar, setWhichInnerSidebar)}

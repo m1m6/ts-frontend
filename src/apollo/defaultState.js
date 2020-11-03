@@ -15,6 +15,7 @@ export default {
         __typename: 'customizer',
         isOpen: false,
 		position: 'LEFT',
-		text: 'FULL'
+		text: 'FULL',
+		shouldOpenTheSelectOptions: false
     },
 };

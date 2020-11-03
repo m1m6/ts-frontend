@@ -48,7 +48,6 @@ const ChangePassword = props => {
                             me: { email }
                         } = data;
 
-                        console.log(values, email);
                         const result = await changePassword({
                             variables: {
                                 email,

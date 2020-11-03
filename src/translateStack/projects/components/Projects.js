@@ -15,6 +15,7 @@ import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import Input from '../../../form/components/Input';
 import Popup from '../../../components/Popup';
 import { useAddSinglePageMutation } from '../useMutations';
+import { getProjectTranslationsPercentage, getProjectWordsAndStringsCount } from '../utils';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -166,6 +167,9 @@ const Projects = ({ routerHistory }) => {
 
     let hasFinishedSetup = userData && userData.me ? !userData.me.isNew : false;
 
+    let { wordsCount, stringCount } = getProjectWordsAndStringsCount(data.userPages);
+    let percentageTranslations = getProjectTranslationsPercentage(data.userPages, stringCount);
+
     return (
         <div className="projects-page-wrapper">
             <div className="projects-page-header">
@@ -226,7 +230,7 @@ const Projects = ({ routerHistory }) => {
             <div className="projects-page-sub-header">
                 <div className="p-an-w">
                     <div className="p-an-l">Words</div>
-                    <div className="p-an-v">n.a. </div>
+                    <div className="p-an-v">{wordsCount > 0 ? wordsCount : 'n.a.'} </div>
                 </div>
 
                 <div className="p-an-w">
@@ -238,7 +242,7 @@ const Projects = ({ routerHistory }) => {
 
                 <div className="p-an-w">
                     <div className="p-an-l">Strings</div>
-                    <div className="p-an-v">n.a. </div>
+                    <div className="p-an-v"> {stringCount > 0 ? stringCount : 'n.a.'} </div>
                 </div>
 
                 <div className="p-an-w">
@@ -254,7 +258,7 @@ const Projects = ({ routerHistory }) => {
 
                 <div className="p-an-w">
                     <div className="p-an-l">Translated</div>
-                    <div className="p-an-v last">95%</div>
+                    <div className="p-an-v last">{percentageTranslations}%</div>
                 </div>
             </div>
 
@@ -270,6 +274,7 @@ const Projects = ({ routerHistory }) => {
                     }}
                 />
             </div>
+            <div id="sidebar-id"></div>
 
             {showPopup && (
                 <Popup

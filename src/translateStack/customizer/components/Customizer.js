@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import classNames from 'classnames';
 import { browserHistory } from '../../../browserHistory';
 import { useCustomizerMutationClient } from '../useMutations';
@@ -65,11 +65,37 @@ const Customizer = (props) => {
         return <></>;
     }
 
-    let customizer = data && data.customizer ? data.customizer : {};
+    let customizer = meData && meData.me && meData.me.customizer ? meData.me.customizer : {};
     let userLanguages = meData && meData.me ? meData.me.languages : [];
+    let { shouldOpenTheSelectOptions } = data.customizer;
 
-    let { position, text } = customizer;
-    let mappedLangs = mapLanguages(userLanguages, text);
+    let { position, text, appearance, publishedLanguages } = customizer;
+    let mappedLangs = mapLanguages(userLanguages, text).filter((l) =>
+        publishedLanguages.includes(l.value)
+    );
+
+    const Option = (props) => {
+        return props.value === 1 ? (
+            <>
+                {appearance === 'WITH_BRANDING' && (
+                    <div
+                        style={{
+                            fontFamily: 'Open Sans',
+                            fontSize: '9px',
+                            lineHeight: '5.22',
+                            textAlign: 'center',
+                        }}
+                    >
+                        ⚡by translatestack
+                    </div>
+                )}
+
+                <components.Option {...props} />
+            </>
+        ) : (
+            <components.Option {...props} />
+        );
+    };
 
     return (
         <div className="customizer-page-wrapper">
@@ -95,6 +121,9 @@ const Customizer = (props) => {
                         isClearable={false}
                         isOptionDisabled={true}
                         styles={CustomStyle(text)}
+                        menuPlacement={'top'}
+                        menuIsOpen={shouldOpenTheSelectOptions === true ? true : undefined}
+                        components={{ Option }}
                     />
                 </div>
             </div>

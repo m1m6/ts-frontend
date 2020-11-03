@@ -5,7 +5,12 @@ import { useGetPageQuery } from '../useQueries';
 import Select from 'react-select';
 import { useMeQuery } from '../../../rootUseQuery';
 import Button from '../../../form/components/Button';
-import { getStringTranslation, mapLanguages } from '../utils';
+import {
+    getPageWordsCount,
+    getStringTranslation,
+    getTranslationsPercentageByLanguage,
+    mapLanguages,
+} from '../utils';
 import { usePublishStringsMutation } from '../useMutations';
 
 const EditableContext = React.createContext();
@@ -222,6 +227,7 @@ const mapRows = (strings, selectedLanguageId) => {
             rows.push(row);
         });
     }
+
     return rows;
 };
 
@@ -236,6 +242,7 @@ const Translation = (props) => {
     const [publishTranslations] = usePublishStringsMutation();
 
     let [rowsData, setRowsData] = useState([]);
+    let [userSelectedLang, setUserSelectedLang] = useState(0);
 
     if (loading || meLoading) {
         return <></>;
@@ -243,6 +250,11 @@ const Translation = (props) => {
 
     const pageData = data.getPage;
     const userLanguages = meData && meData.me ? meData.me.languages : [];
+    const wordsCount = getPageWordsCount(data.getPage ? data.getPage.strings : []);
+    const percentageTranslated = getTranslationsPercentageByLanguage(
+        data.getPage ? data.getPage.strings : [],
+        userSelectedLang
+    );
 
     return (
         <div className="translation-page-wrapper">
@@ -288,22 +300,28 @@ const Translation = (props) => {
             <div className="translation-page-sub-header">
                 <div className="t-an-w">
                     <div className="t-an-l">Words</div>
-                    <div className="t-an-v">n.a. </div>
+                    <div className="t-an-v">{wordsCount > 0 ? wordsCount : 'n.a.'} </div>
                 </div>
 
                 <div className="t-an-w">
                     <div className="t-an-l">Strings</div>
-                    <div className="t-an-v">n.a. </div>
+                    <div className="t-an-v">
+                        {data.getPage && data.getPage.strings
+                            ? data.getPage.strings.length
+                            : 'n.a.'}
+                    </div>
                 </div>
 
                 <div className="t-an-w">
                     <div className="t-an-l">Translated</div>
-                    <div className="t-an-v last">95%</div>
+                    <div className="t-an-v last">{percentageTranslated}%</div>
                 </div>
 
                 <div className="t-an-w">
                     <div className="t-an-l">Languages</div>
-                    <div className="t-an-v">n.a.</div>
+                    <div className="t-an-v">
+                        {userLanguages && userLanguages.length ? userLanguages.length : 'n.a.'}
+                    </div>
                 </div>
             </div>
 
@@ -312,6 +330,7 @@ const Translation = (props) => {
                     strings={data.getPage ? data.getPage.strings : placeHolderRow}
                     userLanguages={userLanguages}
                     setRowsData={setRowsData}
+                    setUserSelectedLang={setUserSelectedLang}
                 />
             </div>
         </div>
@@ -328,13 +347,15 @@ const placeHolderRow = [
     },
 ];
 
-const TableWrapper = ({ strings, userLanguages, setRowsData }) => {
+const TableWrapper = ({ strings, userLanguages, setRowsData, setUserSelectedLang }) => {
     let [selectedLanguageId, setSelectedLanguageId] = useState(userLanguages[0].Languages.id);
     let [rows, setRows] = useState(mapRows(strings, selectedLanguageId));
 
     useEffect(() => {
+        setRows(mapRows(strings, selectedLanguageId));
         setRowsData(rows);
-    });
+        setUserSelectedLang(selectedLanguageId);
+    }, [selectedLanguageId]);
 
     const handleSave = (row) => {
         const newData = [...rows];

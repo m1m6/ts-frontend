@@ -1,9 +1,9 @@
 import React from 'react';
+import wordcount from 'wordcount';
 
 export const getStringTranslation = (string, selectedLanguage) => {
     let translatedStringValue = 'n.a.';
     let updatedAtValue = string.updatedAt;
-
     if (string && string.translations && string.translations.length) {
         let { translations } = string;
         translations.forEach(({ languagesId, translatedString, updatedAt }) => {
@@ -33,7 +33,7 @@ export const mapLanguages = (languagesList, textAppearance) => {
                 />
                 <span style={{ marginLeft: '13px' }}>
                     {textAppearance && textAppearance === 'SHORTENED'
-                        ? Languages.language.substring(0, 2).toUpperCase()
+                        ? Languages.abbreviation.toUpperCase()
                         : textAppearance && textAppearance === 'FLAG_ONLY'
                         ? ''
                         : Languages.language}
@@ -42,4 +42,37 @@ export const mapLanguages = (languagesList, textAppearance) => {
         ),
         value: Languages.id,
     }));
+};
+
+export const getPageWordsCount = (strings) => {
+    let count = 0;
+
+    if (strings && strings.length) {
+        strings.forEach((string) => {
+            count += wordcount(string.original);
+        });
+    }
+
+    return count;
+};
+
+export const getTranslationsPercentageByLanguage = (strings, languageId) => {
+
+    let percentage = 0;
+    let langTranslationsCount = 0;
+
+    if (strings && strings.length) {
+        strings.forEach(({ translations }) => {
+            if (translations && translations.length) {
+                translations.forEach(({ languagesId }) => {
+                    if (languagesId === languageId) {
+                        langTranslationsCount++;
+                    }
+                });
+            }
+        });
+        percentage = ((langTranslationsCount / strings.length) * 100).toFixed(1);
+    }
+
+    return percentage;
 };

@@ -4,7 +4,6 @@ import classNames from 'classnames';
 
 const Checkbox = ({ label, iconType, ...props }) => {
     const [field, meta, helpers] = useField(props);
-    console.log('meta', meta);
     return (
         <div className="checkbox-field-wrapper">
             <div className="checkbox-input">

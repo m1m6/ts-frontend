@@ -24,7 +24,6 @@ export default (_, { fullName, id, email, role, isNew }, { cache }) => {
             isNew,
         },
     };
-    console.log('data', data);
 
     apolloClient.writeData({
         query,

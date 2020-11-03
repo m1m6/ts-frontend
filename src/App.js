@@ -41,7 +41,6 @@ const App = () => {
             customizerData.customizer &&
             customizerData.customizer.isOpen === false
         ) {
-            console.log("updateCustomizerData app true");
             updateCustomizerData(true);
         }
     }, []);

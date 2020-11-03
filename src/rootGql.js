@@ -9,6 +9,14 @@ export const ME_QUERY = gql`
             role
             isNew
             skippedOnboarding
+            customizer {
+                id
+                position
+                text
+                appearance
+                publishedLanguages
+                customDivId
+            }
             languages {
                 Languages {
                     id
@@ -47,4 +55,3 @@ export const LANGUAGES_LIST_QUERY = gql`
         }
     }
 `;
-
