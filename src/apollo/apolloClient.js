@@ -25,7 +25,7 @@ const middlewareLink = new ApolloLink((operation, forward) => {
 });
 
 const wsLink = new WebSocketLink({
-    uri: 'ws://localhost:4000',
+    uri: process.env.REACT_APP_WS_GRAPHQL_URL ,
     options: {
         reconnect: true,
         connectionParams: {
@@ -33,7 +33,7 @@ const wsLink = new WebSocketLink({
         },
     },
 });
-const uploadLink = createUploadLink({ uri: 'http://localhost:4000' });
+const uploadLink = createUploadLink({ uri: process.env.REACT_APP_HTTP_GRAPHQL_URL });
 
 const httpLinkAuth = middlewareLink.concat(uploadLink);
 
