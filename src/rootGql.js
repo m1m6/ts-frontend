@@ -9,6 +9,7 @@ export const ME_QUERY = gql`
             role
             isNew
             skippedOnboarding
+            apiKey
             customizer {
                 id
                 position

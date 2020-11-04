@@ -52,7 +52,7 @@ const placeHolderRow = [
     },
 ];
 
-const SetupPopup = ({ setShowPopup }) => {
+const SetupPopup = ({ setShowPopup, apiKey }) => {
     let [pageUrl, setPageUrl] = useState(undefined);
     let [isSubmitting, setIsSubmitting] = useState(false);
     const [useAddSinglePage] = useAddSinglePageMutation();
@@ -72,7 +72,7 @@ const SetupPopup = ({ setShowPopup }) => {
     <script type="text/javascript">
         var tsstack = function () {
             var tss = document.createElement('script'); tss.type = 'text/javascript'; tss.async = true;
-            tss.src = 'http://localhost:5500/index.js?apiKey=d037c40228044607871b72909c2ccb74';
+            tss.src = 'https://app.translatestack.com/static/sdk.js?apiKey=${apiKey}';
             tss.id = "tss-script";
             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(tss);
         }
@@ -166,6 +166,7 @@ const Projects = ({ routerHistory }) => {
     }
 
     let hasFinishedSetup = userData && userData.me ? !userData.me.isNew : false;
+    let apiKey = userData && userData.me ? userData.me.apiKey : ''
 
     let { wordsCount, stringCount } = getProjectWordsAndStringsCount(data.userPages);
     let percentageTranslations = getProjectTranslationsPercentage(data.userPages, stringCount);
@@ -280,7 +281,7 @@ const Projects = ({ routerHistory }) => {
                 <Popup
                     text="test"
                     component={() => {
-                        return <SetupPopup setShowPopup={setShowPopup} />;
+                        return <SetupPopup setShowPopup={setShowPopup} apiKey={apiKey}/>;
                     }}
                     closePopup={(e) => setShowPopup(false)}
                 />

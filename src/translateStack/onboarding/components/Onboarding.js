@@ -14,6 +14,7 @@ import { useOnboardingQueryClient } from '../useQueries';
 import { useOnboardingMutation, useUpdateUserMutation } from '../../../user/useMutations';
 import { Redirect } from 'react-router-dom';
 import { copyToClipboard } from '../../../utils/generalUtils';
+import { useMeQuery } from '../../../rootUseQuery';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -165,7 +166,8 @@ const Step3 = ({
     selectedLanguages,
     hasError,
     setHasError,
-    routerHistory
+    routerHistory,
+    apiKey,
 }) => {
     const [onboarding] = useOnboardingMutation();
     const [updateUser] = useUpdateUserMutation();
@@ -186,7 +188,7 @@ const Step3 = ({
     <script type="text/javascript">
         var tsstack = function () {
             var tss = document.createElement('script'); tss.type = 'text/javascript'; tss.async = true;
-            tss.src = 'http://localhost:5500/index.js?apiKey=d037c40228044607871b72909c2ccb74';
+            tss.src = 'https://app.translatestack.com/static/sdk.js?apiKey=${apiKey}';
             tss.id = "tss-script";
             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(tss);
         }
@@ -239,7 +241,7 @@ const Step3 = ({
                     label="SKIP FOR NOW"
                     onClick={async (e) => {
                         await updateUser({ variables: { skippedOnboarding: true } });
-                        routerHistory.push("/")
+                        routerHistory.push('/');
                     }}
                 />
             </div>
@@ -252,17 +254,19 @@ const Onboarding = ({ isNew, routerHistory }) => {
     let [isValidating, setIsValidating] = useState(undefined);
     let [hasError, setHasError] = useState(undefined);
 
+    const { data: meData, loading: meLoading } = useMeQuery();
     const { loading, data, error } = useOnboardingQueryClient();
     let [onboardingMutation] = useOnboardingMutationClient();
 
     if (!isNew) {
         return <Redirect to="/" />;
     }
-    if (loading) {
+    if (loading || meLoading) {
         return '';
     }
 
     let currentStep = data && data.onboarding ? data.onboarding.currentStep : 1;
+    let apiKey = meData && meData.me ? meData.me.apiKey : '';
 
     if (currentStep === 1) {
         return (
@@ -295,6 +299,7 @@ const Onboarding = ({ isNew, routerHistory }) => {
                 hasError={hasError}
                 setHasError={setHasError}
                 routerHistory={routerHistory}
+                apiKey={apiKey}
             />
         );
     }
