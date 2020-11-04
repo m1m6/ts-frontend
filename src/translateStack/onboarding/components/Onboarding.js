@@ -188,7 +188,7 @@ const Step3 = ({
     <script type="text/javascript">
         var tsstack = function () {
             var tss = document.createElement('script'); tss.type = 'text/javascript'; tss.async = true;
-            tss.src = 'https://app.translatestack.com/static/sdk.js?apiKey=${apiKey}';
+            tss.src = 'https://app.translatestack.com/sdk/sdk.js?apiKey=${apiKey}';
             tss.id = "tss-script";
             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(tss);
         }
