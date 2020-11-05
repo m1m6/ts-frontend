@@ -136,7 +136,7 @@ const mapRows = (pages) => {
 
             row.key = i;
             row.url = page.pageUrl;
-            row.strings = page.strings.length;
+            row.strings = page.pageString.length;
             row.translated = `10%`;
             row.lastEdit = page.updatedAt;
             row.pageId = page.id;
@@ -166,7 +166,7 @@ const Projects = ({ routerHistory }) => {
     }
 
     let hasFinishedSetup = userData && userData.me ? !userData.me.isNew : false;
-    let apiKey = userData && userData.me ? userData.me.apiKey : ''
+    let apiKey = userData && userData.me ? userData.me.apiKey : '';
 
     let { wordsCount, stringCount } = getProjectWordsAndStringsCount(data.userPages);
     let percentageTranslations = getProjectTranslationsPercentage(data.userPages, stringCount);
@@ -259,7 +259,9 @@ const Projects = ({ routerHistory }) => {
 
                 <div className="p-an-w">
                     <div className="p-an-l">Translated</div>
-                    <div className="p-an-v last">{percentageTranslations}%</div>
+                    <div className="p-an-v last">
+                        {!isNaN(percentageTranslations) ? percentageTranslations : 0}%
+                    </div>
                 </div>
             </div>
 
@@ -281,7 +283,7 @@ const Projects = ({ routerHistory }) => {
                 <Popup
                     text="test"
                     component={() => {
-                        return <SetupPopup setShowPopup={setShowPopup} apiKey={apiKey}/>;
+                        return <SetupPopup setShowPopup={setShowPopup} apiKey={apiKey} />;
                     }}
                     closePopup={(e) => setShowPopup(false)}
                 />

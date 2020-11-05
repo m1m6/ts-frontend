@@ -6,9 +6,9 @@ export const getProjectWordsAndStringsCount = (userPages) => {
     let stringCount = 0;
 
     if (userPages && userPages.length) {
-        userPages.forEach(({ strings }) => {
-            wordsCount += getPageWordsCount(strings);
-            stringCount += strings.length;
+        userPages.forEach(({ pageString }) => {
+            wordsCount += getPageWordsCount(pageString);
+            stringCount += pageString.length;
         });
     }
 
@@ -20,8 +20,8 @@ export const getProjectTranslationsPercentage = (userPages, stringCount) => {
     let translationsCount = 0;
 
     if (userPages && userPages.length) {
-        userPages.forEach(({ strings }) => {
-            strings.forEach(({ translations }) => {
+        userPages.forEach(({ pageString }) => {
+            pageString.forEach(({ translations }) => {
                 if (translations && translations.length && translations.length > 0) {
                     translationsCount++;
                 }

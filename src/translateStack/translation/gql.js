@@ -6,13 +6,13 @@ export const getPageQuery = gql`
             id
             pageUrl
             updatedAt
-            strings {
+            pageString {
                 id
                 original
                 updatedAt
                 translations {
                     id
-                    languagesId
+                    languageId
                     translatedString
                     updatedAt
                 }

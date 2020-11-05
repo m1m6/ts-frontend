@@ -23,7 +23,14 @@ const CustomStyle = (text) => {
         },
         container: (base, { selectProps: { width, height } }) => ({
             ...base,
-            width: text === 'FULL' ? '150px' : text === 'SHORTENED' ? '120px' : '85px',
+            width:
+                text === 'FULL'
+                    ? '150px'
+                    : text === 'SHORTENED'
+                    ? '120px'
+                    : text === 'FLAG_ONLY'
+                    ? '85px'
+                    : '120px',
         }),
         control: (base, state) => ({
             ...base,
@@ -74,8 +81,8 @@ const Customizer = (props) => {
         publishedLanguages.includes(l.value)
     );
 
-    const Option = (props) => {
-        return props.value === 1 ? (
+    const Option = (props, index) => {
+        return props.options && props.options.length && props.options[0].value === props.value ? (
             <>
                 {appearance === 'WITH_BRANDING' && (
                     <div
@@ -86,7 +93,7 @@ const Customizer = (props) => {
                             textAlign: 'center',
                         }}
                     >
-                        ⚡by translatestack
+                        ⚡ by translatestack
                     </div>
                 )}
 
@@ -118,7 +125,6 @@ const Customizer = (props) => {
                         options={mappedLangs}
                         defaultValue={mappedLangs[0]}
                         isSearchable={false}
-                        isClearable={false}
                         isOptionDisabled={true}
                         styles={CustomStyle(text)}
                         menuPlacement={'top'}

@@ -10,15 +10,15 @@ export const userPagesQuery = gql`
                 id
                 fullName
             }
-            strings {
+            pageString {
                 id
                 original
                 updatedAt
                 translations {
                     translatedString
-                    stringsId
+                    pageStringId
                     id
-                    languagesId
+                    languageId
                 }
             }
         }

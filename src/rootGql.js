@@ -19,7 +19,7 @@ export const ME_QUERY = gql`
                 customDivId
             }
             languages {
-                Languages {
+                Language {
                     id
                     abbreviation
                     language
@@ -46,8 +46,8 @@ export const ME_QUERY_CLIENT = gql`
 `;
 
 export const LANGUAGES_LIST_QUERY = gql`
-    query MeQuery {
-        languagesList @client {
+    query languagesList {
+        languagesList {
             id
             abbreviation
             language

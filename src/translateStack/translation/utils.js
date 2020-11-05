@@ -6,8 +6,8 @@ export const getStringTranslation = (string, selectedLanguage) => {
     let updatedAtValue = string.updatedAt;
     if (string && string.translations && string.translations.length) {
         let { translations } = string;
-        translations.forEach(({ languagesId, translatedString, updatedAt }) => {
-            if (languagesId === selectedLanguage) {
+        translations.forEach(({ languageId, translatedString, updatedAt }) => {
+            if (languageId === selectedLanguage) {
                 translatedStringValue = translatedString;
                 updatedAtValue = updatedAt;
             }
@@ -18,7 +18,7 @@ export const getStringTranslation = (string, selectedLanguage) => {
 };
 
 export const mapLanguages = (languagesList, textAppearance) => {
-    return languagesList.map(({ Languages }) => ({
+    return languagesList.map(({ Language }) => ({
         label: (
             <div
                 style={{
@@ -28,27 +28,27 @@ export const mapLanguages = (languagesList, textAppearance) => {
                 }}
             >
                 <img
-                    src={Languages.flag}
+                    src={Language.flag}
                     style={{ width: '23px', height: '23px', borderRadius: '50px' }}
                 />
                 <span style={{ marginLeft: '13px' }}>
                     {textAppearance && textAppearance === 'SHORTENED'
-                        ? Languages.abbreviation.toUpperCase()
+                        ? Language.abbreviation.toUpperCase()
                         : textAppearance && textAppearance === 'FLAG_ONLY'
                         ? ''
-                        : Languages.language}
+                        : Language.language}
                 </span>
             </div>
         ),
-        value: Languages.id,
+        value: Language.id,
     }));
 };
 
-export const getPageWordsCount = (strings) => {
+export const getPageWordsCount = (pageString) => {
     let count = 0;
 
-    if (strings && strings.length) {
-        strings.forEach((string) => {
+    if (pageString && pageString.length) {
+        pageString.forEach((string) => {
             count += wordcount(string.original);
         });
     }
@@ -64,8 +64,8 @@ export const getTranslationsPercentageByLanguage = (strings, languageId) => {
     if (strings && strings.length) {
         strings.forEach(({ translations }) => {
             if (translations && translations.length) {
-                translations.forEach(({ languagesId }) => {
-                    if (languagesId === languageId) {
+                translations.forEach(({ languageId }) => {
+                    if (languageId === languageId) {
                         langTranslationsCount++;
                     }
                 });

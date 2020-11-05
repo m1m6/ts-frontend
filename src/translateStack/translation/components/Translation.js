@@ -250,9 +250,9 @@ const Translation = (props) => {
 
     const pageData = data.getPage;
     const userLanguages = meData && meData.me ? meData.me.languages : [];
-    const wordsCount = getPageWordsCount(data.getPage ? data.getPage.strings : []);
+    const wordsCount = getPageWordsCount(data.getPage ? data.getPage.pageString : []);
     const percentageTranslated = getTranslationsPercentageByLanguage(
-        data.getPage ? data.getPage.strings : [],
+        data.getPage ? data.getPage.pageString : [],
         userSelectedLang
     );
 
@@ -280,7 +280,6 @@ const Translation = (props) => {
                                 .map(({ translated, stringId, selectedLanguageId }) => {
                                     return { translated, stringId, selectedLanguageId };
                                 });
-
                             if (updatedRows && updatedRows.length > 0) {
                                 const results = await publishTranslations({
                                     variables: { input: updatedRows },
@@ -306,8 +305,8 @@ const Translation = (props) => {
                 <div className="t-an-w">
                     <div className="t-an-l">Strings</div>
                     <div className="t-an-v">
-                        {data.getPage && data.getPage.strings
-                            ? data.getPage.strings.length
+                        {data.getPage && data.getPage.pageString
+                            ? data.getPage.pageString.length
                             : 'n.a.'}
                     </div>
                 </div>
@@ -327,7 +326,7 @@ const Translation = (props) => {
 
             <div className="translation-page-table">
                 <TableWrapper
-                    strings={data.getPage ? data.getPage.strings : placeHolderRow}
+                    strings={data.getPage ? data.getPage.pageString : placeHolderRow}
                     userLanguages={userLanguages}
                     setRowsData={setRowsData}
                     setUserSelectedLang={setUserSelectedLang}
@@ -348,12 +347,14 @@ const placeHolderRow = [
 ];
 
 const TableWrapper = ({ strings, userLanguages, setRowsData, setUserSelectedLang }) => {
-    let [selectedLanguageId, setSelectedLanguageId] = useState(userLanguages[0].Languages.id);
+    let [selectedLanguageId, setSelectedLanguageId] = useState(userLanguages[0].Language.id);
     let [rows, setRows] = useState(mapRows(strings, selectedLanguageId));
 
     useEffect(() => {
-        setRows(mapRows(strings, selectedLanguageId));
-        setRowsData(rows);
+        const mappedRows = mapRows(strings, selectedLanguageId)
+        console.log("mappedRows", mappedRows);
+        setRows(mappedRows);
+        setRowsData(mappedRows);
         setUserSelectedLang(selectedLanguageId);
     }, [selectedLanguageId]);
 
@@ -363,6 +364,7 @@ const TableWrapper = ({ strings, userLanguages, setRowsData, setUserSelectedLang
         const item = newData[index];
         newData.splice(index, 1, { ...item, ...row, isUpdated: true });
         setRows(newData);
+        setRowsData(newData);
     };
 
     const finalColumns = columns(userLanguages, setSelectedLanguageId).map((col) => {
