@@ -19,7 +19,7 @@ const { Step } = Steps;
 
 const HeaderLogo = () => {
     return (
-        <div className="header-logo pointer" onClick={() => browserHistory.push("/")}>
+        <div className="header-logo pointer" onClick={() => browserHistory.push('/')}>
             <Logo className="onboarding-header" fill="#ccc" />
         </div>
     );
@@ -31,6 +31,7 @@ const OnboardingSteps = ({ currentStep }) => {
             <div className="onboarding-title">Your integration guide</div>
             <div className="onboarding-steps">
                 <Steps progressDot current={currentStep - 1} direction="vertical">
+                    <Step title="Source Language" />
                     <Step title="Targeted Languages" />
                     <Step title="Your Domain" />
                     <Step title="Installation" />
@@ -39,7 +40,6 @@ const OnboardingSteps = ({ currentStep }) => {
         </div>
     );
 };
-
 
 const Sidebar = ({ isOpenCustomizer }) => {
     const { data, loading, error } = useMeQuery();

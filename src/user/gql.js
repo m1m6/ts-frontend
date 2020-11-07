@@ -9,8 +9,8 @@ export const ONBOARDING_QUERY_CLIENT = gql`
 `;
 
 export const ONBOARDING_MUTATION = gql`
-    mutation onboarding($pageUrl: String!, $translationLanguages: [Int!]!) {
-        onboarding(pageUrl: $pageUrl, translationLanguages: $translationLanguages)
+    mutation onboarding($pageUrl: String!, $translationLanguages: [Int!]!, sourceLanguage: Int!) {
+        onboarding(pageUrl: $pageUrl, translationLanguages: $translationLanguages, sourceLanguage: $sourceLanguage)
     }
 `;
 

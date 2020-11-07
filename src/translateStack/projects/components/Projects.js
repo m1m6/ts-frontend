@@ -180,7 +180,9 @@ const Projects = ({ routerHistory }) => {
                         {hasFinishedSetup
                             ? data.userPages[0].pageUrl.substring(
                                   0,
-                                  data.userPages[0].pageUrl.indexOf('/')
+                                  data.userPages[0].pageUrl.indexOf('/') > 0
+                                      ? data.userPages[0].pageUrl.indexOf('/')
+                                      : data.userPages[0].pageUrl.length
                               )
                             : 'n.a.'}
                     </div>

@@ -74,19 +74,88 @@ const CustomStyle = () => {
             paddingTop: '10px',
             paddingBottom: '8px',
         }),
+        singleValue: (base, state) => ({
+            ...base,
+            height: '47px',
+            borderRadius: '3px',
+            border: 'solid 1px rgba(227, 232, 238, 0.42)',
+            backgroundColor: 'rgba(227, 232, 238, 0.42)',
+            paddingLeft: '13px',
+            paddingTop: '10px',
+            paddingBottom: '8px',
+        }),
     };
 };
 
-const Step1 = ({ currentStep, onboardingMutation, selectedLanguages, setSelectedLanguages }) => {
+const SourceLanguageStep = ({
+    currentStep,
+    onboardingMutation,
+    setSourceLanguages,
+    sourceLanguage,
+}) => {
     const changeHandler = (value) => {
-        setSelectedLanguages(value);
+        setSourceLanguages(value);
     };
 
     const languagesList = getLanguagesList();
     return (
         <div className="onboarding-step-wrapper">
-            <div className="onboarding-step-count">{currentStep} out of 3</div>
-            <div className="onboarding-step-title">Choose your target language</div>
+            <div className="onboarding-step-count">{currentStep} out of 4</div>
+            <div className="onboarding-step-title">Choose your source and target languages</div>
+            <div className="onboarding-step-description">
+                Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
+                Journals und Research Paper stützt. Verwend
+            </div>
+            <div style={{ marginBottom: '26px' }}>
+                <Select
+                    styles={CustomStyle(sourceLanguage)}
+                    options={languagesList}
+                    isLoading={languagesList && languagesList.length == 0}
+                    loadingMessage="Loading..."
+                    isMulti={false}
+                    value={sourceLanguage}
+                    onChange={changeHandler}
+                    width="517px"
+                    placeholder="Select source language"
+                    isClearable={false}
+                />
+            </div>
+            <div>
+                <OnboardinButton
+                    // disabled={
+                    //     selectedLanguages == null ||
+                    //     (selectedLanguages && selectedLanguages.length === 0)
+                    // }
+                    onClick={async () => {
+                        await onboardingMutation({ variables: { currentStep: currentStep + 1 } });
+                    }}
+                    label="NEXT"
+                />
+            </div>
+        </div>
+    );
+};
+
+const TargetLanguagesStep = ({
+    currentStep,
+    onboardingMutation,
+    selectedLanguages,
+    setSelectedLanguages,
+    sourceLanguage
+}) => {
+    const changeHandler = (value) => {
+        setSelectedLanguages(value);
+    };
+
+    const languagesList = getLanguagesList();
+
+    console.log("sourceLanguage", sourceLanguage);
+    console.log("languagesList", languagesList);
+
+    return (
+        <div className="onboarding-step-wrapper">
+            <div className="onboarding-step-count">{currentStep} out of 4</div>
+            <div className="onboarding-step-title">Choose your source and target languages</div>
             <div className="onboarding-step-description">
                 Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
                 Journals und Research Paper stützt. Verwend
@@ -94,14 +163,14 @@ const Step1 = ({ currentStep, onboardingMutation, selectedLanguages, setSelected
             <div style={{ marginBottom: '26px' }}>
                 <Select
                     styles={CustomStyle(selectedLanguages)}
-                    options={languagesList}
+                    options={languagesList.filter(lang => lang.value !== sourceLanguage.value)}
                     isLoading={languagesList && languagesList.length == 0}
                     loadingMessage="Loading..."
                     isMulti={true}
                     value={selectedLanguages}
                     onChange={changeHandler}
                     width="517px"
-                    placeholder="Select languages"
+                    placeholder="Select ltarget anguages"
                     isClearable={false}
                 />
             </div>
@@ -123,7 +192,7 @@ const Step1 = ({ currentStep, onboardingMutation, selectedLanguages, setSelected
 const Step2 = ({ currentStep, onboardingMutation, pageUrl, setPageUrl }) => {
     return (
         <div className="onboarding-step-wrapper">
-            <div className="onboarding-step-count">{currentStep} out of 3</div>
+            <div className="onboarding-step-count">{currentStep} out of 4</div>
             <div className="onboarding-step-title">Choose your domain</div>
             <div className="onboarding-step-description">
                 Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
@@ -168,12 +237,13 @@ const Step3 = ({
     setHasError,
     routerHistory,
     apiKey,
+    sourceLanguage
 }) => {
     const [onboarding] = useOnboardingMutation();
     const [updateUser] = useUpdateUserMutation();
     return (
         <div className="onboarding-step-wrapper last">
-            <div className="onboarding-step-count last">{currentStep} out of 3</div>
+            <div className="onboarding-step-count last">{currentStep} out of 4</div>
             <div className="onboarding-step-title last">Set up</div>
             <div className="onboarding-step-description last">
                 Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
@@ -211,6 +281,7 @@ const Step3 = ({
                             variables: {
                                 pageUrl,
                                 translationLanguages: selectedLanguages.map((lang) => lang.value),
+                                sourceLanguage: sourceLanguage.value
                             },
                         });
 
@@ -249,6 +320,7 @@ const Step3 = ({
     );
 };
 const Onboarding = ({ isNew, routerHistory }) => {
+    let [sourceLanguage, setSourceLanguages] = useState(undefined);
     let [selectedLanguages, setSelectedLanguages] = useState([]);
     let [pageUrl, setPageUrl] = useState(undefined);
     let [isValidating, setIsValidating] = useState(undefined);
@@ -270,14 +342,25 @@ const Onboarding = ({ isNew, routerHistory }) => {
 
     if (currentStep === 1) {
         return (
-            <Step1
+            <SourceLanguageStep
+                currentStep={currentStep}
+                onboardingMutation={onboardingMutation}
+                sourceLanguage={sourceLanguage}
+                setSourceLanguages={setSourceLanguages}
+            />
+        );
+    }
+    if (currentStep === 2) {
+        return (
+            <TargetLanguagesStep
                 currentStep={currentStep}
                 onboardingMutation={onboardingMutation}
                 selectedLanguages={selectedLanguages}
                 setSelectedLanguages={setSelectedLanguages}
+                sourceLanguage={sourceLanguage}
             />
         );
-    } else if (currentStep === 2) {
+    } else if (currentStep === 3) {
         return (
             <Step2
                 currentStep={currentStep}
@@ -300,6 +383,7 @@ const Onboarding = ({ isNew, routerHistory }) => {
                 setHasError={setHasError}
                 routerHistory={routerHistory}
                 apiKey={apiKey}
+                sourceLanguage={sourceLanguage}
             />
         );
     }
