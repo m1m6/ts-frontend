@@ -64,6 +64,13 @@ const CustomStyle = () => {
             ...base,
             display: 'none',
         }),
+        placeholder: (defaultStyles) => {
+            return {
+                ...defaultStyles,
+                color: '#0a2540',
+                marginLeft: '15px',
+            }
+        },
         multiValue: (base, state) => ({
             ...base,
             height: '47px',
@@ -103,8 +110,7 @@ const SourceLanguageStep = ({
             <div className="onboarding-step-count">{currentStep} out of 4</div>
             <div className="onboarding-step-title">Choose your source and target languages</div>
             <div className="onboarding-step-description">
-                Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
-                Journals und Research Paper stützt. Verwend
+            Select the source language of your website.
             </div>
             <div style={{ marginBottom: '26px' }}>
                 <Select
@@ -157,8 +163,7 @@ const TargetLanguagesStep = ({
             <div className="onboarding-step-count">{currentStep} out of 4</div>
             <div className="onboarding-step-title">Choose your source and target languages</div>
             <div className="onboarding-step-description">
-                Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
-                Journals und Research Paper stützt. Verwend
+                Select the languages that your website should be translated to. You can always add languages later, too.
             </div>
             <div style={{ marginBottom: '26px' }}>
                 <Select
@@ -193,10 +198,9 @@ const Step2 = ({ currentStep, onboardingMutation, pageUrl, setPageUrl }) => {
     return (
         <div className="onboarding-step-wrapper">
             <div className="onboarding-step-count">{currentStep} out of 4</div>
-            <div className="onboarding-step-title">Choose your domain</div>
+            <div className="onboarding-step-title">Enter your domain</div>
             <div className="onboarding-step-description">
-                Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
-                Journals und Research Paper stützt. Verwend
+                Enter the URL of your project and get started translating your page within minutes. Make sure it is a valid URL.
             </div>
             <div style={{ marginBottom: '26px', marginTop: '33px' }}>
                 <Input
@@ -244,11 +248,9 @@ const Step3 = ({
     return (
         <div className="onboarding-step-wrapper last">
             <div className="onboarding-step-count last">{currentStep} out of 4</div>
-            <div className="onboarding-step-title last">Set up</div>
+            <div className="onboarding-step-title last">Final Set up</div>
             <div className="onboarding-step-description last">
-                Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
-                Journals und Research Paper stützt. Verwende dafür fundierte Quellen und Online
-                Bibliotheken, die wir dir unten aufgeführt haben.
+                  This is your unique code snippet. Copy & paste it and place in in the head of your project. Only after this step you are able to get started.
             </div>
             <div className="onboarding-step-code-wrapper">
                 <div className="onboarding-step-code">
@@ -269,9 +271,7 @@ const Step3 = ({
             </div>
             <div className="onboarding-step-title">Test your setup</div>
             <div className="onboarding-step-description last">
-                Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
-                Journals und Research Paper stützt. Verwende dafür fundierte Quellen und Online
-                Bibliotheken, die wir dir unten aufgeführt haben.
+                Let's validate if the code snippet is placed correctly in the head of your project. You are one click away to start translating.
             </div>
             <div>
                 <OnboardinButton

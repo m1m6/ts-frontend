@@ -58,11 +58,9 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
     const [useAddSinglePage] = useAddSinglePageMutation();
     return (
         <div className="setup-popup-wrapper">
-            <div className="setup-p-title">Set up</div>
+            <div className="setup-p-title">Add another page</div>
             <div className="setup-p-description">
-                Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
-                Journals und Research Paper stützt. Verwende dafür fundierte Quellen und Online
-                Bibliotheken, die wir dir unten aufgeführt haben.
+                Copy your code snippet below and place it in the &#60;head&#62; of your page. Afterwards, enter the URL to test your integration.
             </div>
             <div className="setup-p-code">
                 <div className="setup-code">
@@ -82,10 +80,10 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
                 </div>
             </div>
             <div className="setup-p-d-w">
-                <div className="setup-p-d-t">Choose your page</div>
+                <div className="setup-p-d-t">Enter URL of the page</div>
                 <div className="setup-p-d-d">
-                    Es ist essentiell, dass du deine Bachelorarbeit auf etablierte internationale
-                    Journals und Research Paper stützt. Verwend
+                    After you placed the code snippet in the new page, you can test the implementation. Just enter the valid
+                    URL and press the button.
                 </div>
                 <div className="setup-p-d-i">
                     <Input
