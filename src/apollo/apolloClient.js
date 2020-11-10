@@ -10,7 +10,6 @@ import { ACCESS_TOKEN } from '../constants';
 import defaultState from './defaultState';
 import resolvers from './resolvers';
 
-const httpLink = createHttpLink({ uri: 'http://localhost:4000' });
 const cache = new InMemoryCache({ freezeResults: true });
 cache.writeData({ data: defaultState });
 
