@@ -437,7 +437,6 @@ const LanguagesComponent = ({}) => {
                     styles={CustomStyle()}
                     options={mappedLangs}
                     isLoading={mappedLangs && mappedLangs.length == 0}
-                    loadingMessage="Loading..."
                     isMulti={true}
                     value={selectedLanguages}
                     onChange={changeHandler}
