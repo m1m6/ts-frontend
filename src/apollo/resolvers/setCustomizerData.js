@@ -1,7 +1,11 @@
 import gql from 'graphql-tag';
 import { apolloClient } from '../apolloClient';
 
-export default (_, { isOpen, position, text, shouldOpenTheSelectOptions}, { cache }) => {
+export default (
+    _,
+    { isOpen, position, text, shouldOpenTheSelectOptions, customDirection, languages, branding },
+    { cache }
+) => {
     const query = gql`
         query getCustomizerData {
             customizer @client {
@@ -9,6 +13,9 @@ export default (_, { isOpen, position, text, shouldOpenTheSelectOptions}, { cach
                 position
                 text
                 shouldOpenTheSelectOptions
+                customDirection
+                languages
+                branding
             }
         }
     `;
@@ -19,7 +26,10 @@ export default (_, { isOpen, position, text, shouldOpenTheSelectOptions}, { cach
             isOpen,
             position,
             text,
-            shouldOpenTheSelectOptions
+            shouldOpenTheSelectOptions,
+            customDirection,
+            languages,
+            branding,
         },
     };
 

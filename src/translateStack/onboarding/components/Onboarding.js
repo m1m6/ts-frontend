@@ -3,6 +3,7 @@ import Select from 'react-select';
 import { message } from 'antd';
 import { Grid } from 'svg-loaders-react';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import classNames from 'classnames';
 import jsx from 'react-syntax-highlighter/dist/esm/languages/prism/jsx';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { getLanguagesList } from '../../../assets/js/languages';
@@ -18,11 +19,11 @@ import { useMeQuery } from '../../../rootUseQuery';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
-const OnboardinButton = ({ disabled = false, label, ...props }) => {
+const OnboardinButton = ({ disabled = false, label, isActive, ...props }) => {
     return (
         <Button
             children={label}
-            className="wf-btn-primary"
+            className={classNames('wf-btn-primary', { active: isActive })}
             disabled={disabled}
             style={{
                 height: '45px',
@@ -69,7 +70,7 @@ const CustomStyle = () => {
                 ...defaultStyles,
                 color: '#0a2540',
                 marginLeft: '15px',
-            }
+            };
         },
         multiValue: (base, state) => ({
             ...base,
@@ -110,7 +111,7 @@ const SourceLanguageStep = ({
             <div className="onboarding-step-count">{currentStep} out of 4</div>
             <div className="onboarding-step-title">Choose your source and target languages</div>
             <div className="onboarding-step-description">
-            Select the source language of your website.
+                Select the source language of your website.
             </div>
             <div style={{ marginBottom: '26px' }}>
                 <Select
@@ -132,6 +133,7 @@ const SourceLanguageStep = ({
                     //     selectedLanguages == null ||
                     //     (selectedLanguages && selectedLanguages.length === 0)
                     // }
+                    isActive={!!sourceLanguage}
                     onClick={async () => {
                         await onboardingMutation({ variables: { currentStep: currentStep + 1 } });
                     }}
@@ -147,7 +149,7 @@ const TargetLanguagesStep = ({
     onboardingMutation,
     selectedLanguages,
     setSelectedLanguages,
-    sourceLanguage
+    sourceLanguage,
 }) => {
     const changeHandler = (value) => {
         setSelectedLanguages(value);
@@ -155,20 +157,18 @@ const TargetLanguagesStep = ({
 
     const languagesList = getLanguagesList();
 
-    console.log("sourceLanguage", sourceLanguage);
-    console.log("languagesList", languagesList);
-
     return (
         <div className="onboarding-step-wrapper">
             <div className="onboarding-step-count">{currentStep} out of 4</div>
             <div className="onboarding-step-title">Choose your source and target languages</div>
             <div className="onboarding-step-description">
-                Select the languages that your website should be translated to. You can always add languages later, too.
+                Select the languages that your website should be translated to. You can always add
+                languages later, too.
             </div>
             <div style={{ marginBottom: '26px' }}>
                 <Select
                     styles={CustomStyle(selectedLanguages)}
-                    options={languagesList.filter(lang => lang.value !== sourceLanguage.value)}
+                    options={languagesList.filter((lang) => lang.value !== sourceLanguage.value)}
                     isLoading={languagesList && languagesList.length == 0}
                     loadingMessage="Loading..."
                     isMulti={true}
@@ -181,6 +181,7 @@ const TargetLanguagesStep = ({
             </div>
             <div>
                 <OnboardinButton
+                    isActive={selectedLanguages && selectedLanguages.length > 0}
                     disabled={
                         selectedLanguages == null ||
                         (selectedLanguages && selectedLanguages.length === 0)
@@ -200,7 +201,8 @@ const Step2 = ({ currentStep, onboardingMutation, pageUrl, setPageUrl }) => {
             <div className="onboarding-step-count">{currentStep} out of 4</div>
             <div className="onboarding-step-title">Enter your domain</div>
             <div className="onboarding-step-description">
-                Enter the URL of your project and get started translating your page within minutes. Make sure it is a valid URL.
+                Enter the URL of your project and get started translating your page within minutes.
+                Make sure it is a valid URL.
             </div>
             <div style={{ marginBottom: '26px', marginTop: '33px' }}>
                 <Input
@@ -213,6 +215,7 @@ const Step2 = ({ currentStep, onboardingMutation, pageUrl, setPageUrl }) => {
             </div>
             <div>
                 <OnboardinButton
+                    isActive={!!pageUrl}
                     disabled={!pageUrl}
                     onClick={async () => {
                         if (/^(http|https):\/\/[^ "]+$/.test(pageUrl)) {
@@ -241,7 +244,7 @@ const Step3 = ({
     setHasError,
     routerHistory,
     apiKey,
-    sourceLanguage
+    sourceLanguage,
 }) => {
     const [onboarding] = useOnboardingMutation();
     const [updateUser] = useUpdateUserMutation();
@@ -250,7 +253,8 @@ const Step3 = ({
             <div className="onboarding-step-count last">{currentStep} out of 4</div>
             <div className="onboarding-step-title last">Final Set up</div>
             <div className="onboarding-step-description last">
-                  This is your unique code snippet. Copy & paste it and place in in the head of your project. Only after this step you are able to get started.
+                This is your unique code snippet. Copy & paste it and place in in the head of your
+                project. Only after this step you are able to get started.
             </div>
             <div className="onboarding-step-code-wrapper">
                 <div className="onboarding-step-code">
@@ -271,17 +275,19 @@ const Step3 = ({
             </div>
             <div className="onboarding-step-title">Test your setup</div>
             <div className="onboarding-step-description last">
-                Let's validate if the code snippet is placed correctly in the head of your project. You are one click away to start translating.
+                Let's validate if the code snippet is placed correctly in the head of your project.
+                You are one click away to start translating.
             </div>
             <div>
                 <OnboardinButton
+                    isActive={true}
                     onClick={async () => {
                         setIsValidating(true);
                         const results = await onboarding({
                             variables: {
                                 pageUrl,
                                 translationLanguages: selectedLanguages.map((lang) => lang.value),
-                                sourceLanguage: sourceLanguage.value
+                                sourceLanguage: sourceLanguage.value,
                             },
                         });
 

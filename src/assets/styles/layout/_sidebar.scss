@@ -27,12 +27,22 @@
 					font-size: 16px;
 					font-weight: 400;
 				}
+
+				&.activeLink {
+					color: $periwinkle-two;
+				}
 			}
 
 			&:hover{
 				  background-color: #f9f6ff;
 			}
+
+			&.activeMenu { 
+				background-color: #f9f6ff;
+			}
 		}
+
+
 
 		.bottom-items{
 			position: absolute;

@@ -17,6 +17,7 @@ export const ME_QUERY = gql`
                 appearance
                 publishedLanguages
                 customDivId
+                customDivDirection
             }
             languages {
                 Language {
@@ -24,6 +25,7 @@ export const ME_QUERY = gql`
                     abbreviation
                     language
                     flag
+                    localName
                 }
             }
             pages {
@@ -53,6 +55,7 @@ export const LANGUAGES_LIST_QUERY = gql`
             language
             flag
             iso2
+            localName
         }
     }
 `;

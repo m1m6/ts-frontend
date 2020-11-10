@@ -1,9 +1,8 @@
 import { message, Skeleton, Table, Tag } from 'antd';
 import React, { useState } from 'react';
-import { Rings } from 'svg-loaders-react';
+import { format } from 'date-fns';
 import Button from '../../../form/components/Button';
 import { useUserPagesQuery } from '../useQueries';
-import { ReactComponent as CheckLogo } from '../../../assets/check.svg';
 import { useMeQuery } from '../../../rootUseQuery';
 import { useUpdateUserMutation } from '../../../user/useMutations';
 import { useOnboardingMutationClient } from '../../onboarding/useMutations';
@@ -16,6 +15,7 @@ import Input from '../../../form/components/Input';
 import Popup from '../../../components/Popup';
 import { useAddSinglePageMutation } from '../useMutations';
 import { getProjectTranslationsPercentage, getProjectWordsAndStringsCount } from '../utils';
+import { getTranslationsPercentageByLanguage } from '../../translation/utils';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -60,7 +60,8 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
         <div className="setup-popup-wrapper">
             <div className="setup-p-title">Add another page</div>
             <div className="setup-p-description">
-                Copy your code snippet below and place it in the &#60;head&#62; of your page. Afterwards, enter the URL to test your integration.
+                Copy your code snippet below and place it in the &#60;head&#62; of your page.
+                Afterwards, enter the URL to test your integration.
             </div>
             <div className="setup-p-code">
                 <div className="setup-code">
@@ -82,8 +83,8 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
             <div className="setup-p-d-w">
                 <div className="setup-p-d-t">Enter URL of the page</div>
                 <div className="setup-p-d-d">
-                    After you placed the code snippet in the new page, you can test the implementation. Just enter the valid
-                    URL and press the button.
+                    After you placed the code snippet in the new page, you can test the
+                    implementation. Just enter the valid URL and press the button.
                 </div>
                 <div className="setup-p-d-i">
                     <Input
@@ -135,8 +136,8 @@ const mapRows = (pages) => {
             row.key = i;
             row.url = page.pageUrl;
             row.strings = page.pageString.length;
-            row.translated = `10%`;
-            row.lastEdit = page.updatedAt;
+            row.translated = `${getTranslationsPercentageByLanguage(page.pageString)}%`;
+            row.lastEdit = format(new Date(page.updatedAt).getTime(), 'd. MMM');
             row.pageId = page.id;
 
             rows.push(row);
@@ -184,8 +185,8 @@ const Projects = ({ routerHistory }) => {
                               )
                             : 'n.a.'}
                     </div>
-                    <div className="project-status">
-                        {hasFinishedSetup ? (
+                    <div id="project-status" className="project-status">
+                        {/* {hasFinishedSetup ? (
                             <>
                                 <CheckLogo
                                     style={{
@@ -209,7 +210,7 @@ const Projects = ({ routerHistory }) => {
                                 />
                                 INSTALLATION NOT COMPLETED
                             </>
-                        )}
+                        )} */}
                     </div>
                 </div>
                 <div className="rs">

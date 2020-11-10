@@ -24,12 +24,12 @@ const CustomStyle = (text) => {
         container: (base, { selectProps: { width, height } }) => ({
             ...base,
             width:
-                text === 'FULL'
+                text === 'FULL' || text === 'TEXT_ONLY'
                     ? '150px'
                     : text === 'SHORTENED'
                     ? '120px'
                     : text === 'FLAG_ONLY'
-                    ? '85px'
+                    ? '90px'
                     : '120px',
         }),
         control: (base, state) => ({
@@ -41,7 +41,6 @@ const CustomStyle = (text) => {
         }),
         singleValue: (base, state) => ({
             ...base,
-            // opacity: '0.29',
             fontFamily: 'Open Sans',
             fontSize: '12px',
             fontWeight: 'bold',
@@ -74,17 +73,24 @@ const Customizer = (props) => {
 
     let customizer = meData && meData.me && meData.me.customizer ? meData.me.customizer : {};
     let userLanguages = meData && meData.me ? meData.me.languages : [];
-    let { shouldOpenTheSelectOptions } = data.customizer;
+    let {
+        shouldOpenTheSelectOptions,
+        position: localPosition,
+        customDirection: localCustomDirection,
+        languages,
+        branding,
+        text: localText
+    } = data.customizer;
 
-    let { position, text, appearance, publishedLanguages } = customizer;
-    let mappedLangs = mapLanguages(userLanguages, text).filter((l) =>
-        publishedLanguages.includes(l.value)
+    let { position, text, appearance, publishedLanguages, customDivDirection } = customizer;
+    let mappedLangs = mapLanguages(userLanguages, (localText || text), true).filter((l) =>
+        (languages || publishedLanguages).includes(l.value)
     );
 
     const Option = (props, index) => {
         return props.options && props.options.length && props.options[0].value === props.value ? (
             <>
-                {appearance === 'WITH_BRANDING' && (
+                {(branding || appearance) === 'WITH_BRANDING' && (
                     <div
                         style={{
                             fontFamily: 'Open Sans',
@@ -117,8 +123,8 @@ const Customizer = (props) => {
 
                 <div
                     className={classNames('window-content', {
-                        isLeft: position === 'LEFT',
-                        isRight: position === 'RIGHT',
+                        isLeft: (localPosition || position) === 'LEFT',
+                        isRight: (localPosition || position) === 'RIGHT',
                     })}
                 >
                     <Select
@@ -126,8 +132,16 @@ const Customizer = (props) => {
                         defaultValue={mappedLangs[0]}
                         isSearchable={false}
                         isOptionDisabled={true}
-                        styles={CustomStyle(text)}
-                        menuPlacement={'top'}
+                        styles={CustomStyle(localText || text)}
+                        menuPlacement={
+                            (localCustomDirection || '').toLowerCase() === 'up'
+                                ? 'top'
+                                : (localCustomDirection || '').toLowerCase() === 'down'
+                                ? 'bottom'
+                                : customDivDirection.toLowerCase() === 'up'
+                                ? 'top'
+                                : 'bottom'
+                        }
                         menuIsOpen={shouldOpenTheSelectOptions === true ? true : undefined}
                         components={{ Option }}
                     />

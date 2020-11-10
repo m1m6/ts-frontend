@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Rings } from 'svg-loaders-react';
 import { Layout, Steps } from 'antd';
+import classNames from 'classnames';
 import { ReactComponent as Logo } from '../assets/logo.svg';
+
 import { useMeQuery } from '../rootUseQuery';
 import { useOnboardingQueryClient } from '../translateStack/onboarding/useQueries';
 import { Link } from 'react-router-dom';
@@ -47,6 +49,7 @@ const Sidebar = ({ isOpenCustomizer }) => {
     const [updateUser] = useUpdateUserMutation();
     const [updateOnboardingClient] = useOnboardingMutationClient();
     const [updateCustomizerClient] = useCustomizerMutationClient();
+    let [activeMenu, setActiveMenu] = useState('Projects');
 
     if (loading) {
         return <></>;
@@ -71,8 +74,19 @@ const Sidebar = ({ isOpenCustomizer }) => {
                 <CustomizerSidebar />
             ) : (
                 <div className="menu-wrapper">
-                    <div className="menu-item">
-                        <Link to="/" title="Projects">
+                    <div
+                        className={classNames('menu-item', {
+                            activeMenu: activeMenu === 'Projects',
+                        })}
+                    >
+                        <Link
+                            to="/"
+                            title="Projects"
+                            onClick={(e) => setActiveMenu('Projects')}
+                            className={classNames({
+                                activeLink: activeMenu === 'Projects',
+                            })}
+                        >
                             Projects
                         </Link>
                     </div>
@@ -104,6 +118,7 @@ const Sidebar = ({ isOpenCustomizer }) => {
                             to="#"
                             title="Customizer"
                             onClick={async (e) => {
+                                setActiveMenu('Projects');
                                 e.preventDefault();
                                 await updateCustomizerClient({ variables: { isOpen: true } });
                                 browserHistory.push('/customizer');
@@ -114,8 +129,19 @@ const Sidebar = ({ isOpenCustomizer }) => {
                     </div>
 
                     <div className="bottom-items">
-                        <div className="menu-item">
-                            <Link to="/settings" title="Settings">
+                        <div
+                            className={classNames('menu-item', {
+                                activeMenu: activeMenu === 'Settings',
+                            })}
+                        >
+                            <Link
+                                to="/settings"
+                                title="Settings"
+                                onClick={(e) => setActiveMenu('Settings')}
+                                className={classNames({
+                                    activeLink: activeMenu === 'Settings',
+                                })}
+                            >
                                 Settings
                             </Link>
                         </div>

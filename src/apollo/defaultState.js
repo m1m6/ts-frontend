@@ -14,8 +14,11 @@ export default {
     customizer: {
         __typename: 'customizer',
         isOpen: false,
-		position: 'LEFT',
-		text: 'FULL',
-		shouldOpenTheSelectOptions: false
+        position: null,
+        text: null,
+        shouldOpenTheSelectOptions: false,
+        customDirection: null,
+        languages: null,
+        branding: null
     },
 };

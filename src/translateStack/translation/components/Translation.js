@@ -1,5 +1,7 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef, Children } from 'react';
 import { Table, Input, Form, message } from 'antd';
+import {parse, format} from 'date-fns';
+
 import GoBack from '../../../components/GoBack';
 import { useGetPageQuery } from '../useQueries';
 import Select from 'react-select';
@@ -61,7 +63,6 @@ const EditableRow = ({ index, ...props }) => {
         </Form>
     );
 };
-
 const EditableCell = ({
     title,
     editable,
@@ -72,88 +73,59 @@ const EditableCell = ({
     ...restProps
 }) => {
     const [editing, setEditing] = useState(false);
+    const [focus, setFocus] = useState(false);
 
-    const inputRef = useRef();
     const form = useContext(EditableContext);
-    useEffect(() => {
-        if (editing) {
-            inputRef.current.focus();
-        }
-    }, [editing]);
-
-    const toggleEdit = () => {
-        setEditing(!editing);
-        form.setFieldsValue({
-            [dataIndex]: record[dataIndex],
-        });
-    };
-
-    const save = async (e) => {
-        try {
-            const values = await form.validateFields();
-            toggleEdit();
-            handleSave({ ...record, ...values });
-        } catch (errInfo) {
-            console.log('Save failed:', errInfo);
-        }
-    };
-
     let childNode = children;
 
     if (editable) {
-        childNode = editing ? (
-            <Form.Item
-                style={{
-                    margin: 0,
-                }}
-                name={dataIndex}
-                rules={[
-                    {
-                        validator: (_, value) => {
-                            let tbodyWrapper = document.getElementsByClassName('ant-table-tbody');
+        let tbodyWrapper = document.getElementsByClassName('ant-table-tbody');
 
-                            if (value) {
-                                if (tbodyWrapper) {
-                                    if (tbodyWrapper[0]) {
-                                        tbodyWrapper[0].children[
-                                            record.key
-                                        ].children[0].style.borderLeft = 'none';
-                                    }
-                                }
-                                return Promise.resolve();
-                            } else {
-                                if (tbodyWrapper) {
-                                    if (tbodyWrapper[0]) {
-                                        tbodyWrapper[0].children[
-                                            record.key
-                                        ].children[0].style.borderLeft = '2px solid red';
-                                    }
-                                }
-                                return Promise.reject();
-                            }
-                        },
-                    },
-                ]}
-            >
-                <Input.TextArea
-                    cols="10"
-                    rows="3"
-                    ref={inputRef}
-                    onPressEnter={save}
-                    onBlur={save}
-                    className="translated-string-input"
-                />
-            </Form.Item>
-        ) : (
-            <div
-                className="editable-cell-value-wrap"
-                style={{
-                    paddingRight: 24,
+        if (record && (record[dataIndex] === null || record[dataIndex] === '')) {
+            if (tbodyWrapper) {
+                if (tbodyWrapper[0]) {
+                    tbodyWrapper[0].children[record.key].children[0].style.borderLeft =
+                        '2px solid #ff7166';
+                }
+            }
+        } else {
+            if (tbodyWrapper) {
+                if (tbodyWrapper[0]) {
+                    if (focus) {
+                        tbodyWrapper[0].children[record.key].children[0].style.borderLeft =
+                            '2px solid #9966ff';
+                    } else
+                        tbodyWrapper[0].children[record.key].children[0].style.borderLeft = 'none';
+                }
+            }
+        }
+
+        childNode = (
+            <Input.TextArea
+                value={record[dataIndex]}
+                onChange={async (e) => {
+                    handleSave({ ...record, ...{ translated: e.target.value } });
                 }}
-                onClick={toggleEdit}
-            >
-                {children}
-            </div>
+                cols="10"
+                rows="3"
+                onFocus={(e) => setFocus(true)}
+                onBlur={(e) => setFocus(false)}
+                style={{
+                    border:
+                        record[dataIndex] === null || record[dataIndex] === ''
+                            ? '2px solid #ff7166'
+                            : focus
+                            ? '2px solid #9966ff'
+                            : '2px solid rgba(227, 232, 238, 0.42)',
+
+                    backgroundColor:
+                        record[dataIndex] === null || record[dataIndex] === ''
+                            ? 'rgba(255, 113, 102, 0.06)'
+                            : focus
+                            ? 'rgba(153, 102, 255, 0.13)'
+                            : 'unset',
+                }}
+            />
         );
     }
     return <td {...restProps}>{childNode}</td>;
@@ -221,7 +193,7 @@ const mapRows = (strings, selectedLanguageId) => {
             row.id = string.id;
             row.original = string.original;
             row.translated = translatedStringValue;
-            row.lastEdit = updatedAtValue;
+            row.lastEdit = format(new Date(updatedAtValue).getTime(), 'd. MMM');
             row.stringId = string.id;
             row.selectedLanguageId = selectedLanguageId;
             rows.push(row);
@@ -243,6 +215,7 @@ const Translation = (props) => {
 
     let [rowsData, setRowsData] = useState([]);
     let [userSelectedLang, setUserSelectedLang] = useState(0);
+    let [dataUpdated, setDataUpdated] = useState(false);
 
     if (loading || meLoading) {
         return <></>;
@@ -270,30 +243,31 @@ const Translation = (props) => {
                     </div>
                 </div>
                 <div className="rs">
-                    <Button
-                        className="wf-btn-primary"
-                        children={'Publish Changes'}
-                        onClick={async (e) => {
-                            // get all updated strings only
-                            const updatedRows = rowsData
-                                .filter((row) => row.isUpdated && row.translated !== 'n.a.')
-                                .map(({ translated, stringId, selectedLanguageId }) => {
-                                    return { translated, stringId, selectedLanguageId };
-                                });
-                            if (updatedRows && updatedRows.length > 0) {
-                                const results = await publishTranslations({
-                                    variables: { input: updatedRows },
-                                });
-                                if (results && results.data && results.data.addTranslations) {
-                                    message.success('Translations saved successfully!');
-                                } else {
-                                    message.error(
-                                        "Unable to save the translations, we've received the error, and we're working on it."
-                                    );
+                    {dataUpdated && (
+                        <Button
+                            className="wf-btn-primary"
+                            children={'Publish Changes'}
+                            onClick={async (e) => {
+                                const updatedRows = rowsData
+                                    .filter((row) => row.isUpdated && row.translated !== 'n.a.')
+                                    .map(({ translated, stringId, selectedLanguageId }) => {
+                                        return { translated, stringId, selectedLanguageId };
+                                    });
+                                if (updatedRows && updatedRows.length > 0) {
+                                    const results = await publishTranslations({
+                                        variables: { input: updatedRows },
+                                    });
+                                    if (results && results.data && results.data.addTranslations) {
+                                        message.success('Translations saved successfully!');
+                                    } else {
+                                        message.error(
+                                            "Unable to save the translations, we've received the error, and we're working on it."
+                                        );
+                                    }
                                 }
-                            }
-                        }}
-                    />
+                            }}
+                        />
+                    )}
                 </div>
             </div>
             <div className="translation-page-sub-header">
@@ -330,6 +304,7 @@ const Translation = (props) => {
                     userLanguages={userLanguages}
                     setRowsData={setRowsData}
                     setUserSelectedLang={setUserSelectedLang}
+                    setDataUpdated={setDataUpdated}
                 />
             </div>
         </div>
@@ -346,28 +321,17 @@ const placeHolderRow = [
     },
 ];
 
-const TableWrapper = ({ strings, userLanguages, setRowsData, setUserSelectedLang }) => {
+const TableWrapper = ({
+    strings,
+    userLanguages,
+    setRowsData,
+    setUserSelectedLang,
+    setDataUpdated,
+}) => {
     let [selectedLanguageId, setSelectedLanguageId] = useState(userLanguages[0].Language.id);
     let [rows, setRows] = useState(mapRows(strings, selectedLanguageId));
 
-    useEffect(() => {
-        const mappedRows = mapRows(strings, selectedLanguageId)
-        console.log("mappedRows", mappedRows);
-        setRows(mappedRows);
-        setRowsData(mappedRows);
-        setUserSelectedLang(selectedLanguageId);
-    }, [selectedLanguageId]);
-
-    const handleSave = (row) => {
-        const newData = [...rows];
-        const index = newData.findIndex((item) => row.key === item.key);
-        const item = newData[index];
-        newData.splice(index, 1, { ...item, ...row, isUpdated: true });
-        setRows(newData);
-        setRowsData(newData);
-    };
-
-    const finalColumns = columns(userLanguages, setSelectedLanguageId).map((col) => {
+    let finalColumns = columns(userLanguages, setSelectedLanguageId).map((col) => {
         if (!col.editable) {
             return col;
         }
@@ -383,6 +347,24 @@ const TableWrapper = ({ strings, userLanguages, setRowsData, setUserSelectedLang
             }),
         };
     });
+
+    useEffect(() => {
+        setUserSelectedLang(selectedLanguageId);
+
+        const mappedRows = mapRows(strings, selectedLanguageId);
+        setRows(mappedRows);
+        setRowsData(mappedRows);
+    }, [selectedLanguageId]);
+
+    const handleSave = (row) => {
+        const newData = [...rows];
+        const index = newData.findIndex((item) => row.key === item.key);
+        const item = newData[index];
+        newData.splice(index, 1, { ...item, ...row, isUpdated: true });
+        setDataUpdated(true);
+        setRows(newData);
+        setRowsData(newData);
+    };
 
     const components = {
         body: {

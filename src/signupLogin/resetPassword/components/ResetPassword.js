@@ -2,19 +2,17 @@ import React from 'react';
 import { Row, Icon } from 'antd';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
+import classNames from 'classnames';
 import InputField from '../../../form/components/InputField';
 import Button from '../../../form/components/Button';
-import Link from '../../../form/components/Link';
 import { showAllGraphQLErrors } from '../../../helper/graphqlErrors';
-import { auth } from '../../auth';
-import { isAdmin } from '../../utils';
 
 const initialValues = {
     email: '',
 };
 
 const resetPasswordSchema = Yup.object().shape({
-    email: Yup.string().required('*Required'),
+    email: Yup.string().email("Please enter valid email").required('*Required'),
 });
 
 const ResetPassword = ({ routerHistory }) => {
@@ -28,7 +26,7 @@ const ResetPassword = ({ routerHistory }) => {
                     fontSize: '12px',
                     color: '#9966ff',
                     cursor: 'pointer',
-                    marginBottom: '21px'
+                    marginBottom: '21px',
                 }}
                 onClick={() => routerHistory.goBack()}
             >
@@ -56,22 +54,20 @@ const ResetPassword = ({ routerHistory }) => {
                     }
                 }}
             >
-                {({ values, isSubmitting }) => (
+                {({ values, isSubmitting, dirty, errors }) => (
                     <Form>
                         <Row className="auth-row">
-                            <InputField
-                                name="email"
-                                type="text"
-                                label="Email"
-                            />
+                            <InputField name="email" type="text" label="Email" />
                         </Row>
                         <Row>
                             <Button
                                 htmlType="submit"
                                 type="primary"
                                 disabled={isSubmitting}
-                                className="wf-btn-primary"
-                                style={{marginTop: '19px'}}
+                                className={classNames('wf-btn-primary', {
+                                    active: dirty && Object.keys(errors).length === 0,
+                                })}
+                                style={{ marginTop: '19px' }}
                             >
                                 {isSubmitting ? 'SENDING...' : <>SEND EMAIL</>}
                             </Button>

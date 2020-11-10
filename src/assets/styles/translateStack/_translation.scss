@@ -81,6 +81,14 @@
         }
     }
 
+    .ant-input{
+        &:focus {
+            outline: none;
+            outline-color: none;
+            border: none;
+            box-shadow: unset;
+        }
+    }
     .translation-page-table {
         margin-left: 32px;
         margin-top: 25px;

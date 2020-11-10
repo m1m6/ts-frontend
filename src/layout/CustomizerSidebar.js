@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { message, Radio } from 'antd';
 import { Link } from 'react-router-dom';
+import classNames from 'classnames';
 import { browserHistory } from '../browserHistory';
 import GoBack from '../components/GoBack';
 import { ReactComponent as RightArrow } from '../assets/right-arrow-angle.svg';
@@ -8,7 +9,6 @@ import {
     useCustomizerMutation,
     useCustomizerMutationClient,
 } from '../translateStack/customizer/useMutations';
-import { useCustomizerQueryClient } from '../translateStack/customizer/useQueries';
 import Button from '../form/components/Button';
 import { useMeQuery } from '../rootUseQuery';
 import { mapLanguages } from '../translateStack/translation/utils';
@@ -134,12 +134,73 @@ const CustomStyle = () => {
     };
 };
 
+const CustomDirectionStyle = () => {
+    return {
+        option: (base, data) => {
+            return {
+                ...base,
+                backgroundColor: '#e8eaef',
+                color: '#0a2540',
+                fontSize: '12px',
+                letterSpacing: '0.43px',
+                fontWeight: 'bold',
+                '&:active': { backgroundColor: 'rgba(227, 232, 238, 0.42)' },
+                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.01)' },
+            };
+        },
+        menu: (provided, state) => ({
+            ...provided,
+            width: state.selectProps.width,
+            borderBottom: '1px dotted pink',
+            color: state.selectProps.menuColor,
+            padding: 10,
+        }),
+        container: (base, { selectProps: { width, height } }) => ({
+            ...base,
+            width: width,
+            marginTop: '10px',
+            height: '56px',
+        }),
+        control: (base, state) => ({
+            ...base,
+            border: 'solid 1px rgba(227, 232, 238, 0.42)',
+            borderRadius: '2px',
+            boxShadow: 'none',
+            '&:hover': { borderColor: '#a172ff' },
+        }),
+        indicatorSeparator: (base, state) => ({
+            ...base,
+            display: 'none',
+        }),
+        multiValue: (base, state) => ({
+            ...base,
+            height: '47px',
+            borderRadius: '3px',
+            border: 'solid 1px rgba(227, 232, 238, 0.42)',
+            backgroundColor: 'rgba(227, 232, 238, 0.42)',
+            paddingLeft: '13px',
+            paddingTop: '10px',
+            paddingBottom: '8px',
+        }),
+        singleValue: (base, state) => ({
+            ...base,
+            fontFamily: 'Open Sans',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            letterSpacing: '0.5px',
+            color: '#0a2540',
+        }),
+    };
+};
+
 const PositionComponent = ({}) => {
     const { data, loading: meLoading } = useMeQuery();
     const [updateCustomizer] = useCustomizerMutation();
-
+    const [updateCustomizerClient] = useCustomizerMutationClient();
+    const [btnActive, setBtnActive] = useState(false);
     const [userPosition, setUserPosition] = useState(null);
     const [customPosition, setCustomPosition] = useState(null);
+    const [customDirection, setCustomDirection] = useState(null);
 
     if (meLoading) return <></>;
 
@@ -147,6 +208,19 @@ const PositionComponent = ({}) => {
 
     if (customizer && userPosition === null) {
         setUserPosition(customizer.position || 'LEFT');
+    }
+
+    if (customizer && customPosition === null) {
+        setCustomPosition(customizer.customDivId || '');
+    }
+
+    if (customizer && customizer.customDivDirection !== null && customDirection === null) {
+        setCustomDirection({
+            label: `${customizer.customDivDirection[0]}${customizer.customDivDirection
+                .slice(1)
+                .toLowerCase()}`,
+            value: customizer.customDivDirection,
+        });
     }
 
     return (
@@ -161,6 +235,15 @@ const PositionComponent = ({}) => {
                     value={userPosition}
                     onChange={async (e) => {
                         setUserPosition(e.target.value);
+
+                        if (e.target.value !== 'CUSTOM') {
+                            setBtnActive(true);
+                        }
+                        await updateCustomizerClient({
+                            variables: {
+                                position: e.target.value,
+                            },
+                        });
                     }}
                 >
                     <Radio.Button value="LEFT">LEFT</Radio.Button>
@@ -174,24 +257,65 @@ const PositionComponent = ({}) => {
                             value={customPosition}
                             onChange={(e) => {
                                 setCustomPosition(e.target.value);
+                                if (e.target.value !== '') {
+                                    setBtnActive(true);
+                                }
                             }}
                         />
+
                         <div className="hint">
                             * If id of element will not be found on the page, default position will
                             be used
                         </div>
+
+                        <div
+                            style={{
+                                fontFamily: 'Open Sans',
+                                fontSize: '14px',
+                                fontWeight: 'bold',
+                                letterSpacing: '0.5px',
+                                color: '#0a2540',
+                                marginTop: '19px',
+                            }}
+                        >
+                            Direction of Opening
+                        </div>
+                        <Select
+                            options={[
+                                { label: 'Down', value: 'DOWN' },
+                                { label: 'Up', value: 'UP' },
+                            ]}
+                            styles={CustomDirectionStyle()}
+                            value={customDirection}
+                            onChange={async (e) => {
+                                setCustomDirection(e);
+                                setBtnActive(true);
+                                await updateCustomizerClient({
+                                    variables: {
+                                        customDirection: e.label,
+                                    },
+                                });
+                            }}
+                            width="200px"
+                            height="30px"
+                        />
                     </div>
                 )}
 
                 <Button
                     children="SAVE"
-                    className="wf-btn-primary"
+                    className={classNames('wf-btn-primary', { active: btnActive })}
                     onClick={async (e) => {
+                        if (!customPosition) {
+                            message.error('Please enter valid DIV ID.');
+                            return;
+                        }
                         const results = await updateCustomizer({
                             variables: {
                                 ...data.me.customizer,
                                 position: userPosition,
-                                customDivId: customPosition
+                                customDivId: customPosition,
+                                customDivDirection: customDirection ? customDirection.value : '',
                             },
                         });
 
@@ -209,8 +333,10 @@ const PositionComponent = ({}) => {
 const TextComponent = ({}) => {
     const { data, loading: meLoading } = useMeQuery();
     const [updateCustomizer] = useCustomizerMutation();
+    const [updateCustomizerClient] = useCustomizerMutationClient();
 
     const [userText, setUserText] = useState(null);
+    const [btnActive, setBtnActive] = useState(false);
 
     if (meLoading) return <></>;
 
@@ -232,15 +358,22 @@ const TextComponent = ({}) => {
                     value={userText}
                     onChange={async (e) => {
                         setUserText(e.target.value);
+                        setBtnActive(true);
+                        await updateCustomizerClient({
+                            variables: {
+                                text: e.target.value,
+                            },
+                        });
                     }}
                 >
                     <Radio.Button value="FULL">FULL</Radio.Button>
                     <Radio.Button value="SHORTENED">SHORTENED</Radio.Button>
+                    <Radio.Button value="TEXT_ONLY">TEXT ONLY</Radio.Button>
                     <Radio.Button value="FLAG_ONLY">FLAG ONLY</Radio.Button>
                 </Radio.Group>
                 <Button
                     children="SAVE"
-                    className="wf-btn-primary"
+                    className={classNames('wf-btn-primary', { active: btnActive })}
                     onClick={async (e) => {
                         const results = await updateCustomizer({
                             variables: {
@@ -262,6 +395,9 @@ const TextComponent = ({}) => {
 
 const LanguagesComponent = ({}) => {
     const [selectedLanguages, setSelectedLanguages] = useState(null);
+    const [btnActive, setBtnActive] = useState(false);
+
+    const [updateCustomizerClient] = useCustomizerMutationClient();
     const { data: meData, loading: meLoading } = useMeQuery();
     const [updateCustomizer] = useCustomizerMutation();
 
@@ -280,8 +416,16 @@ const LanguagesComponent = ({}) => {
         setSelectedLanguages(filteredLangs);
     }
 
-    const changeHandler = (value) => {
+    const changeHandler = async (value) => {
         setSelectedLanguages(value);
+        setBtnActive(true);
+
+        let mappedValues = value ? value.map((v) => v.value) : null;
+        await updateCustomizerClient({
+            variables: {
+                languages: mappedValues,
+            },
+        });
     };
     return (
         <>
@@ -303,7 +447,7 @@ const LanguagesComponent = ({}) => {
                 />
                 <Button
                     children="SAVE"
-                    className="wf-btn-primary"
+                    className={classNames('wf-btn-primary', { active: btnActive })}
                     onClick={async (e) => {
                         const results = await updateCustomizer({
                             variables: {
@@ -326,7 +470,9 @@ const LanguagesComponent = ({}) => {
 const AppearanceComponent = ({}) => {
     const { data, loading: meLoading } = useMeQuery();
     const [updateCustomizer] = useCustomizerMutation();
+    const [updateCustomizerClient] = useCustomizerMutationClient();
 
+    const [btnActive, setBtnActive] = useState(false);
     const [userBranding, setUserBranding] = useState(null);
 
     if (meLoading) return <></>;
@@ -349,6 +495,12 @@ const AppearanceComponent = ({}) => {
                     value={userBranding}
                     onChange={async (e) => {
                         setUserBranding(e.target.value);
+                        setBtnActive(true);
+                        await updateCustomizerClient({
+                            variables: {
+                                branding: e.target.value,
+                            },
+                        });
                     }}
                 >
                     <Radio.Button value="WITH_BRANDING">WITH BRANDING</Radio.Button>
@@ -356,7 +508,7 @@ const AppearanceComponent = ({}) => {
                 </Radio.Group>
                 <Button
                     children="SAVE"
-                    className="wf-btn-primary"
+                    className={classNames('wf-btn-primary', { active: btnActive })}
                     onClick={async (e) => {
                         const results = await updateCustomizer({
                             variables: {

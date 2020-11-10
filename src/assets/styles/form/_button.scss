@@ -27,4 +27,8 @@
 	&:disabled {
 		opacity: 0.32;
 	}
+
+	&.active {
+		opacity: 1;
+	}
 }
