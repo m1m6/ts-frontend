@@ -2,6 +2,8 @@ import { message, Skeleton, Table, Tag } from 'antd';
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import Button from '../../../form/components/Button';
+import { ReactComponent as CheckLogo } from '../../../assets/check.svg';
+import { Rings } from 'svg-loaders-react';
 import { useUserPagesQuery } from '../useQueries';
 import { useMeQuery } from '../../../rootUseQuery';
 import { useUpdateUserMutation } from '../../../user/useMutations';
@@ -183,10 +185,10 @@ const Projects = ({ routerHistory }) => {
                                       ? data.userPages[0].pageUrl.indexOf('/')
                                       : data.userPages[0].pageUrl.length
                               )
-                            : 'n.a.'}
+                            : ''}
                     </div>
                     <div id="project-status" className="project-status">
-                        {/* {hasFinishedSetup ? (
+                        {hasFinishedSetup ? (
                             <>
                                 <CheckLogo
                                     style={{
@@ -210,7 +212,7 @@ const Projects = ({ routerHistory }) => {
                                 />
                                 INSTALLATION NOT COMPLETED
                             </>
-                        )} */}
+                        )}
                     </div>
                 </div>
                 <div className="rs">
@@ -232,29 +234,29 @@ const Projects = ({ routerHistory }) => {
             <div className="projects-page-sub-header">
                 <div className="p-an-w">
                     <div className="p-an-l">Words</div>
-                    <div className="p-an-v">{wordsCount > 0 ? wordsCount : 'n.a.'} </div>
+                    <div className="p-an-v">{wordsCount > 0 ? wordsCount : '0'} </div>
                 </div>
 
                 <div className="p-an-w">
                     <div className="p-an-l">Pages</div>
                     <div className="p-an-v">
-                        {hasFinishedSetup ? data.userPages.length : 'n.a.'}
+                        {hasFinishedSetup ? data.userPages.length : '0'}
                     </div>
                 </div>
 
                 <div className="p-an-w">
                     <div className="p-an-l">Strings</div>
-                    <div className="p-an-v"> {stringCount > 0 ? stringCount : 'n.a.'} </div>
+                    <div className="p-an-v"> {stringCount > 0 ? stringCount : '0'} </div>
                 </div>
 
                 <div className="p-an-w">
                     <div className="p-an-l">Languages</div>
                     <div className="p-an-v">
                         {userLoading
-                            ? 'n.a.'
+                            ? '0'
                             : userData.me && userData.me.languages && userData.me.languages.length
                             ? userData.me.languages.length
-                            : 'n.a.'}
+                            : '0'}
                     </div>
                 </div>
 

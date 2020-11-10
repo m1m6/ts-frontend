@@ -249,7 +249,7 @@ const Translation = (props) => {
                             children={'Publish Changes'}
                             onClick={async (e) => {
                                 const updatedRows = rowsData
-                                    .filter((row) => row.isUpdated && row.translated !== 'n.a.')
+                                    .filter((row) => row.isUpdated && row.translated !== '0')
                                     .map(({ translated, stringId, selectedLanguageId }) => {
                                         return { translated, stringId, selectedLanguageId };
                                     });
@@ -273,7 +273,7 @@ const Translation = (props) => {
             <div className="translation-page-sub-header">
                 <div className="t-an-w">
                     <div className="t-an-l">Words</div>
-                    <div className="t-an-v">{wordsCount > 0 ? wordsCount : 'n.a.'} </div>
+                    <div className="t-an-v">{wordsCount > 0 ? wordsCount : '0'} </div>
                 </div>
 
                 <div className="t-an-w">
@@ -281,7 +281,7 @@ const Translation = (props) => {
                     <div className="t-an-v">
                         {data.getPage && data.getPage.pageString
                             ? data.getPage.pageString.length
-                            : 'n.a.'}
+                            : '0'}
                     </div>
                 </div>
 
@@ -293,7 +293,7 @@ const Translation = (props) => {
                 <div className="t-an-w">
                     <div className="t-an-l">Languages</div>
                     <div className="t-an-v">
-                        {userLanguages && userLanguages.length ? userLanguages.length : 'n.a.'}
+                        {userLanguages && userLanguages.length ? userLanguages.length : '0'}
                     </div>
                 </div>
             </div>

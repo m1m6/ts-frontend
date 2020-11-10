@@ -129,10 +129,9 @@ const SourceLanguageStep = ({
             </div>
             <div>
                 <OnboardinButton
-                    // disabled={
-                    //     selectedLanguages == null ||
-                    //     (selectedLanguages && selectedLanguages.length === 0)
-                    // }
+                    disabled={
+                        !sourceLanguage
+                    }
                     isActive={!!sourceLanguage}
                     onClick={async () => {
                         await onboardingMutation({ variables: { currentStep: currentStep + 1 } });

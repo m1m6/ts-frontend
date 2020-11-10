@@ -45,7 +45,7 @@ const App = () => {
         }
     }, []);
     if (loading || customizerLoading) {
-        return <Spin spinning={loading} size="large" delay={500} />;
+        return <Spin spinning={loading} size="large" delay={500} style={{margin: "0 auto"}}/>;
     }
 
     if (userRole === undefined && data && data.me) {
