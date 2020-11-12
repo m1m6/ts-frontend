@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Rings } from 'svg-loaders-react';
 import { Layout, Steps } from 'antd';
 import classNames from 'classnames';
@@ -15,44 +15,117 @@ import { useCustomizerMutationClient } from '../translateStack/customizer/useMut
 import GoBack from '../components/GoBack';
 import { ReactComponent as RightArrow } from '../assets/right-arrow-angle.svg';
 import CustomizerSidebar from './CustomizerSidebar';
+import LoadingBar from 'react-top-loading-bar';
 
 const { Sider } = Layout;
 const { Step } = Steps;
 
 const HeaderLogo = () => {
     return (
-        <div className="header-logo pointer" onClick={() => browserHistory.push('/')}>
+        <div
+            className="header-logo pointer"
+            onClick={() => {
+                if (!window.location.pathname.includes('/onboarding')) {
+                    browserHistory.push('/');
+                }
+            }}
+        >
             <Logo className="onboarding-header" fill="#ccc" />
         </div>
     );
 };
 
-const OnboardingSteps = ({ currentStep }) => {
+const OnboardingSteps = ({ currentStep, updateOnboardingClient }) => {
     return (
         <div className="onboarding-wrapper">
+            {currentStep > 1 && (
+                <GoBack
+                    onClickCB={async (e) => {
+                        await updateOnboardingClient({
+                            variables: { currentStep: currentStep - 1 },
+                        });
+                    }}
+                />
+            )}
             <div className="onboarding-title">Your integration guide</div>
             <div className="onboarding-steps">
                 <Steps progressDot current={currentStep - 1} direction="vertical">
-                    <Step title="Source Language" />
-                    <Step title="Targeted Languages" />
-                    <Step title="Your Domain" />
-                    <Step title="Installation" />
+                    <Step
+                        title="Source Language"
+                        onClick={async (e) => {
+                            await updateOnboardingClient({
+                                variables: { currentStep: 1 },
+                            });
+                        }}
+                        style={{
+                            cursor: 'pointer',
+                        }}
+                    />
+                    <Step
+                        title="Targeted Languages"
+                        onClick={async (e) => {
+                            await updateOnboardingClient({
+                                variables: { currentStep: 2 },
+                            });
+                        }}
+                        style={{
+                            cursor: 'pointer',
+                        }}
+                    />
+                    <Step
+                        title="Your Domain"
+                        onClick={async (e) => {
+                            await updateOnboardingClient({
+                                variables: { currentStep: 3 },
+                            });
+                        }}
+                        style={{
+                            cursor: 'pointer',
+                        }}
+                    />
+                    <Step
+                        title="Installation"
+                        onClick={async (e) => {
+                            await updateOnboardingClient({
+                                variables: { currentStep: 4 },
+                            });
+                        }}
+                        style={{
+                            cursor: 'pointer',
+                        }}
+                    />
                 </Steps>
             </div>
         </div>
     );
 };
 
-const Sidebar = ({ isOpenCustomizer }) => {
+const Sidebar = ({ isOpenCustomizer, openLanguagesComponent }) => {
     const { data, loading, error } = useMeQuery();
     const { data: onboardingData } = useOnboardingQueryClient();
     const [updateUser] = useUpdateUserMutation();
     const [updateOnboardingClient] = useOnboardingMutationClient();
     const [updateCustomizerClient] = useCustomizerMutationClient();
     let [activeMenu, setActiveMenu] = useState('Projects');
+    const [progress, setProgress] = useState(70);
+
+    useEffect(() => {
+        if (loading) {
+            setProgress(100);
+        }
+        return () => {
+            setProgress(0);
+        };
+    }, []);
 
     if (loading) {
-        return <></>;
+        return (
+            <LoadingBar
+                color="#f11946"
+                progress={progress}
+                onLoaderFinished={() => setProgress(0)}
+            />
+        );
     }
 
     const {
@@ -64,14 +137,26 @@ const Sidebar = ({ isOpenCustomizer }) => {
 
     return (
         <Sider
-            width={(isNew && !skippedOnboarding) || isOpenCustomizer ? 323 : 205}
+            width={
+                (isNew &&
+                    !skippedOnboarding &&
+                    browserHistory.location.pathname.includes('onboarding')) ||
+                isOpenCustomizer
+                    ? 323
+                    : 205
+            }
             className="sidebar-wrapper"
         >
             <HeaderLogo />
-            {isNew && !skippedOnboarding ? (
-                <OnboardingSteps currentStep={currentStep} />
+            {isNew &&
+            !skippedOnboarding &&
+            browserHistory.location.pathname.includes('onboarding') ? (
+                <OnboardingSteps
+                    currentStep={currentStep}
+                    updateOnboardingClient={updateOnboardingClient}
+                />
             ) : isOpenCustomizer ? (
-                <CustomizerSidebar />
+                <CustomizerSidebar openLanguagesComponent={openLanguagesComponent} />
             ) : (
                 <div className="menu-wrapper">
                     <div
@@ -90,7 +175,7 @@ const Sidebar = ({ isOpenCustomizer }) => {
                             Projects
                         </Link>
                     </div>
-                    {skippedOnboarding && isNew && (
+                    {isNew && (
                         <div className="menu-item">
                             <Link
                                 title="Setup"

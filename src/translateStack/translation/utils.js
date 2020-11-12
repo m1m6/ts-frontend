@@ -18,35 +18,38 @@ export const getStringTranslation = (string, selectedLanguage) => {
 };
 
 export const mapLanguages = (languagesList, textAppearance, shouldShowLocalName = false) => {
-    return languagesList.map(({ Language }) => ({
-        label: (
-            <div
-                style={{
-                    fontSize: '14px',
-                    color: '#0a2540',
-                    marginRight: '25px',
-                }}
-            >
-                {textAppearance !== 'TEXT_ONLY' && (
-                    <img
-                        src={Language.flag}
-                        style={{ width: '23px', height: '23px', borderRadius: '50px' }}
-                    />
-                )}
+    return languagesList.map((lang) => {
+        const Language = lang.Language ? lang.Language : lang;
+        return {
+            label: (
+                <div
+                    style={{
+                        fontSize: '14px',
+                        color: '#0a2540',
+                        marginRight: '25px',
+                    }}
+                >
+                    {textAppearance !== 'TEXT_ONLY' && (
+                        <img
+                            src={Language.flag}
+                            style={{ width: '23px', height: '23px', borderRadius: '50px' }}
+                        />
+                    )}
 
-                <span style={{ marginLeft: '13px' }}>
-                    {textAppearance && textAppearance === 'SHORTENED'
-                        ? Language.abbreviation.toUpperCase()
-                        : textAppearance && textAppearance === 'FLAG_ONLY'
-                        ? ''
-                        : shouldShowLocalName
-                        ? Language.localName
-                        : Language.language}
-                </span>
-            </div>
-        ),
-        value: Language.id,
-    }));
+                    <span style={{ marginLeft: '13px' }}>
+                        {textAppearance && textAppearance === 'SHORTENED'
+                            ? Language.abbreviation.toUpperCase()
+                            : textAppearance && textAppearance === 'FLAG_ONLY'
+                            ? ''
+                            : shouldShowLocalName
+                            ? Language.localName
+                            : Language.language}
+                    </span>
+                </div>
+            ),
+            value: Language.id,
+        };
+    });
 };
 
 export const getPageWordsCount = (pageString) => {

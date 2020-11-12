@@ -1,5 +1,6 @@
 import { message, Skeleton, Table, Tag } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import LoadingBar from 'react-top-loading-bar';
 import { format } from 'date-fns';
 import Button from '../../../form/components/Button';
 import { ReactComponent as CheckLogo } from '../../../assets/check.svg';
@@ -18,6 +19,7 @@ import Popup from '../../../components/Popup';
 import { useAddSinglePageMutation } from '../useMutations';
 import { getProjectTranslationsPercentage, getProjectWordsAndStringsCount } from '../utils';
 import { getTranslationsPercentageByLanguage } from '../../translation/utils';
+import { useUserLanguagesQuery } from '../../../user/useQueries';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -136,7 +138,41 @@ const mapRows = (pages) => {
             let row = {};
 
             row.key = i;
-            row.url = page.pageUrl;
+            row.url = (
+                <span style={{ display: 'inline-flex' }}>
+                    {page.pageUrl}{' '}
+                    {page.pageString.length === 0 && (
+                        <span
+                            style={{
+                                marginLeft: '10px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Rings
+                                style={{
+                                    width: '16px',
+                                    height: '16px',
+                                    background: '#9966ff',
+                                    borderRadius: '50%',
+                                }}
+                            />
+                            <span
+                                style={{
+                                    color: '#9966ff',
+                                    borderRadius: '50%',
+                                    fontFamily: 'Open Sans',
+                                    fontSize: '14px',
+                                    fontWeight: 'bold',
+                                    marginLeft: '6px',
+                                }}
+                            >
+                                FETCHING DATA
+                            </span>
+                        </span>
+                    )}
+                </span>
+            );
             row.strings = page.pageString.length;
             row.translated = `${getTranslationsPercentageByLanguage(page.pageString)}%`;
             row.lastEdit = format(new Date(page.updatedAt).getTime(), 'd. MMM');
@@ -150,16 +186,38 @@ const mapRows = (pages) => {
 
 const Projects = ({ routerHistory }) => {
     const [showPopup, setShowPopup] = useState(false);
+    const [progress, setProgress] = useState(10);
 
     const { data, loading, error } = useUserPagesQuery();
     const { data: userData, loading: userLoading, error: userError } = useMeQuery();
     const [updateUser] = useUpdateUserMutation();
     const [updateOnboardingClient] = useOnboardingMutationClient();
+    const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
 
     let dataSource = placeHolderRow;
 
-    if (loading || userLoading) {
-        return '';
+    useEffect(() => {
+        // if (userData && userData.me) {
+        //     console.log("");
+        //     if (userData.me.isNew === true && userData.me.skippedOnboarding === false)
+        //         routerHistory.push('/onboarding');
+        // }
+        if (loading || userLoading || userLanguagesLoading) {
+            setProgress(100);
+        } 
+        return () => {
+            setProgress(0);
+        };
+    }, []);
+
+    if (loading || userLoading || userLanguagesLoading) {
+        return (
+            <LoadingBar
+                color="#f11946"
+                progress={progress}
+                onLoaderFinished={() => setProgress(0)}
+            />
+        );
     } else {
         if (data && data.userPages) {
             dataSource = mapRows(data.userPages);
@@ -239,9 +297,7 @@ const Projects = ({ routerHistory }) => {
 
                 <div className="p-an-w">
                     <div className="p-an-l">Pages</div>
-                    <div className="p-an-v">
-                        {hasFinishedSetup ? data.userPages.length : '0'}
-                    </div>
+                    <div className="p-an-v">{hasFinishedSetup ? data.userPages.length : '0'}</div>
                 </div>
 
                 <div className="p-an-w">
@@ -252,10 +308,11 @@ const Projects = ({ routerHistory }) => {
                 <div className="p-an-w">
                     <div className="p-an-l">Languages</div>
                     <div className="p-an-v">
-                        {userLoading
+                        {userLanguagesLoading
                             ? '0'
-                            : userData.me && userData.me.languages && userData.me.languages.length
-                            ? userData.me.languages.length
+                            : userLanguagesData.userLanguages &&
+                              userLanguagesData.userLanguages.length
+                            ? userLanguagesData.userLanguages.length
                             : '0'}
                     </div>
                 </div>

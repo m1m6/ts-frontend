@@ -24,11 +24,12 @@
 	// 	outline: 0;
 	// }
 
+	&.active {
+		opacity: 1;
+	}
+	
 	&:disabled {
 		opacity: 0.32;
 	}
 
-	&.active {
-		opacity: 1;
-	}
 }

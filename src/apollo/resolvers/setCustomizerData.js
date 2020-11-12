@@ -3,7 +3,17 @@ import { apolloClient } from '../apolloClient';
 
 export default (
     _,
-    { isOpen, position, text, shouldOpenTheSelectOptions, customDirection, languages, branding },
+    {
+        isOpen,
+        position,
+        text,
+        shouldOpenTheSelectOptions,
+        customDirection,
+        languages,
+        branding,
+        removedItems,
+        openLanguagesComponent
+    },
     { cache }
 ) => {
     const query = gql`
@@ -16,6 +26,8 @@ export default (
                 customDirection
                 languages
                 branding
+                removedItems
+                openLanguagesComponent
             }
         }
     `;
@@ -30,6 +42,8 @@ export default (
             customDirection,
             languages,
             branding,
+            removedItems,
+            openLanguagesComponent
         },
     };
 

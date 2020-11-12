@@ -12,6 +12,8 @@ const AuthPageLayout = ({ history, Component, title, headerLink, ...rest }) => {
             history.push('/');
         }
     }, []);
+
+    console.log("enters AuthPageLayout");
     return (
         <div className="auth-page-layout">
             <div

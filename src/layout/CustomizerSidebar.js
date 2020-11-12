@@ -8,12 +8,15 @@ import { ReactComponent as RightArrow } from '../assets/right-arrow-angle.svg';
 import {
     useCustomizerMutation,
     useCustomizerMutationClient,
+    useUpdateTargetLanguagesMutation,
 } from '../translateStack/customizer/useMutations';
+import { useCustomizerQueryClient } from '../translateStack/customizer/useQueries';
 import Button from '../form/components/Button';
-import { useMeQuery } from '../rootUseQuery';
+import { useLanugagesListQuery, useMeQuery } from '../rootUseQuery';
 import { mapLanguages } from '../translateStack/translation/utils';
 import Select from 'react-select';
 import Input from '../form/components/Input';
+import { useUserLanguagesQuery } from '../user/useQueries';
 
 const MainComponent = ({ setWhichInnerSidebar }) => {
     const [updateCustomizerClient] = useCustomizerMutationClient();
@@ -302,29 +305,39 @@ const PositionComponent = ({}) => {
                     </div>
                 )}
 
-                <Button
-                    children="SAVE"
-                    className={classNames('wf-btn-primary', { active: btnActive })}
-                    onClick={async (e) => {
-                        if (!customPosition) {
-                            message.error('Please enter valid DIV ID.');
-                            return;
-                        }
-                        const results = await updateCustomizer({
-                            variables: {
-                                ...data.me.customizer,
-                                position: userPosition,
-                                customDivId: customPosition,
-                                customDivDirection: customDirection ? customDirection.value : '',
-                            },
-                        });
+                {btnActive && (
+                    <Button
+                        children="SAVE"
+                        className={classNames('wf-btn-primary active', { active: btnActive })}
+                        onClick={async (e) => {
 
-                        if (results.data && results.data.updateCustomizer) {
-                            message.success('Successfully saved.');
-                        }
-                    }}
-                    style={{ ...sharedBtnStyles }}
-                />
+                            if (userPosition === 'CUSTOM' && !customPosition) {
+                                message.error('Please enter valid DIV ID.');
+                                return;
+                            }
+
+                            setBtnActive(false);
+
+                            const results = await updateCustomizer({
+                                variables: {
+                                    ...data.me.customizer,
+                                    position: userPosition,
+                                    customDivId: customPosition,
+                                    customDivDirection: customDirection
+                                        ? customDirection.value
+                                        : '',
+                                },
+                            });
+
+                            if (results.data && results.data.updateCustomizer) {
+                                message.success('Successfully saved.');
+                            }
+
+                            setBtnActive(false);
+                        }}
+                        style={{ ...sharedBtnStyles }}
+                    />
+                )}
             </div>
         </>
     );
@@ -338,7 +351,7 @@ const TextComponent = ({}) => {
     const [userText, setUserText] = useState(null);
     const [btnActive, setBtnActive] = useState(false);
 
-    if (meLoading) return <></>;
+    if (meLoading) return <>Loading...</>;
 
     let customizer = data && data.me ? data.me.customizer : {};
 
@@ -371,23 +384,28 @@ const TextComponent = ({}) => {
                     <Radio.Button value="TEXT_ONLY">TEXT ONLY</Radio.Button>
                     <Radio.Button value="FLAG_ONLY">FLAG ONLY</Radio.Button>
                 </Radio.Group>
-                <Button
-                    children="SAVE"
-                    className={classNames('wf-btn-primary', { active: btnActive })}
-                    onClick={async (e) => {
-                        const results = await updateCustomizer({
-                            variables: {
-                                ...data.me.customizer,
-                                text: userText,
-                            },
-                        });
+                {btnActive && (
+                    <Button
+                        children="SAVE"
+                        className={classNames('wf-btn-primary active')}
+                        onClick={async (e) => {
+                            setBtnActive(false);
 
-                        if (results.data && results.data.updateCustomizer) {
-                            message.success('Successfully saved.');
-                        }
-                    }}
-                    style={{ ...sharedBtnStyles }}
-                />
+                            const results = await updateCustomizer({
+                                variables: {
+                                    ...data.me.customizer,
+                                    text: userText,
+                                },
+                            });
+
+                            if (results.data && results.data.updateCustomizer) {
+                                message.success('Successfully saved.');
+                            }
+
+                        }}
+                        style={{ ...sharedBtnStyles }}
+                    />
+                )}
             </div>
         </>
     );
@@ -395,38 +413,60 @@ const TextComponent = ({}) => {
 
 const LanguagesComponent = ({}) => {
     const [selectedLanguages, setSelectedLanguages] = useState(null);
+    const [isInitialValues, setIsInitialValues] = useState(true);
+
     const [btnActive, setBtnActive] = useState(false);
+    const { data: langData, loading: langLoading } = useLanugagesListQuery();
+    const {
+        data: customizerLocalData,
+        lodaing: customizerLocalLoading,
+    } = useCustomizerQueryClient();
 
     const [updateCustomizerClient] = useCustomizerMutationClient();
+
     const { data: meData, loading: meLoading } = useMeQuery();
+    const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
     const [updateCustomizer] = useCustomizerMutation();
+    const [updateTargetLanguages] = useUpdateTargetLanguagesMutation();
 
-    if (meLoading) return <></>;
+    if (meLoading || langLoading || customizerLocalLoading || userLanguagesLoading)
+        return <>Loading...</>;
 
-    let userLanguages = meData && meData.me ? meData.me.languages : [];
+    let userLanguages =
+        userLanguagesData && userLanguagesData.userLanguages ? userLanguagesData.userLanguages : [];
+    let sourceLanguage = meData.me.sourceLanguage;
 
-    let mappedLangs = mapLanguages(userLanguages);
+    let systemLanguages = langData.languagesList.filter((l) => l.id != sourceLanguage);
 
+    let mappedLangs = mapLanguages(systemLanguages);
     let customizer = meData && meData.me ? meData.me.customizer : {};
 
-    if (customizer && selectedLanguages === null) {
-        let filteredLangs = mappedLangs.filter((lang) =>
-            customizer.publishedLanguages.includes(lang.value)
-        );
-        setSelectedLanguages(filteredLangs);
+    if (customizer && selectedLanguages === null && isInitialValues) {
+        let selectedTargetLangs = mapLanguages(userLanguages.filter(({ isActive }) => isActive));
+        setSelectedLanguages(selectedTargetLangs);
     }
 
-    const changeHandler = async (value) => {
+    const changeHandler = async (value, action) => {
         setSelectedLanguages(value);
         setBtnActive(true);
+        setIsInitialValues(false);
 
-        let mappedValues = value ? value.map((v) => v.value) : null;
+        let mappedValues = value ? value.map((v) => v.value) : [];
+        let removedItems = JSON.parse(JSON.stringify(customizerLocalData.customizer.removedItems));
+
+        if (action.action === 'remove-value') {
+            removedItems.push(action.removedValue.value);
+        }
+
+        removedItems = removedItems.filter((i) => !mappedValues.includes(i));
         await updateCustomizerClient({
             variables: {
                 languages: mappedValues,
+                removedItems: removedItems,
             },
         });
     };
+
     return (
         <>
             <div className="customizer-menu-title">Languages</div>
@@ -444,23 +484,34 @@ const LanguagesComponent = ({}) => {
                     placeholder="Select languages"
                     isClearable={false}
                 />
-                <Button
-                    children="SAVE"
-                    className={classNames('wf-btn-primary', { active: btnActive })}
-                    onClick={async (e) => {
-                        const results = await updateCustomizer({
-                            variables: {
-                                ...meData.me.customizer,
-                                publishedLanguages: selectedLanguages.map((l) => l.value),
-                            },
-                        });
+                {btnActive && (
+                    <Button
+                        children="SAVE"
+                        className={classNames('wf-btn-primary active')}
+                        onClick={async (e) => {
+                            setBtnActive(false);
+                            let selectedLanguagesIds = selectedLanguages
+                                ? selectedLanguages.map((l) => l.value)
+                                : [];
 
-                        if (results.data && results.data.updateCustomizer) {
-                            message.success('Successfully saved.');
-                        }
-                    }}
-                    style={{ ...sharedBtnStyles }}
-                />
+                            const results = await updateTargetLanguages({
+                                variables: {
+                                    selectedLanguagesIds,
+                                },
+                            });
+
+                            if (results.data && results.data.updateTargetLanguages) {
+                                message.success('Successfully saved.');
+                            } else {
+                                message.warn(
+                                    'An error occured during saving your changes, please try again later.'
+                                );
+                            }
+
+                        }}
+                        style={{ ...sharedBtnStyles }}
+                    />
+                )}
             </div>
         </>
     );
@@ -472,6 +523,7 @@ const AppearanceComponent = ({}) => {
     const [updateCustomizerClient] = useCustomizerMutationClient();
 
     const [btnActive, setBtnActive] = useState(false);
+
     const [userBranding, setUserBranding] = useState(null);
 
     if (meLoading) return <></>;
@@ -505,23 +557,26 @@ const AppearanceComponent = ({}) => {
                     <Radio.Button value="WITH_BRANDING">WITH BRANDING</Radio.Button>
                     <Radio.Button value="WITHOUT_BRANDING">WITHOUT BRANDING</Radio.Button>
                 </Radio.Group>
-                <Button
-                    children="SAVE"
-                    className={classNames('wf-btn-primary', { active: btnActive })}
-                    onClick={async (e) => {
-                        const results = await updateCustomizer({
-                            variables: {
-                                ...data.me.customizer,
-                                appearance: userBranding,
-                            },
-                        });
+                {btnActive && (
+                    <Button
+                        children="SAVE"
+                        className={classNames('wf-btn-primary active')}
+                        onClick={async (e) => {
+                            setBtnActive(false);
+                            const results = await updateCustomizer({
+                                variables: {
+                                    ...data.me.customizer,
+                                    appearance: userBranding,
+                                },
+                            });
 
-                        if (results.data && results.data.updateCustomizer) {
-                            message.success('Successfully saved.');
-                        }
-                    }}
-                    style={{ ...sharedBtnStyles }}
-                />
+                            if (results.data && results.data.updateCustomizer) {
+                                message.success('Successfully saved.');
+                            }
+                        }}
+                        style={{ ...sharedBtnStyles }}
+                    />
+                )}
             </div>
         </>
     );
@@ -545,20 +600,25 @@ const whichComponentToRender = (whichInnerSidebar, setWhichInnerSidebar) => {
     }
 };
 
-const CustomizerSidebar = () => {
-    // 0 means the main sidebar
-    const [whichInnerSidebar, setWhichInnerSidebar] = useState(0);
+const CustomizerSidebar = ({ openLanguagesComponent }) => {
+    const [updateCustomizerClient] = useCustomizerMutationClient();
+
+    const [whichInnerSidebar, setWhichInnerSidebar] = useState(openLanguagesComponent ? 2 : 0);
 
     return (
         <div className="customizer-sidebar-wrapper">
             <div className="go-back">
                 <GoBack
-                    onClickCB={(e) => {
+                    onClickCB={async (e) => {
                         if (whichInnerSidebar === 0) {
                             browserHistory.push('/');
                         } else {
                             setWhichInnerSidebar(0);
                         }
+
+                        await updateCustomizerClient({
+                            variables: { openLanguagesComponent: false },
+                        });
                     }}
                     routerHistory={browserHistory}
                 />

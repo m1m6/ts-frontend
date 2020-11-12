@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import LoadingBar from 'react-top-loading-bar';
 
 const PageLayout = ({
     history,
@@ -9,6 +10,22 @@ const PageLayout = ({
     isOpenCustomizer,
     ...rest
 }) => {
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (loading) {
+            setLoading(false);
+        }
+    }, []);
+
+    if (loading) {
+        return (
+            <LoadingBar
+                color="#f11946"
+                progress={50}
+            />
+        );
+    }
     if (isOpenCustomizer) {
         return (
             <div className="customizer-page-layout">

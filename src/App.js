@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import LoadingBar from 'react-top-loading-bar';
+
 import Layout from './layout/Layout';
 import Sidebar from './layout/Sidebar';
 import Content from './layout/Content';
@@ -14,6 +16,8 @@ import { useCustomizerMutationClient } from './translateStack/customizer/useMuta
 const token = auth.getAccessToken();
 
 const App = () => {
+    const ref = useRef(null);
+
     const { loading, data, error } = useMeQuery();
     const [userRole, setUserRole] = useState(undefined);
     const { data: customizerData, loading: customizerLoading } = useCustomizerQueryClient();
@@ -45,7 +49,7 @@ const App = () => {
         }
     }, []);
     if (loading || customizerLoading) {
-        return <Spin spinning={loading} size="large" delay={500} style={{margin: "0 auto"}}/>;
+        return <></>;
     }
 
     if (userRole === undefined && data && data.me) {
@@ -57,25 +61,32 @@ const App = () => {
     const isOpenCustomizer =
         customizerData && customizerData.customizer ? customizerData.customizer.isOpen : false;
 
+    const openLanguagesComponent =
+        customizerData && customizerData.customizer
+            ? customizerData.customizer.openLanguagesComponent
+            : false;
+
     if (token) {
         return (
-            <Layout
-                style={{
-                    marginLeft:
-                        (isNew && !skippedOnboarding) || isOpenCustomizer ? '323px' : '205px',
-                    backgroundColor: 'rgba(247, 250, 252, 0.5)',
-                }}
-            >
-                <Sidebar userRole={userRole} isOpenCustomizer={isOpenCustomizer} />
-                <Content className="app-page-wrapper" id="app-page-wrapper-id">
-                    <Routes
-                        userRole={userRole}
-                        isNew={isNew}
-                        skippedOnboarding={skippedOnboarding}
-                        isOpenCustomizer={isOpenCustomizer}
-                    />
-                </Content>
-            </Layout>
+            <>
+                <Layout
+                    style={{
+                        marginLeft:
+                            (isNew && !skippedOnboarding && browserHistory.location.pathname.includes('onboarding') ) || isOpenCustomizer ? '323px' : '205px',
+                        backgroundColor: 'rgba(247, 250, 252, 0.5)',
+                    }}
+                >
+                    <Sidebar userRole={userRole} isOpenCustomizer={isOpenCustomizer} openLanguagesComponent={openLanguagesComponent}/>
+                    <Content className="app-page-wrapper" id="app-page-wrapper-id">
+                        <Routes
+                            userRole={userRole}
+                            isNew={isNew}
+                            skippedOnboarding={skippedOnboarding}
+                            isOpenCustomizer={isOpenCustomizer}
+                        />
+                    </Content>
+                </Layout>
+            </>
         );
     } else {
         return <Routes />;

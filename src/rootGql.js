@@ -10,6 +10,7 @@ export const ME_QUERY = gql`
             isNew
             skippedOnboarding
             apiKey
+            sourceLanguage
             customizer {
                 id
                 position
@@ -18,15 +19,6 @@ export const ME_QUERY = gql`
                 publishedLanguages
                 customDivId
                 customDivDirection
-            }
-            languages {
-                Language {
-                    id
-                    abbreviation
-                    language
-                    flag
-                    localName
-                }
             }
             pages {
                 id

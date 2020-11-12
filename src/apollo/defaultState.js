@@ -19,6 +19,8 @@ export default {
         shouldOpenTheSelectOptions: false,
         customDirection: null,
         languages: null,
-        branding: null
+        branding: null,
+        removedItems: [],
+        openLanguagesComponent: false
     },
 };

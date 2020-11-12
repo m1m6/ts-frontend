@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import { message } from 'antd';
 import { Grid } from 'svg-loaders-react';
@@ -6,7 +6,7 @@ import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import classNames from 'classnames';
 import jsx from 'react-syntax-highlighter/dist/esm/languages/prism/jsx';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { getLanguagesList } from '../../../assets/js/languages';
+import { getLanguagesList, getUserLangaugesList } from '../../../assets/js/languages';
 import Button from '../../../form/components/Button';
 import Input from '../../../form/components/Input';
 import Link from '../../../form/components/Link';
@@ -15,7 +15,8 @@ import { useOnboardingQueryClient } from '../useQueries';
 import { useOnboardingMutation, useUpdateUserMutation } from '../../../user/useMutations';
 import { Redirect } from 'react-router-dom';
 import { copyToClipboard } from '../../../utils/generalUtils';
-import { useMeQuery } from '../../../rootUseQuery';
+import { useLanugagesListQuery, useMeQuery } from '../../../rootUseQuery';
+import { useUpdateTargetLanguagesMutation } from '../../customizer/useMutations';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -100,12 +101,30 @@ const SourceLanguageStep = ({
     onboardingMutation,
     setSourceLanguages,
     sourceLanguage,
+    storedSourceLanguageId,
 }) => {
+    const [currentLang, setCurrent] = useState(null);
+
     const changeHandler = (value) => {
+        setCurrent(value);
         setSourceLanguages(value);
     };
 
     const languagesList = getLanguagesList();
+    const sourceLanguageExists = languagesList.filter((l) => l.value === storedSourceLanguageId);
+
+    useEffect(() => {
+        if (
+            sourceLanguageExists &&
+            sourceLanguageExists.length &&
+            sourceLanguageExists[0] &&
+            !currentLang
+        ) {
+            setCurrent(sourceLanguageExists);
+            setSourceLanguages(sourceLanguageExists);
+        }
+    });
+
     return (
         <div className="onboarding-step-wrapper">
             <div className="onboarding-step-count">{currentStep} out of 4</div>
@@ -115,12 +134,12 @@ const SourceLanguageStep = ({
             </div>
             <div style={{ marginBottom: '26px' }}>
                 <Select
-                    styles={CustomStyle(sourceLanguage)}
+                    styles={CustomStyle(currentLang)}
                     options={languagesList}
                     isLoading={languagesList && languagesList.length == 0}
                     loadingMessage="Loading..."
                     isMulti={false}
-                    value={sourceLanguage}
+                    value={currentLang}
                     onChange={changeHandler}
                     width="517px"
                     placeholder="Select source language"
@@ -129,10 +148,8 @@ const SourceLanguageStep = ({
             </div>
             <div>
                 <OnboardinButton
-                    disabled={
-                        !sourceLanguage
-                    }
-                    isActive={!!sourceLanguage}
+                    disabled={!sourceLanguage && !sourceLanguageExists}
+                    isActive={!!sourceLanguage || sourceLanguageExists}
                     onClick={async () => {
                         await onboardingMutation({ variables: { currentStep: currentStep + 1 } });
                     }}
@@ -150,11 +167,26 @@ const TargetLanguagesStep = ({
     setSelectedLanguages,
     sourceLanguage,
 }) => {
+    const languagesList = getLanguagesList();
+    const userLanguages = getUserLangaugesList();
+    const [currentSelected, setCurrentSelected] = useState(null);
+
     const changeHandler = (value) => {
+        if (value === null) {
+            value = [];
+        }
+        setCurrentSelected(value);
         setSelectedLanguages(value);
     };
 
-    const languagesList = getLanguagesList();
+    useEffect(() => {
+        if (userLanguages && userLanguages.length && userLanguages[0] && !currentSelected) {
+            setCurrentSelected(userLanguages);
+            setSelectedLanguages(userLanguages);
+        }
+    });
+
+    console.log('sourceLanguage', sourceLanguage);
 
     return (
         <div className="onboarding-step-wrapper">
@@ -167,15 +199,24 @@ const TargetLanguagesStep = ({
             <div style={{ marginBottom: '26px' }}>
                 <Select
                     styles={CustomStyle(selectedLanguages)}
-                    options={languagesList.filter((lang) => lang.value !== sourceLanguage.value)}
+                    options={
+                        languagesList.filter(
+                            (lang) =>
+                                lang.value !==
+                                (sourceLanguage && sourceLanguage.length
+                                    ? sourceLanguage[0].value
+                                    : sourceLanguage.value)
+                        )
+                        // .filter((l) => !userLanguagesIds.includes(l.value))}
+                    }
                     isLoading={languagesList && languagesList.length == 0}
-                    loadingMessage="Loading..."
+                    // loadingMessage="Loading..."
                     isMulti={true}
-                    value={selectedLanguages}
+                    value={currentSelected}
                     onChange={changeHandler}
                     width="517px"
-                    placeholder="Select ltarget anguages"
-                    isClearable={false}
+                    placeholder="Select target languages"
+                    isDisabled={languagesList && languagesList.length == 0}
                 />
             </div>
             <div>
@@ -247,6 +288,8 @@ const Step3 = ({
 }) => {
     const [onboarding] = useOnboardingMutation();
     const [updateUser] = useUpdateUserMutation();
+    const [updateTargetLanguages] = useUpdateTargetLanguagesMutation();
+
     return (
         <div className="onboarding-step-wrapper last">
             <div className="onboarding-step-count last">{currentStep} out of 4</div>
@@ -282,24 +325,42 @@ const Step3 = ({
                     isActive={true}
                     onClick={async () => {
                         setIsValidating(true);
-                        const results = await onboarding({
-                            variables: {
-                                pageUrl,
-                                translationLanguages: selectedLanguages.map((lang) => lang.value),
-                                sourceLanguage: sourceLanguage.value,
-                            },
-                        });
 
-                        if (results && results.data && results.data.onboarding) {
-                            message.success('Successfully added your page!');
-                            await updateUser({ variables: { isNew: false } });
-                            window.location.assign('/');
+                        if (
+                            selectedLanguages &&
+                            selectedLanguages.length &&
+                            sourceLanguage &&
+                            sourceLanguage.length &&
+                            sourceLanguage[0] &&
+                            pageUrl
+                        ) {
+                            const results = await onboarding({
+                                variables: {
+                                    pageUrl,
+                                    translationLanguages: selectedLanguages.map(
+                                        (lang) => lang.value
+                                    ),
+                                    sourceLanguage:
+                                        sourceLanguage && sourceLanguage.length && sourceLanguage[0]
+                                            ? sourceLanguage[0].value
+                                            : 0,
+                                },
+                            });
+
+                            if (results && results.data && results.data.onboarding) {
+                                message.success('Successfully added your page!');
+                                await updateUser({ variables: { isNew: false } });
+                                window.location.assign('/');
+                            } else {
+                                setHasError(true);
+                                message.error(
+                                    'Ooops, it seems the snippet is still not installed. Try again.'
+                                );
+                            }
                         } else {
-                            setHasError(true);
-                            message.error(
-                                'Ooops, it seems the snippet is still not installed. Try again.'
-                            );
+                            message.warn('Please fill all onboarding fields');
                         }
+
                         setIsValidating(false);
                     }}
                     label={
@@ -316,7 +377,29 @@ const Step3 = ({
                 <Link
                     label="SKIP FOR NOW"
                     onClick={async (e) => {
-                        await updateUser({ variables: { skippedOnboarding: true } });
+                        let selectedLanguagesIds = selectedLanguages.map((l) => l.value);
+
+                        console.log('selectedLanguagesIds', selectedLanguagesIds);
+                        console.log('sourceLanguage', sourceLanguage);
+
+                        if (selectedLanguagesIds) {
+                            updateTargetLanguages({
+                                variables: {
+                                    selectedLanguagesIds,
+                                },
+                            });
+                        }
+
+                        if (sourceLanguage && sourceLanguage.length && sourceLanguage[0]) {
+                            updateUser({
+                                variables: { sourceLanguage: sourceLanguage[0].value },
+                            });
+                        }
+
+                        await updateUser({
+                            variables: { skippedOnboarding: true },
+                        });
+
                         routerHistory.push('/');
                     }}
                 />
@@ -335,15 +418,35 @@ const Onboarding = ({ isNew, routerHistory }) => {
     const { loading, data, error } = useOnboardingQueryClient();
     let [onboardingMutation] = useOnboardingMutationClient();
 
+    useEffect(() => {
+        /*
+
+        React.useEffect(() => {
+    return () => {
+            props.history.goForward();
+        }
+    }
+}, []);
+        */
+        if (routerHistory.location.pathname === '/onboarding') {
+            window.history.pushState(null, document.title, window.location.href);
+            window.addEventListener('popstate', function (event) {
+                window.history.pushState(null, document.title, window.location.href);
+            });
+        }
+    });
+
     if (!isNew) {
         return <Redirect to="/" />;
     }
+
     if (loading || meLoading) {
         return '';
     }
 
     let currentStep = data && data.onboarding ? data.onboarding.currentStep : 1;
     let apiKey = meData && meData.me ? meData.me.apiKey : '';
+    let storedSourceLanguageId = meData && meData.me ? meData.me.sourceLanguage : '';
 
     if (currentStep === 1) {
         return (
@@ -352,6 +455,7 @@ const Onboarding = ({ isNew, routerHistory }) => {
                 onboardingMutation={onboardingMutation}
                 sourceLanguage={sourceLanguage}
                 setSourceLanguages={setSourceLanguages}
+                storedSourceLanguageId={storedSourceLanguageId}
             />
         );
     }

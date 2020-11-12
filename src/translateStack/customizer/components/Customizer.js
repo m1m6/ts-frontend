@@ -1,11 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select, { components } from 'react-select';
 import classNames from 'classnames';
 import { browserHistory } from '../../../browserHistory';
 import { useCustomizerMutationClient } from '../useMutations';
 import { useCustomizerQueryClient } from '../useQueries';
-import { useMeQuery } from '../../../rootUseQuery';
+import { useMeQuery, useLanugagesListQuery } from '../../../rootUseQuery';
 import { mapLanguages } from '../../translation/utils';
+import EmptyCustomizer from './EmptyCustomizer';
+import { useUserLanguagesQuery } from '../../../user/useQueries';
+import LoadingBar from 'react-top-loading-bar';
 
 const CustomStyle = (text) => {
     return {
@@ -49,9 +52,12 @@ const CustomStyle = (text) => {
     };
 };
 
-const Customizer = (props) => {
+const Customizer = ({ routerHistory, location }) => {
     const { loading, data } = useCustomizerQueryClient();
+    const { data: langData, loading: langLoading } = useLanugagesListQuery();
     const { data: meData, loading: meLoading } = useMeQuery();
+    const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
+    const [progress, setProgress] = useState(100);
 
     const [updateCustomizerClient] = useCustomizerMutationClient();
 
@@ -65,26 +71,63 @@ const Customizer = (props) => {
                 await updateCustomizerData(false);
             }
         });
+
     }, []);
 
-    if (loading || meLoading) {
-        return <></>;
+    if (loading || meLoading || langLoading || userLanguagesLoading) {
+        return (
+            <>
+                <LoadingBar
+                    color="#f11946"
+                    progress={progress}
+                    onLoaderFinished={() => setProgress(100)}
+                />
+                <EmptyCustomizer />
+            </>
+        );
     }
 
     let customizer = meData && meData.me && meData.me.customizer ? meData.me.customizer : {};
-    let userLanguages = meData && meData.me ? meData.me.languages : [];
+    let userLanguages =
+        userLanguagesData && userLanguagesData.userLanguages ? userLanguagesData.userLanguages : [];
+    let systemLanguages = langData && langData.languagesList ? langData.languagesList : [];
+    let sourceLanguage = systemLanguages
+        .filter((l) => l.id === meData.me.sourceLanguage)
+        .map((l) => {
+            return {
+                Language: {
+                    ...l,
+                },
+            };
+        });
+
     let {
         shouldOpenTheSelectOptions,
         position: localPosition,
         customDirection: localCustomDirection,
-        languages,
+        languages: localLanguages,
         branding,
-        text: localText
+        text: localText,
+        removedItems,
     } = data.customizer;
 
-    let { position, text, appearance, publishedLanguages, customDivDirection } = customizer;
-    let mappedLangs = mapLanguages(userLanguages, (localText || text), true).filter((l) =>
-        (languages || publishedLanguages).includes(l.value)
+    let { position, text, appearance, customDivDirection } = customizer;
+
+    let localLanguagesObjects = localLanguages
+        ? systemLanguages.filter((l) => localLanguages.includes(l.id))
+        : [];
+
+    userLanguages = userLanguages.filter(
+        ({ isActive, Language }) => isActive && !removedItems.includes(Language.id)
+    );
+
+    let userLangIds = userLanguages.map(({ Language }) => Language.id);
+    let uniqueLocalLanguages = localLanguagesObjects.filter((l) => !userLangIds.includes(l.id));
+
+    let mappedLangs = mapLanguages(
+        [...uniqueLocalLanguages, ...userLanguages, ...sourceLanguage],
+        localText || text,
+        true
     );
 
     const Option = (props, index) => {
@@ -129,12 +172,15 @@ const Customizer = (props) => {
                 >
                     <Select
                         options={mappedLangs}
-                        defaultValue={mappedLangs[0]}
+                        defaultValue={mappedLangs[mappedLangs.length - 1]}
                         isSearchable={false}
                         isOptionDisabled={true}
                         styles={CustomStyle(localText || text)}
                         menuPlacement={
-                            (localCustomDirection || '').toLowerCase() === 'up'
+                            (localPosition || position) === 'LEFT' ||
+                            (localPosition || position) === 'RIGHT'
+                                ? 'top'
+                                : (localCustomDirection || '').toLowerCase() === 'up'
                                 ? 'top'
                                 : (localCustomDirection || '').toLowerCase() === 'down'
                                 ? 'bottom'

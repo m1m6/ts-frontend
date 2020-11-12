@@ -10,6 +10,8 @@ export const CUSTOMIZER_QUERY = gql`
             customDirection
             languages
             branding
+            removedItems
+            openLanguagesComponent
         }
     }
 `;
@@ -20,9 +22,11 @@ export const CUSTOMIZER_MUTATION = gql`
         $position: String
         $text: String
         $shouldOpenTheSelectOptions: Boolean
-        $customDirection: String,
-        $languages: [Int],
+        $customDirection: String
+        $languages: [Int]
         $branding: String
+        $removedItems: [Int]
+        $openLanguagesComponent: Boolean
     ) {
         setCustomizerData(
             isOpen: $isOpen
@@ -32,6 +36,8 @@ export const CUSTOMIZER_MUTATION = gql`
             customDirection: $customDirection
             languages: $languages
             branding: $branding
+            removedItems: $removedItems
+            openLanguagesComponent: $openLanguagesComponent
         ) @client {
             isOpen
             position
@@ -40,6 +46,8 @@ export const CUSTOMIZER_MUTATION = gql`
             customDirection
             languages
             branding
+            removedItems
+            openLanguagesComponent
         }
     }
 `;
@@ -68,5 +76,11 @@ export const CUSTOMIZER_MUTATION_SERVER = gql`
             customDivId
             customDivDirection
         }
+    }
+`;
+
+export const UPDATE_TARGET_LANGUAGES_MUTATION = gql`
+    mutation updateTargetLanguages($selectedLanguagesIds: [Int!]!) {
+        updateTargetLanguages(selectedLanguagesIds: $selectedLanguagesIds)
     }
 `;

@@ -10,12 +10,36 @@ export const ONBOARDING_QUERY_CLIENT = gql`
 
 export const ONBOARDING_MUTATION = gql`
     mutation onboarding($pageUrl: String!, $translationLanguages: [Int!]!, $sourceLanguage: Int!) {
-        onboarding(pageUrl: $pageUrl, translationLanguages: $translationLanguages, sourceLanguage: $sourceLanguage)
+        onboarding(
+            pageUrl: $pageUrl
+            translationLanguages: $translationLanguages
+            sourceLanguage: $sourceLanguage
+        )
     }
 `;
 
 export const UPDATE_USER_MUTATION = gql`
-    mutation updateUser($isNew: Boolean, $skippedOnboarding: Boolean) {
-        updateUser(isNew: $isNew, skippedOnboarding: $skippedOnboarding)
+    mutation updateUser($isNew: Boolean, $skippedOnboarding: Boolean, $sourceLanguage: Int) {
+        updateUser(
+            isNew: $isNew
+            skippedOnboarding: $skippedOnboarding
+            sourceLanguage: $sourceLanguage
+        )
+    }
+`;
+
+export const USER_LANGUAGES_QUERY = gql`
+    query userLanguages {
+        userLanguages {
+            isActive
+            Language {
+                id
+                localName
+                flag
+                language
+                iso2
+                abbreviation
+            }
+        }
     }
 `;

@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect, useRef, Children } from 'react';
 import { Table, Input, Form, message } from 'antd';
-import {parse, format} from 'date-fns';
+import { parse, format } from 'date-fns';
 
 import GoBack from '../../../components/GoBack';
 import { useGetPageQuery } from '../useQueries';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import { useMeQuery } from '../../../rootUseQuery';
 import Button from '../../../form/components/Button';
 import {
@@ -14,6 +14,10 @@ import {
     mapLanguages,
 } from '../utils';
 import { usePublishStringsMutation } from '../useMutations';
+import { useUserLanguagesQuery } from '../../../user/useQueries';
+import LoadingBar from 'react-top-loading-bar';
+import { browserHistory } from '../../../browserHistory';
+import { useCustomizerMutationClient } from '../../customizer/useMutations';
 
 const EditableContext = React.createContext();
 
@@ -22,12 +26,13 @@ const CustomStyle = () => {
         option: (base, data) => {
             return {
                 ...base,
-                backgroundColor: '#e8eaef',
+                backgroundColor: 'white',
                 color: '#0a2540',
                 fontSize: '12px',
                 letterSpacing: '0.43px',
                 fontWeight: 'bold',
                 '&:active': { backgroundColor: 'rgba(227, 232, 238, 0.42)' },
+                '&:hover': { backgroundColor: '#e8eaef' },
             };
         },
         container: (base, { selectProps: { width, height } }) => ({
@@ -132,7 +137,44 @@ const EditableCell = ({
 };
 
 const columns = (userLanguages, setSelectedLanguageId) => {
-    const mappedLanguages = mapLanguages(userLanguages);
+    let mappedLanguages = mapLanguages(userLanguages);
+    const [updateCustomizerClient] = useCustomizerMutationClient();
+
+    const Option = (props, index) => {
+        let { options, value } = props;
+
+        return options[options.length - 1].value === value ? (
+            <>
+                <components.Option {...props} />
+                <div
+                    style={{
+                        fontFamily: 'Open Sans',
+                        fontSize: '9px',
+                        lineHeight: '5.22',
+                        textAlign: 'center',
+                    }}
+                >
+                    <Button
+                        children="Add more"
+                        className={'wf-btn-primary active'}
+                        onClick={async (e) => {
+                            await updateCustomizerClient({
+                                variables: { isOpen: true, openLanguagesComponent: true },
+                            });
+                            browserHistory.push('/customizer');
+                        }}
+                        style={{
+                            marginTop: '10px',
+                            width: '101px',
+                            lineHeight: '3.36',
+                        }}
+                    />
+                </div>
+            </>
+        ) : (
+            <components.Option {...props} />
+        );
+    };
 
     return [
         {
@@ -159,6 +201,7 @@ const columns = (userLanguages, setSelectedLanguageId) => {
                         onChange={(e) => setSelectedLanguageId(e.value)}
                         styles={CustomStyle()}
                         isSearchable={false}
+                        components={{ Option }}
                     />
                 </div>
             ),
@@ -208,21 +251,40 @@ const Translation = (props) => {
     if (props.match && props.match.params) {
         pageId = parseInt(props.match.params.pageId);
     }
-
+    const [progress, setProgress] = useState(0);
     const { data, loading, error } = useGetPageQuery(pageId);
     const { data: meData, loading: meLoading } = useMeQuery();
+    const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
+
     const [publishTranslations] = usePublishStringsMutation();
 
     let [rowsData, setRowsData] = useState([]);
     let [userSelectedLang, setUserSelectedLang] = useState(0);
     let [dataUpdated, setDataUpdated] = useState(false);
 
-    if (loading || meLoading) {
-        return <></>;
+    useEffect(() => {
+        if (loading || meLoading || userLanguagesLoading) {
+            setProgress(progress + 40);
+        }
+
+        return () => {
+            setProgress(0);
+        };
+    }, []);
+    if (loading || meLoading || userLanguagesLoading) {
+        return (
+            <LoadingBar
+                color="#f11946"
+                progress={progress}
+                onLoaderFinished={() => setProgress(0)}
+            />
+        );
     }
 
     const pageData = data.getPage;
-    const userLanguages = meData && meData.me ? meData.me.languages : [];
+    let userLanguages =
+        userLanguagesData && userLanguagesData.userLanguages ? userLanguagesData.userLanguages : [];
+
     const wordsCount = getPageWordsCount(data.getPage ? data.getPage.pageString : []);
     const percentageTranslated = getTranslationsPercentageByLanguage(
         data.getPage ? data.getPage.pageString : [],
@@ -265,6 +327,8 @@ const Translation = (props) => {
                                         );
                                     }
                                 }
+
+                                setDataUpdated(false);
                             }}
                         />
                     )}

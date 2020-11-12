@@ -1,5 +1,9 @@
 import { useMutation } from '@apollo/react-hooks';
-import { CUSTOMIZER_MUTATION, CUSTOMIZER_MUTATION_SERVER } from './gql';
+import {
+    CUSTOMIZER_MUTATION,
+    CUSTOMIZER_MUTATION_SERVER,
+    UPDATE_TARGET_LANGUAGES_MUTATION,
+} from './gql';
 
 export const useCustomizerMutationClient = () =>
     useMutation(CUSTOMIZER_MUTATION, {
@@ -7,5 +11,10 @@ export const useCustomizerMutationClient = () =>
     });
 export const useCustomizerMutation = () =>
     useMutation(CUSTOMIZER_MUTATION_SERVER, {
-        refetchQueries: ['MeQuery'],
+        // refetchQueries: ['MeQuery'],
+    });
+
+export const useUpdateTargetLanguagesMutation = () =>
+    useMutation(UPDATE_TARGET_LANGUAGES_MUTATION, {
+        refetchQueries: ['userLanguages'],
     });
