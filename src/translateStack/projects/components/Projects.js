@@ -115,7 +115,7 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
                                     message.success('Page successfully added');
                                     setShowPopup(false);
                                 } else {
-                                    message.warn('Unable to verify the page!');
+                                    message.warn('Unable to verify the page');
                                 }
                             } else {
                                 message.error('Please enter a valid page url');
@@ -204,7 +204,7 @@ const Projects = ({ routerHistory }) => {
         // }
         if (loading || userLoading || userLanguagesLoading) {
             setProgress(100);
-        } 
+        }
         return () => {
             setProgress(0);
         };
@@ -213,7 +213,7 @@ const Projects = ({ routerHistory }) => {
     if (loading || userLoading || userLanguagesLoading) {
         return (
             <LoadingBar
-                color="#f11946"
+                color="#a172ff"
                 progress={progress}
                 onLoaderFinished={() => setProgress(0)}
             />

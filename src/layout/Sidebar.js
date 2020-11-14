@@ -121,7 +121,7 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent }) => {
     if (loading) {
         return (
             <LoadingBar
-                color="#f11946"
+                color="#a172ff"
                 progress={progress}
                 onLoaderFinished={() => setProgress(0)}
             />
