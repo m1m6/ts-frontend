@@ -26,7 +26,7 @@ export const mapLanguages = (languagesList, textAppearance, shouldShowLocalName 
                     style={{
                         fontSize: '14px',
                         color: '#0a2540',
-                        marginRight: '25px',
+                        marginRight: '5px',
                     }}
                 >
                     {textAppearance !== 'TEXT_ONLY' && (

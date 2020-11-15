@@ -118,10 +118,13 @@ const SourceLanguageStep = ({
             sourceLanguageExists &&
             sourceLanguageExists.length &&
             sourceLanguageExists[0] &&
-            !currentLang
+            !currentLang &&
+            !sourceLanguage
         ) {
             setCurrent(sourceLanguageExists);
             setSourceLanguages(sourceLanguageExists);
+        } else if (sourceLanguage) {
+            setCurrent(sourceLanguage);
         }
     });
 
@@ -183,6 +186,8 @@ const TargetLanguagesStep = ({
         if (userLanguages && userLanguages.length && userLanguages[0] && !currentSelected) {
             setCurrentSelected(userLanguages);
             setSelectedLanguages(userLanguages);
+        } else if (selectedLanguages && selectedLanguages.length > 0) {
+            setCurrentSelected(selectedLanguages);
         }
     });
 
@@ -199,18 +204,14 @@ const TargetLanguagesStep = ({
             <div style={{ marginBottom: '26px' }}>
                 <Select
                     styles={CustomStyle(selectedLanguages)}
-                    options={
-                        languagesList.filter(
-                            (lang) =>
-                                lang.value !==
-                                (sourceLanguage && sourceLanguage.length
-                                    ? sourceLanguage[0].value
-                                    : sourceLanguage.value)
-                        )
-                        // .filter((l) => !userLanguagesIds.includes(l.value))}
-                    }
+                    options={languagesList.filter(
+                        (lang) =>
+                            lang.value !==
+                            (sourceLanguage && sourceLanguage.length
+                                ? sourceLanguage[0].value
+                                : sourceLanguage.value)
+                    )}
                     isLoading={languagesList && languagesList.length == 0}
-                    // loadingMessage="Loading..."
                     isMulti={true}
                     value={currentSelected}
                     onChange={changeHandler}
@@ -235,6 +236,7 @@ const TargetLanguagesStep = ({
         </div>
     );
 };
+
 const Step2 = ({ currentStep, onboardingMutation, pageUrl, setPageUrl }) => {
     return (
         <div className="onboarding-step-wrapper">
@@ -330,8 +332,6 @@ const Step3 = ({
                             selectedLanguages &&
                             selectedLanguages.length &&
                             sourceLanguage &&
-                            sourceLanguage.length &&
-                            sourceLanguage[0] &&
                             pageUrl
                         ) {
                             const results = await onboarding({
@@ -343,7 +343,7 @@ const Step3 = ({
                                     sourceLanguage:
                                         sourceLanguage && sourceLanguage.length && sourceLanguage[0]
                                             ? sourceLanguage[0].value
-                                            : 0,
+                                            : sourceLanguage.value,
                                 },
                             });
 

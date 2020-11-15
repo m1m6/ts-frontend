@@ -24,11 +24,15 @@ const CustomStyle = (text) => {
                 '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.01)' },
             };
         },
+        menu: (provided, state) => ({
+            ...provided,
+            width: state.selectProps.width,
+        }),
         container: (base, { selectProps: { width, height } }) => ({
             ...base,
             width:
                 text === 'FULL' || text === 'TEXT_ONLY'
-                    ? '150px'
+                    ? '200px'
                     : text === 'SHORTENED'
                     ? '120px'
                     : text === 'FLAG_ONLY'
@@ -140,6 +144,10 @@ const Customizer = ({ routerHistory, location }) => {
                             fontSize: '9px',
                             lineHeight: '5.22',
                             textAlign: 'center',
+                            cursor: "pointer"
+                        }}
+                        onClick={e => {
+                            window.open("https://translatestack.com/", "_blank")
                         }}
                     >
                         ⚡ by translatestack

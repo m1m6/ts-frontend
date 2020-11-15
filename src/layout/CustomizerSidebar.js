@@ -105,7 +105,7 @@ const CustomStyle = () => {
             width: state.selectProps.width,
             borderBottom: '1px dotted pink',
             color: state.selectProps.menuColor,
-            padding: 20,
+            padding: 6,
         }),
         container: (base, { selectProps: { width, height } }) => ({
             ...base,

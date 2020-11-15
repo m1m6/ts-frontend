@@ -37,13 +37,17 @@ const HeaderLogo = () => {
 
 const OnboardingSteps = ({ currentStep, updateOnboardingClient }) => {
     return (
-        <div className="onboarding-wrapper">
+        <div className="onboarding-wrapper" >
             {currentStep > 1 && (
                 <GoBack
                     onClickCB={async (e) => {
                         await updateOnboardingClient({
                             variables: { currentStep: currentStep - 1 },
                         });
+                    }}
+                    style={{
+                        top: '100px',
+                        position: 'fixed',
                     }}
                 />
             )}
@@ -151,10 +155,12 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent }) => {
             {isNew &&
             !skippedOnboarding &&
             browserHistory.location.pathname.includes('onboarding') ? (
-                <OnboardingSteps
-                    currentStep={currentStep}
-                    updateOnboardingClient={updateOnboardingClient}
-                />
+                <>
+                    <OnboardingSteps
+                        currentStep={currentStep}
+                        updateOnboardingClient={updateOnboardingClient}
+                    />
+                </>
             ) : isOpenCustomizer ? (
                 <CustomizerSidebar openLanguagesComponent={openLanguagesComponent} />
             ) : (
