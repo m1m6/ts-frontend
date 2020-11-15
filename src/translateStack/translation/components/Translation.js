@@ -18,6 +18,7 @@ import { useUserLanguagesQuery } from '../../../user/useQueries';
 import LoadingBar from 'react-top-loading-bar';
 import { browserHistory } from '../../../browserHistory';
 import { useCustomizerMutationClient } from '../../customizer/useMutations';
+import { Redirect } from 'react-router-dom';
 
 const EditableContext = React.createContext();
 
@@ -285,6 +286,10 @@ const Translation = (props) => {
         );
     }
 
+    if (error) {
+        message.warn('Unauthorized!');
+        return <Redirect to="/" />;
+    }
     const pageData = data.getPage;
     let userLanguages =
         userLanguagesData && userLanguagesData.userLanguages ? userLanguagesData.userLanguages : [];
