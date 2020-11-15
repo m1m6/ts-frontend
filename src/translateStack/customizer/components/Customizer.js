@@ -15,13 +15,14 @@ const CustomStyle = (text) => {
         option: (base, data) => {
             return {
                 ...base,
-                backgroundColor: '#e8eaef',
+                backgroundColor: '#fff',
                 color: '#0a2540',
                 fontSize: '12px',
                 letterSpacing: '0.43px',
                 fontWeight: 'bold',
-                '&:active': { backgroundColor: 'rgba(227, 232, 238, 0.42)' },
-                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.01)' },
+                '&:active': { backgroundColor: 'rgba(227, 232, 238, 0.01)' },
+                '&:hover': { backgroundColor: '#e8eaef' },
+
             };
         },
         menu: (provided, state) => ({
@@ -44,7 +45,7 @@ const CustomStyle = (text) => {
             border: 'solid 1px rgba(227, 232, 238, 0.42)',
             borderRadius: '2px',
             boxShadow: 'none',
-            '&:hover': { borderColor: '#a172ff' },
+            '&:hover': { borderColor: 'none' },
         }),
         singleValue: (base, state) => ({
             ...base,
@@ -52,6 +53,10 @@ const CustomStyle = (text) => {
             fontSize: '12px',
             fontWeight: 'bold',
             letterSpacing: '0.43px',
+        }),
+        indicatorSeparator: (base, state) => ({
+            ...base,
+            display: 'none',
         }),
     };
 };
@@ -82,7 +87,7 @@ const Customizer = ({ routerHistory, location }) => {
         return (
             <>
                 <LoadingBar
-                    color="#f11946"
+                    color="#a172ff"
                     progress={progress}
                     onLoaderFinished={() => setProgress(100)}
                 />

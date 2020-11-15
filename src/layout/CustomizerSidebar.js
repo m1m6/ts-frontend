@@ -142,13 +142,13 @@ const CustomDirectionStyle = () => {
         option: (base, data) => {
             return {
                 ...base,
-                backgroundColor: '#e8eaef',
+                backgroundColor: '#fff',
                 color: '#0a2540',
                 fontSize: '12px',
                 letterSpacing: '0.43px',
                 fontWeight: 'bold',
-                '&:active': { backgroundColor: 'rgba(227, 232, 238, 0.42)' },
-                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.01)' },
+                '&:active': { backgroundColor: 'rgba(227, 232, 238, 0.00)' },
+                '&:hover': { backgroundColor: '#e8eaef' },
             };
         },
         menu: (provided, state) => ({
@@ -156,13 +156,13 @@ const CustomDirectionStyle = () => {
             width: state.selectProps.width,
             borderBottom: '1px dotted pink',
             color: state.selectProps.menuColor,
-            padding: 10,
+
         }),
         container: (base, { selectProps: { width, height } }) => ({
             ...base,
             width: width,
             marginTop: '10px',
-            height: '56px',
+            height: '30px',
         }),
         control: (base, state) => ({
             ...base,
@@ -279,6 +279,7 @@ const PositionComponent = ({}) => {
                                 letterSpacing: '0.5px',
                                 color: '#0a2540',
                                 marginTop: '19px',
+                                marginBottom: '10px',
                             }}
                         >
                             Direction of Opening
@@ -299,7 +300,7 @@ const PositionComponent = ({}) => {
                                     },
                                 });
                             }}
-                            width="200px"
+                            width="100%"
                             height="30px"
                         />
                     </div>

@@ -21,7 +21,7 @@ const PageLayout = ({
     if (loading) {
         return (
             <LoadingBar
-                color="#f11946"
+                color="#a172ff"
                 progress={50}
             />
         );
