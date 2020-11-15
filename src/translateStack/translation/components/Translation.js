@@ -37,7 +37,11 @@ const CustomStyle = () => {
         },
         container: (base, { selectProps: { width, height } }) => ({
             ...base,
-            width: '40%',
+            width: '160px',
+        }),
+        indicatorSeparator: (base, state) => ({
+            ...base,
+            display: 'none',
         }),
         control: (base, state) => ({
             ...base,
@@ -48,7 +52,7 @@ const CustomStyle = () => {
         }),
         singleValue: (base, state) => ({
             ...base,
-            opacity: '0.29',
+            opacity: '1',
             fontFamily: 'Open Sans',
             fontSize: '12px',
             fontWeight: 'bold',
@@ -274,7 +278,7 @@ const Translation = (props) => {
     if (loading || meLoading || userLanguagesLoading) {
         return (
             <LoadingBar
-                color="#f11946"
+                color="#a172ff"
                 progress={progress}
                 onLoaderFinished={() => setProgress(0)}
             />
