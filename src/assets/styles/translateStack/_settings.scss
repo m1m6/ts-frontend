@@ -1,0 +1,36 @@
+.settings-wrapper {
+    margin: 24px;
+    border: solid 1px $pale-grey-42;
+    background-color: $white;
+    padding-left: 50px;
+    padding-top: 30px;
+    padding-bottom: 33px;
+    .settings-header {
+        font-family: 'Open Sans';
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 0.43px;
+        color: $dark-indigo;
+        margin-bottom: 26px;
+        display: flex;
+        justify-content: space-between;
+        width: 68%;
+    }
+
+    .profile-form {
+        .field-name {
+            margin-bottom: 14px;
+            font-family: 'Open Sans';
+            font-size: 14px;
+            color: $dark-indigo;
+        }
+    }
+
+    .input-field-wrapper {
+        .ant-input {
+            font-family: 'Open Sans';
+            font-size: 14px;
+            color: $dark-indigo;
+        }
+    }
+}

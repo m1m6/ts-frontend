@@ -1,11 +1,11 @@
 import gql from 'graphql-tag';
 
-export const changePasswordMutation = gql`
-    mutation changePassword($email: String!, $oldPassword: String!, $newPassword: String!) {
-        changePassword(email: $email, oldPassword: $oldPassword, newPassword: $newPassword) {
+export const updateUserMetaDataGQL = gql`
+    mutation updateUserMetaData($email: String!, $password: String, $fullName: String!) {
+        updateUserMetaData(email: $email, password: $password, fullName: $fullName) {
             user {
                 id
-                name
+                fullName
                 email
             }
             token

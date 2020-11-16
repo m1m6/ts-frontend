@@ -15,6 +15,7 @@ import Onboarding from './translateStack/onboarding/components/Onboarding';
 import Projects from './translateStack/projects/components/Projects';
 import Translation from './translateStack/translation/components/Translation';
 import Customizer from './translateStack/customizer/components/Customizer';
+import Settings from './userProfile/profile/components/Settings';
 
 export const ROUTE_PATHS = {
     home: '/',
@@ -23,6 +24,7 @@ export const ROUTE_PATHS = {
         onboarding: '/onboarding',
         translation: '/translation/:pageId',
         customizer: '/customizer',
+        settings: '/settings',
     },
     auth: {
         me: '/me', // TODO add
@@ -100,6 +102,25 @@ const Routes = ({ userRole, isNew, skippedOnboarding, isOpenCustomizer }) => {
                 )}
                 roles={[ROLES.ADMIN]}
                 userRole={userRole}
+            />
+
+            <ProtectedRoute
+                path={ROUTE_PATHS.app.settings}
+                exact
+                component={(matchProps) => (
+                    <PageLayout
+                        Component={Settings}
+                        {...matchProps}
+                        title=""
+                        isNew={isNew}
+                        skippedOnboarding={skippedOnboarding}
+                        isOpenCustomizer={isOpenCustomizer}
+                    />
+                )}
+                roles={[ROLES.ADMIN]}
+                userRole={userRole}
+                isNew={isNew}
+                skippedOnboarding={skippedOnboarding}
             />
 
             <Route
