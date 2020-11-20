@@ -16,5 +16,5 @@ export const useCustomizerMutation = () =>
 
 export const useUpdateTargetLanguagesMutation = () =>
     useMutation(UPDATE_TARGET_LANGUAGES_MUTATION, {
-        refetchQueries: ['userLanguages'],
+        refetchQueries: ['userLanguages', 'getUserPlan'],
     });

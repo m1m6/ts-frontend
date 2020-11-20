@@ -210,6 +210,10 @@ const Projects = ({ routerHistory }) => {
         };
     }, []);
 
+    if (error) {
+        return <div style={{margin: "0 auto"}}>Unable to parse your request </div>;
+    }
+
     if (loading || userLoading || userLanguagesLoading) {
         return (
             <LoadingBar

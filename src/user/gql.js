@@ -43,3 +43,24 @@ export const USER_LANGUAGES_QUERY = gql`
         }
     }
 `;
+
+export const USER_SUBSCRIPTION_PLAN = gql`
+    query getUserPlan {
+        getUserPlan {
+            stripeCustomerId
+            subscription
+            planId
+            status
+            plan {
+                id
+                type
+                monthlyPriceId
+                yearlyPriceId
+                targetLanguages
+                pages
+                monthlyPriceAmount
+                yearlyPriceAmount
+            }
+        }
+    }
+`;

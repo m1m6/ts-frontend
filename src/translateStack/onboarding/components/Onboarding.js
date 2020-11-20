@@ -17,6 +17,7 @@ import { Redirect } from 'react-router-dom';
 import { copyToClipboard } from '../../../utils/generalUtils';
 import { useLanugagesListQuery, useMeQuery } from '../../../rootUseQuery';
 import { useUpdateTargetLanguagesMutation } from '../../customizer/useMutations';
+import { useUserSubscriptionPlan } from '../../../user/useQueries';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -54,7 +55,7 @@ const CustomStyle = () => {
             width: width,
             marginTop: '33px',
             minHeight: '83px',
-            height: '83px',
+            // height: '83px',
         }),
         control: (base, state) => ({
             ...base,
@@ -169,12 +170,23 @@ const TargetLanguagesStep = ({
     selectedLanguages,
     setSelectedLanguages,
     sourceLanguage,
+    subscriptionData,
 }) => {
     const languagesList = getLanguagesList();
     const userLanguages = getUserLangaugesList();
     const [currentSelected, setCurrentSelected] = useState(null);
 
     const changeHandler = (value) => {
+        let languagesLimit = 2;
+
+        if (subscriptionData && subscriptionData.getUserPlan && subscriptionData.getUserPlan.plan) {
+            languagesLimit = subscriptionData.getUserPlan.plan.targetLanguages;
+        }
+
+        if (value && value.length > languagesLimit) {
+            message.warning('Exceeds the limit of your package.');
+            return;
+        }
         if (value === null) {
             value = [];
         }
@@ -190,8 +202,6 @@ const TargetLanguagesStep = ({
             setCurrentSelected(selectedLanguages);
         }
     });
-
-    console.log('sourceLanguage', sourceLanguage);
 
     return (
         <div className="onboarding-step-wrapper">
@@ -215,7 +225,7 @@ const TargetLanguagesStep = ({
                     isMulti={true}
                     value={currentSelected}
                     onChange={changeHandler}
-                    width="517px"
+                    width="60%"
                     placeholder="Select target languages"
                     isDisabled={languagesList && languagesList.length == 0}
                 />
@@ -417,6 +427,7 @@ const Onboarding = ({ isNew, routerHistory }) => {
     const { data: meData, loading: meLoading } = useMeQuery();
     const { loading, data, error } = useOnboardingQueryClient();
     let [onboardingMutation] = useOnboardingMutationClient();
+    const { data: subscriptionData, loading: subscriptionLoading } = useUserSubscriptionPlan();
 
     useEffect(() => {
         /*
@@ -467,6 +478,8 @@ const Onboarding = ({ isNew, routerHistory }) => {
                 selectedLanguages={selectedLanguages}
                 setSelectedLanguages={setSelectedLanguages}
                 sourceLanguage={sourceLanguage}
+                subscriptionData={subscriptionData}
+                subscriptionLoading={subscriptionLoading}
             />
         );
     } else if (currentStep === 3) {

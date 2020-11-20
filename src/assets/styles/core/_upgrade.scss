@@ -1,0 +1,55 @@
+.upgrade-popup {
+
+    .popup-title {
+        font-family: 'Open Sans';
+        font-size: 30px;
+        font-weight: bold;
+        color: $dark-indigo;
+        text-align: center;
+        margin-top: 50px;
+    }
+
+    .popup-sub-title {
+        font-family: 'Open Sans';
+        font-size: 14px;
+        color: $dark-indigo;
+        text-align: center;
+        margin-top: 27px;
+    }
+
+    .popup-next-btn {
+        justify-content: center;
+        display: flex;
+
+        > .wf-btn-primary {
+            width: 111px;
+            opacity: 1;
+            margin-top: 100px;
+
+
+            &:disabled {
+                opacity: 0.32;
+            }
+        }
+    }
+
+    .subscription-form {
+        margin-left: 87px;
+        margin-right: 100px;
+        margin-top: 60px;
+
+
+        .ts-input {
+            outline: 0;
+            &::placeholder{
+                opacity: 0.13;
+                font-family: 'Open Sans';
+                font-size: 14px;
+                font-weight: bold;
+                line-height: 1.81;
+                letter-spacing: normal;
+                color: $dark-indigo;
+            }
+        }
+    }
+}

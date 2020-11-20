@@ -1,7 +1,7 @@
 import React from "react";
 
-const Input = ({ children, ...rest }) => (
-	<input className="ts-input" size="large" type="text" {...rest} >
+const Input = ({ children, ref , ...rest }) => (
+	<input className="ts-input" size="large" type="text" ref={ref} {...rest} >
 		{children}
 	</input>
 );
