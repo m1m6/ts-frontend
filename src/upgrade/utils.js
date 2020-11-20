@@ -45,7 +45,11 @@ export const mapPlans = (plansData, cycle = 'YEARLY') => {
                                 color: '#0a2540',
                             }}
                         >
-                            ({`${plan.pages} Pages, ${plan.targetLanguages} Languages`})
+                            (
+                            {`${plan.pages} Pages, ${plan.targetLanguages} Languages${
+                                plan.id > 2 ? ', removed branding' : ''
+                            }`}
+                            )
                         </span>
                         <span
                             style={{
