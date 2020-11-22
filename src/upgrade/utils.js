@@ -46,9 +46,9 @@ export const mapPlans = (plansData, cycle = 'YEARLY') => {
                             }}
                         >
                             (
-                            {`${plan.pages} Pages, ${plan.targetLanguages} Languages${
-                                plan.id > 2 ? ', removed branding' : ''
-                            }`}
+                            {`${plan.pages} Pages, ${
+                                plan.id === 4 ? 'all' : plan.targetLanguages
+                            } Languages${plan.id > 2 ? ', removed branding' : ''}`}
                             )
                         </span>
                         <span

@@ -447,12 +447,12 @@ const Onboarding = ({ isNew, routerHistory }) => {
         }
     });
 
-    if (!isNew) {
-        return <Redirect to="/" />;
-    }
-
     if (loading || meLoading) {
         return '';
+    }
+
+    if (!isNew) {
+        return <Redirect to="/" />;
     }
 
     let currentStep = data && data.onboarding ? data.onboarding.currentStep : 1;

@@ -64,21 +64,26 @@ export const getPageWordsCount = (pageString) => {
     return count;
 };
 
-export const getTranslationsPercentageByLanguage = (strings, languageId) => {
+export const getTranslationsPercentageByLanguage = (strings, userSelectedLang, langsLen) => {
     let percentage = 0;
     let langTranslationsCount = 0;
 
     if (strings && strings.length) {
         strings.forEach(({ translations }) => {
-            if (translations && translations.length) {
-                translations.forEach(({ languageId }) => {
-                    if (languageId === languageId) {
-                        langTranslationsCount++;
-                    }
-                });
+            if (translations && translations.length && translations.length > 0) {
+                if (userSelectedLang === null) {
+                    langTranslationsCount += translations.length;
+                } else {
+                    translations.forEach(({ languageId }) => {
+                        if (languageId === userSelectedLang) {
+                            langTranslationsCount++;
+                        }
+                    });
+                }
             }
         });
-        percentage = ((langTranslationsCount / strings.length) * 100).toFixed(1);
+
+        percentage = ((langTranslationsCount / langsLen / strings.length) * 100).toFixed(1);
     }
 
     return percentage;

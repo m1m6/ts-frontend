@@ -130,7 +130,7 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
     );
 };
 
-const mapRows = (pages) => {
+const mapRows = (pages, userLanguagesData) => {
     let rows = [];
 
     if (pages && pages.length) {
@@ -174,7 +174,7 @@ const mapRows = (pages) => {
                 </span>
             );
             row.strings = page.pageString.length;
-            row.translated = `${getTranslationsPercentageByLanguage(page.pageString)}%`;
+            row.translated = `${getTranslationsPercentageByLanguage(page.pageString, null, userLanguagesData.userLanguages.length)}%`;
             row.lastEdit = format(new Date(page.updatedAt).getTime(), 'd. MMM');
             row.pageId = page.id;
 
@@ -197,11 +197,6 @@ const Projects = ({ routerHistory }) => {
     let dataSource = placeHolderRow;
 
     useEffect(() => {
-        // if (userData && userData.me) {
-        //     console.log("");
-        //     if (userData.me.isNew === true && userData.me.skippedOnboarding === false)
-        //         routerHistory.push('/onboarding');
-        // }
         if (loading || userLoading || userLanguagesLoading) {
             setProgress(100);
         }
@@ -224,7 +219,7 @@ const Projects = ({ routerHistory }) => {
         );
     } else {
         if (data && data.userPages) {
-            dataSource = mapRows(data.userPages);
+            dataSource = mapRows(data.userPages, userLanguagesData);
         }
     }
 
@@ -232,7 +227,7 @@ const Projects = ({ routerHistory }) => {
     let apiKey = userData && userData.me ? userData.me.apiKey : '';
 
     let { wordsCount, stringCount } = getProjectWordsAndStringsCount(data.userPages);
-    let percentageTranslations = getProjectTranslationsPercentage(data.userPages, stringCount);
+    let percentageTranslations = getProjectTranslationsPercentage(data.userPages, stringCount, userLanguagesData ? userLanguagesData.userLanguages.length: 1);
 
     return (
         <div className="projects-page-wrapper">
@@ -241,7 +236,7 @@ const Projects = ({ routerHistory }) => {
                     <div className="projects-inner-title">Project</div>
                     <div className="project-name">
                         {hasFinishedSetup
-                            ? data.userPages[0].pageUrl.substring(
+                            ? data.userPages && data.userPages[0] && data.userPages[0].pageUrl.substring(
                                   0,
                                   data.userPages[0].pageUrl.indexOf('/') > 0
                                       ? data.userPages[0].pageUrl.indexOf('/')

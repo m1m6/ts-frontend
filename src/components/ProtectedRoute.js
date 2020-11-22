@@ -15,7 +15,6 @@ const ProtectedRoute = ({ component: Component, userRole, isNew, roles, ...rest 
         setIsAuth(hasAccess(roles, userRole));
     }, [roles, userRole]);
 
-    console.log("enters ProtectedRoute");
 
     return token ? (
         <Route {...rest} render={(matchProps) => <Component {...matchProps} />} />

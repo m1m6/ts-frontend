@@ -26,3 +26,17 @@ export const PUBLISH_TRANSLATIONS_MUTATION = gql`
         addTranslations(input: $input)
     }
 `;
+
+export const REFETCH_PAGE = gql`
+    mutation refetchPage($pageId: Int!) {
+        refetchPage(pageId: $pageId) {
+            id
+        }
+    }
+`;
+
+export const DELETE_PAGE = gql`
+    mutation deletePage($pageId: Int!) {
+        deletePage(pageId: $pageId)
+    }
+`;

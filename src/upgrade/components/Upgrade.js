@@ -290,7 +290,6 @@ const Step2 = ({ setStep }) => {
                                     subscripeResults.data.subscription.status &&
                                     subscripeResults.data.subscription.status === 'PREMIUM'
                                 ) {
-                                    message.success('Wohoooo go to step 3');
                                     setStep(3);
                                 } else {
                                     console.log('subscripeResults', subscripeResults);

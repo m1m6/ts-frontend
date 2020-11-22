@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect, useRef, Children } from 'react';
-import { Table, Input, Form, message } from 'antd';
+import { Table, Input, Form, message, Popover } from 'antd';
 import { parse, format } from 'date-fns';
+import { DeleteOutlined, SyncOutlined } from '@ant-design/icons';
 
 import GoBack from '../../../components/GoBack';
 import { useGetPageQuery } from '../useQueries';
@@ -13,7 +14,7 @@ import {
     getTranslationsPercentageByLanguage,
     mapLanguages,
 } from '../utils';
-import { usePublishStringsMutation } from '../useMutations';
+import { useDeletePage, usePublishStringsMutation, useRefetchPage } from '../useMutations';
 import { useUserLanguagesQuery } from '../../../user/useQueries';
 import LoadingBar from 'react-top-loading-bar';
 import { browserHistory } from '../../../browserHistory';
@@ -262,10 +263,13 @@ const Translation = (props) => {
     const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
 
     const [publishTranslations] = usePublishStringsMutation();
+    const [refetchPage] = useRefetchPage();
+    const [deletePage] = useDeletePage();
 
     let [rowsData, setRowsData] = useState([]);
     let [userSelectedLang, setUserSelectedLang] = useState(0);
     let [dataUpdated, setDataUpdated] = useState(false);
+    let [visible, setVisible] = useState(false);
 
     useEffect(() => {
         if (loading || meLoading || userLanguagesLoading) {
@@ -290,6 +294,61 @@ const Translation = (props) => {
         message.warn('Unauthorized!');
         return <Redirect to="/" />;
     }
+    const content = (
+        <div
+            style={{
+                width: '180px',
+                borderRadius: '2px',
+                border: 'solid 1px #ccd2d8',
+                backgroundColor: 'white',
+                paddingLeft: '19px',
+                paddingTop: '22px',
+            }}
+        >
+            <div
+                style={{ cursor: 'pointer' }}
+                onClick={async () => {
+                    try {
+                        const result = await refetchPage({ variables: { pageId } });
+                        if (result && result.data && result.data.refetchPage) {
+                            message.success(
+                                "Your page is being processed, please come back later when it's ready."
+                            );
+                            browserHistory.push('/');
+                        } else {
+                            message.error('Unable to handle your request');
+                        }
+                    } catch (error) {
+                        console.log(error);
+                        message.error('Unable to handle your request');
+                    }
+                }}
+            >
+                <SyncOutlined style={{ width: '10px', height: '11px' }} />
+                <span style={{ marginLeft: '16px' }}>Fetch again</span>
+            </div>
+            <div
+                style={{ marginTop: '30px', marginBottom: '30px', cursor: 'pointer' }}
+                onClick={async () => {
+                    try {
+                        const result = await deletePage({ variables: { pageId } });
+                        if (result && result.data && result.data.deletePage) {
+                            message.success('Your page is deleted successfully');
+                            browserHistory.push('/');
+                        } else {
+                            message.error('Unable to handle your request');
+                        }
+                    } catch (error) {
+                        console.log(error);
+                        message.error('Unable to handle your request');
+                    }
+                }}
+            >
+                <DeleteOutlined style={{ width: '10px', height: '11px' }} />
+                <span style={{ marginLeft: '16px' }}>Delete Page</span>
+            </div>
+        </div>
+    );
     const pageData = data.getPage;
     let userLanguages =
         userLanguagesData && userLanguagesData.userLanguages ? userLanguagesData.userLanguages : [];
@@ -297,7 +356,8 @@ const Translation = (props) => {
     const wordsCount = getPageWordsCount(data.getPage ? data.getPage.pageString : []);
     const percentageTranslated = getTranslationsPercentageByLanguage(
         data.getPage ? data.getPage.pageString : [],
-        userSelectedLang
+        userSelectedLang,
+        1
     );
 
     return (
@@ -314,33 +374,52 @@ const Translation = (props) => {
                     </div>
                 </div>
                 <div className="rs">
-                    {dataUpdated && (
-                        <Button
-                            className="wf-btn-primary"
-                            children={'Publish Changes'}
-                            onClick={async (e) => {
-                                const updatedRows = rowsData
-                                    .filter((row) => row.isUpdated && row.translated !== '0')
-                                    .map(({ translated, stringId, selectedLanguageId }) => {
-                                        return { translated, stringId, selectedLanguageId };
-                                    });
-                                if (updatedRows && updatedRows.length > 0) {
-                                    const results = await publishTranslations({
-                                        variables: { input: updatedRows },
-                                    });
-                                    if (results && results.data && results.data.addTranslations) {
-                                        message.success('Translations saved successfully!');
-                                    } else {
-                                        message.error(
-                                            "Unable to save the translations, we've received the error, and we're working on it."
-                                        );
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        {dataUpdated && (
+                            <Button
+                                className="wf-btn-primary"
+                                children={'Publish Changes'}
+                                onClick={async (e) => {
+                                    const updatedRows = rowsData
+                                        .filter((row) => row.isUpdated && row.translated !== '0')
+                                        .map(({ translated, stringId, selectedLanguageId }) => {
+                                            return { translated, stringId, selectedLanguageId };
+                                        });
+                                    if (updatedRows && updatedRows.length > 0) {
+                                        const results = await publishTranslations({
+                                            variables: { input: updatedRows },
+                                        });
+                                        if (
+                                            results &&
+                                            results.data &&
+                                            results.data.addTranslations
+                                        ) {
+                                            message.success('Translations saved successfully!');
+                                        } else {
+                                            message.error(
+                                                "Unable to save the translations, we've received the error, and we're working on it."
+                                            );
+                                        }
                                     }
-                                }
 
-                                setDataUpdated(false);
-                            }}
-                        />
-                    )}
+                                    setDataUpdated(false);
+                                }}
+                            />
+                        )}
+
+                        <div className="page-popover">
+                            <Popover
+                                arrowContent="asd"
+                                placement="bottomRight"
+                                content={content}
+                                trigger="click"
+                                visible={visible}
+                                onVisibleChange={(visible) => setVisible(visible)}
+                            >
+                                <Button className={visible ? 'active' : ''}>...</Button>
+                            </Popover>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div className="translation-page-sub-header">

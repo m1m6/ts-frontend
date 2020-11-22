@@ -45,6 +45,36 @@
                 width: 152px;
                 opacity: 1;
             }
+
+
+            .page-popover {
+                margin-top: 34px;
+                margin-left: 14px;
+
+                > button {
+                    width: 49px;
+                    height: 45px;
+                    border-radius: 4px;
+                    box-shadow: 0 2px 20px -5px #e8eaef;
+                    border: solid 1px $dark-indigo;
+                    color: #0a2540;
+                    font-size: 28px;
+                    line-height: 5px;
+                    padding-bottom: 16px;
+                    outline: 0;
+                    cursor: pointer;
+                    opacity: 0.23;
+                }
+
+                .active {
+                    border-radius: 4px;
+                    opacity: 1;
+                    box-shadow: 0 2px 20px -5px #e8eaef;
+                    border: solid 1px $periwinkle-two;
+                    background-color: $periwinkle;
+                    color: #ffffff;
+                }
+            }
         }
     }
 
@@ -223,5 +253,15 @@
         border: solid 1px $pale-grey-42;
         outline: 0;
         box-shadow: none;
+    }
+}
+
+
+.ant-popover-content {
+    .ant-popover-inner {
+        box-shadow: unset;
+        .ant-popover-inner-content {
+            padding: 0;
+        }
     }
 }
