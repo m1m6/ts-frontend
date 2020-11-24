@@ -340,6 +340,9 @@ const Translation = (props) => {
                 onClick={async () => {
                     try {
                         setVisible(false);
+                        message.info(
+                            "Processing..."
+                        , 15);
                         const result = await deletePage({ variables: { pageId } });
                         if (result && result.data && result.data.deletePage) {
                             message.success('Your page is deleted successfully');
