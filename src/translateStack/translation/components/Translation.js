@@ -15,7 +15,7 @@ import {
     getTranslationsPercentageByLanguage,
     mapLanguages,
 } from '../utils';
-import { useDeletePage, usePublishStringsMutation, useRefetchPage } from '../useMutations';
+import { useDeletePage, useDeletePageTranslations, usePublishStringsMutation, useRefetchPage } from '../useMutations';
 import { useUserLanguagesQuery } from '../../../user/useQueries';
 import LoadingBar from 'react-top-loading-bar';
 import { browserHistory } from '../../../browserHistory';
@@ -266,6 +266,7 @@ const Translation = (props) => {
     const [publishTranslations] = usePublishStringsMutation();
     const [refetchPage] = useRefetchPage();
     const [deletePage] = useDeletePage();
+    const [deletePageTranslations] = useDeletePageTranslations();
 
     let [rowsData, setRowsData] = useState([]);
     let [userSelectedLang, setUserSelectedLang] = useState(0);
@@ -311,9 +312,12 @@ const Translation = (props) => {
                 onClick={async () => {
                     try {
                         setVisible(false);
-
+                        message.info(
+                            "Processing..."
+                        , 15);
+                        await deletePageTranslations({ variables: { pageId } });
                         message.success(
-                            "Your page is being processed, please come back later when it's ready."
+                            "Successfully connected to your page. we're collecting the strings."
                         );
                         browserHistory.push('/');
 

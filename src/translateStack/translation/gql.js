@@ -40,3 +40,11 @@ export const DELETE_PAGE = gql`
         deletePage(pageId: $pageId)
     }
 `;
+
+export const DELETE_PAGE_TRANSLATIONS = gql`
+    mutation deletePageTranslations($pageId: Int!) {
+        deletePageTranslations(pageId: $pageId) {
+            id
+        }
+    }
+`;
