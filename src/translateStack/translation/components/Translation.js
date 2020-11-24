@@ -15,7 +15,12 @@ import {
     getTranslationsPercentageByLanguage,
     mapLanguages,
 } from '../utils';
-import { useDeletePage, useDeletePageTranslations, usePublishStringsMutation, useRefetchPage } from '../useMutations';
+import {
+    useDeletePage,
+    useDeletePageTranslations,
+    usePublishStringsMutation,
+    useRefetchPage,
+} from '../useMutations';
 import { useUserLanguagesQuery } from '../../../user/useQueries';
 import LoadingBar from 'react-top-loading-bar';
 import { browserHistory } from '../../../browserHistory';
@@ -95,14 +100,26 @@ const EditableCell = ({
 
         if (record && (record[dataIndex] === null || record[dataIndex] === '')) {
             if (tbodyWrapper) {
-                if (tbodyWrapper[0]) {
+                if (
+                    tbodyWrapper[0] &&
+                    tbodyWrapper[0].children &&
+                    tbodyWrapper[0].children[record.key] &&
+                    tbodyWrapper[0].children[record.key].children &&
+                    tbodyWrapper[0].children[record.key].children[0]
+                ) {
                     tbodyWrapper[0].children[record.key].children[0].style.borderLeft =
                         '2px solid #ff7166';
                 }
             }
         } else {
             if (tbodyWrapper) {
-                if (tbodyWrapper[0]) {
+                if (
+                    tbodyWrapper[0] &&
+                    tbodyWrapper[0].children &&
+                    tbodyWrapper[0].children[record.key] &&
+                    tbodyWrapper[0].children[record.key].children &&
+                    tbodyWrapper[0].children[record.key].children[0]
+                ) {
                     if (focus) {
                         tbodyWrapper[0].children[record.key].children[0].style.borderLeft =
                             '2px solid #9966ff';
@@ -259,19 +276,18 @@ const Translation = (props) => {
         pageId = parseInt(props.match.params.pageId);
     }
     const [progress, setProgress] = useState(0);
-    const { data, loading, error } = useGetPageQuery(pageId);
-    const { data: meData, loading: meLoading } = useMeQuery();
-    const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
-
-    const [publishTranslations] = usePublishStringsMutation();
-    const [refetchPage] = useRefetchPage();
-    const [deletePage] = useDeletePage();
-    const [deletePageTranslations] = useDeletePageTranslations();
-
     let [rowsData, setRowsData] = useState([]);
     let [userSelectedLang, setUserSelectedLang] = useState(0);
     let [dataUpdated, setDataUpdated] = useState(false);
     let [visible, setVisible] = useState(false);
+
+    const { data, loading, error } = useGetPageQuery(pageId);
+    const { data: meData, loading: meLoading } = useMeQuery();
+    const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
+    const [publishTranslations] = usePublishStringsMutation();
+    const [refetchPage] = useRefetchPage();
+    const [deletePage] = useDeletePage();
+    const [deletePageTranslations] = useDeletePageTranslations();
 
     useEffect(() => {
         if (loading || meLoading || userLanguagesLoading) {
@@ -312,9 +328,7 @@ const Translation = (props) => {
                 onClick={async () => {
                     try {
                         setVisible(false);
-                        message.info(
-                            "Processing..."
-                        , 15);
+                        message.info('Processing...', 10);
                         await deletePageTranslations({ variables: { pageId } });
                         message.success(
                             "Successfully connected to your page. we're collecting the strings."
@@ -340,9 +354,7 @@ const Translation = (props) => {
                 onClick={async () => {
                     try {
                         setVisible(false);
-                        message.info(
-                            "Processing..."
-                        , 15);
+                        message.info('Processing...', 10);
                         const result = await deletePage({ variables: { pageId } });
                         if (result && result.data && result.data.deletePage) {
                             message.success('Your page is deleted successfully');

@@ -71,7 +71,7 @@ const App = () => {
     if (token) {
         return (
             <>
-                <Banner setBannerVisible={setBannerVisible} bannerVisible={bannerVisible}/>
+                <Banner setBannerVisible={setBannerVisible} bannerVisible={bannerVisible} />
                 <Layout
                     style={{
                         marginLeft:
@@ -106,14 +106,13 @@ const App = () => {
     }
 };
 
-const Banner = ({setBannerVisible, bannerVisible}) => {
+const Banner = ({ setBannerVisible, bannerVisible }) => {
     const [showUpgradePopup, setShowUpgradePopup] = useState(false);
     const { data: userPlan, loading } = useUserSubscriptionPlan();
 
     if (loading) {
         return <></>;
     }
-
 
     // useEffect(() => {
     //     const shouldShowBanner =
@@ -132,7 +131,6 @@ const Banner = ({setBannerVisible, bannerVisible}) => {
     //     }
     // }, [bannerVisible]);
 
-
     const shouldShowBanner =
         userPlan &&
         userPlan.getUserPlan &&
@@ -144,10 +142,10 @@ const Banner = ({setBannerVisible, bannerVisible}) => {
     const userStatus = shouldShowBanner ? userPlan.getUserPlan.status : '';
     const userPlanData = shouldShowBanner ? userPlan.getUserPlan.plan : {};
     if (shouldShowBanner && userStatus === 'BASIC' && bannerVisible === false) {
-        setBannerVisible(true)
+        setBannerVisible(true);
     }
     return (
-        <div style={{marginBottom: "50px"}}>
+        <div style={{ marginBottom: shouldShowBanner && userStatus === 'BASIC' ? '50px' : 0 }}>
             {shouldShowBanner && userStatus === 'BASIC' && (
                 <>
                     <div
@@ -157,8 +155,8 @@ const Banner = ({setBannerVisible, bannerVisible}) => {
                             top: '0px',
                             backgroundColor: '#a172ff',
                             textAlign: 'center',
-                            position: "fixed",
-                            zIndex: 10
+                            position: 'fixed',
+                            zIndex: 10,
                         }}
                     >
                         <Stars style={{ width: '13px', height: '13px', marginRight: '6px' }} />

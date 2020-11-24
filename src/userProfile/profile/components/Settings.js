@@ -3,7 +3,7 @@ import { Col, Row, Avatar, Tabs, message } from 'antd';
 import * as Yup from 'yup';
 import classNames from 'classnames';
 import { Form, Formik } from 'formik';
-import { useMeQueryClient } from '../../../rootUseQuery';
+import { useMeQuery } from '../../../rootUseQuery';
 import InputField from '../../../form/components/InputField';
 import Button from '../../../form/components/Button';
 import { useUpdateUserMetaDataMutation } from '../useMutations';
@@ -85,7 +85,7 @@ const Team = () => {
 };
 
 const Profile = () => {
-    const { data, loading, error } = useMeQueryClient();
+    const { data, loading, error } = useMeQuery();
     const [updateUser] = useUpdateUserMetaDataMutation();
 
     const initialValues = {
@@ -100,11 +100,11 @@ const Profile = () => {
         password: Yup.string().required('*Required'),
     });
 
-    if (loading) {
-        return <>Loading...</>;
-    }
+    // if (loading) {
+    //     return <></>;
+    // }
 
-    const { me } = data;
+    const { me } = data ? data : { me: { email: '', password: '', fullName: '' } };
     initialValues.email = me.email;
     initialValues.password = '***********';
     initialValues.fullName = me.fullName;

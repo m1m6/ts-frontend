@@ -226,14 +226,11 @@ const Projects = ({ routerHistory }) => {
 
     if (loading || userLoading || userLanguagesLoading) {
         return (
-            <>
-                Loading...
-                {/* <LoadingBar
-                    color="#a172ff"
-                    progress={progress}
-                    onLoaderFinished={() => setProgress(0)}
-                /> */}
-            </>
+            <LoadingBar
+                color="#a172ff"
+                progress={progress}
+                onLoaderFinished={() => setProgress(0)}
+            />
         );
     } else {
         if (data && data.userPages) {
