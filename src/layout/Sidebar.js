@@ -105,14 +105,15 @@ const OnboardingSteps = ({ currentStep, updateOnboardingClient }) => {
 };
 
 const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible }) => {
-    let [activeMenu, setActiveMenu] = useState('Projects');
+    let [activeMenu, setActiveMenu] = useState(
+        window.location.pathname.includes('settings') ? 'Settings' : 'Projects'
+    );
     const [progress, setProgress] = useState(70);
     const { data, loading, error } = useMeQuery();
     const { data: onboardingData } = useOnboardingQueryClient();
     const [updateUser] = useUpdateUserMutation();
     const [updateOnboardingClient] = useOnboardingMutationClient();
     const [updateCustomizerClient] = useCustomizerMutationClient();
-
 
     if (loading) {
         return (
@@ -154,7 +155,10 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible }) =>
                     />
                 </>
             ) : isOpenCustomizer ? (
-                <CustomizerSidebar openLanguagesComponent={openLanguagesComponent} bannerVisible={bannerVisible}/>
+                <CustomizerSidebar
+                    openLanguagesComponent={openLanguagesComponent}
+                    bannerVisible={bannerVisible}
+                />
             ) : (
                 <div className="menu-wrapper">
                     <div
