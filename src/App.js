@@ -23,6 +23,7 @@ const App = () => {
     const [userRole, setUserRole] = useState(undefined);
     const { data: customizerData, loading: customizerLoading } = useCustomizerQueryClient();
     const [updateCustomizerClient] = useCustomizerMutationClient();
+    const [bannerVisible, setBannerVisible] = useState(false);
 
     const [setUserData] = useUserData();
 
@@ -70,7 +71,7 @@ const App = () => {
     if (token) {
         return (
             <>
-                <Banner />
+                <Banner setBannerVisible={setBannerVisible} bannerVisible={bannerVisible}/>
                 <Layout
                     style={{
                         marginLeft:
@@ -87,6 +88,7 @@ const App = () => {
                         userRole={userRole}
                         isOpenCustomizer={isOpenCustomizer}
                         openLanguagesComponent={openLanguagesComponent}
+                        bannerVisible={bannerVisible}
                     />
                     <Content className="app-page-wrapper" id="app-page-wrapper-id">
                         <Routes
@@ -104,13 +106,32 @@ const App = () => {
     }
 };
 
-const Banner = () => {
+const Banner = ({setBannerVisible, bannerVisible}) => {
     const [showUpgradePopup, setShowUpgradePopup] = useState(false);
     const { data: userPlan, loading } = useUserSubscriptionPlan();
 
     if (loading) {
         return <></>;
     }
+
+
+    // useEffect(() => {
+    //     const shouldShowBanner =
+    //     userPlan &&
+    //     userPlan.getUserPlan &&
+    //     userPlan.getUserPlan.plan &&
+    //     userPlan.getUserPlan.plan.id > 1
+    //         ? true
+    //         : false;
+
+    // const userStatus = shouldShowBanner ? userPlan.getUserPlan.status : '';
+    // const userPlanData = shouldShowBanner ? userPlan.getUserPlan.plan : {};
+
+    //     if (shouldShowBanner && userStatus === 'BASIC' && bannerVisible === false) {
+    //         setBannerVisible(true)
+    //     }
+    // }, [bannerVisible]);
+
 
     const shouldShowBanner =
         userPlan &&
@@ -122,9 +143,11 @@ const Banner = () => {
 
     const userStatus = shouldShowBanner ? userPlan.getUserPlan.status : '';
     const userPlanData = shouldShowBanner ? userPlan.getUserPlan.plan : {};
-
+    if (shouldShowBanner && userStatus === 'BASIC' && bannerVisible === false) {
+        setBannerVisible(true)
+    }
     return (
-        <div>
+        <div style={{marginBottom: "50px"}}>
             {shouldShowBanner && userStatus === 'BASIC' && (
                 <>
                     <div
@@ -134,6 +157,8 @@ const Banner = () => {
                             top: '0px',
                             backgroundColor: '#a172ff',
                             textAlign: 'center',
+                            position: "fixed",
+                            zIndex: 10
                         }}
                     >
                         <Stars style={{ width: '13px', height: '13px', marginRight: '6px' }} />

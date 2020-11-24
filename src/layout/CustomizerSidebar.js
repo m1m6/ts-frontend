@@ -90,8 +90,9 @@ const MainComponent = ({ setWhichInnerSidebar }) => {
 
 const sharedBtnStyles = {
     marginLeft: '40px',
-    bottom: '38px',
-    position: 'absolute',
+    // bottom: '38px',
+    // position: 'absolute',
+    marginBottom: '100px',
     width: '105px',
 };
 
@@ -156,7 +157,6 @@ const CustomDirectionStyle = () => {
             width: state.selectProps.width,
             borderBottom: '1px dotted pink',
             color: state.selectProps.menuColor,
-
         }),
         container: (base, { selectProps: { width, height } }) => ({
             ...base,
@@ -196,7 +196,8 @@ const CustomDirectionStyle = () => {
     };
 };
 
-const PositionComponent = ({}) => {
+const PositionComponent = ({ bannerVisible }) => {
+    console.log('bannerVisible', bannerVisible);
     const { data, loading: meLoading } = useMeQuery();
     const [updateCustomizer] = useCustomizerMutation();
     const [updateCustomizerClient] = useCustomizerMutationClient();
@@ -311,7 +312,6 @@ const PositionComponent = ({}) => {
                         children="SAVE"
                         className={classNames('wf-btn-primary active', { active: btnActive })}
                         onClick={async (e) => {
-
                             if (userPosition === 'CUSTOM' && !customPosition) {
                                 message.error('Please enter valid DIV ID.');
                                 return;
@@ -336,7 +336,10 @@ const PositionComponent = ({}) => {
 
                             setBtnActive(false);
                         }}
-                        style={{ ...sharedBtnStyles }}
+                        style={{
+                            ...sharedBtnStyles,
+                            // bottom: bannerVisible ? '88px ' : '38px ',
+                        }}
                     />
                 )}
             </div>
@@ -402,7 +405,6 @@ const TextComponent = ({}) => {
                             if (results.data && results.data.updateCustomizer) {
                                 message.success('Successfully saved.');
                             }
-
                         }}
                         style={{ ...sharedBtnStyles }}
                     />
@@ -474,17 +476,28 @@ const LanguagesComponent = ({}) => {
             <div className="customizer-menu-sub-title">Choose your target languages below </div>
 
             <div className="customizer-menu-group">
-                <Select
-                    styles={CustomStyle()}
-                    options={mappedLangs}
-                    isLoading={mappedLangs && mappedLangs.length == 0}
-                    isMulti={true}
-                    value={selectedLanguages}
-                    onChange={changeHandler}
-                    width="200px"
-                    placeholder="Select languages"
-                    isClearable={false}
-                />
+                <div
+                    style={{
+                        marginBottom: `${
+                            selectedLanguages && selectedLanguages.length
+                                ? selectedLanguages.length * 50
+                                : 50
+                        }px `,
+                    }}
+                >
+                    <Select
+                        styles={CustomStyle()}
+                        options={mappedLangs}
+                        isLoading={mappedLangs && mappedLangs.length == 0}
+                        isMulti={true}
+                        value={selectedLanguages}
+                        onChange={changeHandler}
+                        menuShouldScrollIntoView
+                        width="200px"
+                        placeholder="Select languages"
+                        isClearable={false}
+                    />
+                </div>
                 {btnActive && (
                     <Button
                         children="SAVE"
@@ -508,7 +521,6 @@ const LanguagesComponent = ({}) => {
                                     'An error occured during saving your changes, please try again later.'
                                 );
                             }
-
                         }}
                         style={{ ...sharedBtnStyles }}
                     />
@@ -583,25 +595,30 @@ const AppearanceComponent = ({}) => {
     );
 };
 
-const whichComponentToRender = (whichInnerSidebar, setWhichInnerSidebar) => {
+const whichComponentToRender = (whichInnerSidebar, setWhichInnerSidebar, bannerVisible) => {
     switch (whichInnerSidebar) {
         case 0:
-            return <MainComponent setWhichInnerSidebar={setWhichInnerSidebar} />;
+            return (
+                <MainComponent
+                    setWhichInnerSidebar={setWhichInnerSidebar}
+                    bannerVisible={bannerVisible}
+                />
+            );
 
         case 1:
-            return <PositionComponent />;
+            return <PositionComponent bannerVisible={bannerVisible} />;
 
         case 2:
-            return <LanguagesComponent />;
+            return <LanguagesComponent bannerVisible={bannerVisible} />;
 
         case 3:
-            return <AppearanceComponent />;
+            return <AppearanceComponent bannerVisible={bannerVisible} />;
         case 4:
-            return <TextComponent />;
+            return <TextComponent bannerVisible={bannerVisible} />;
     }
 };
 
-const CustomizerSidebar = ({ openLanguagesComponent }) => {
+const CustomizerSidebar = ({ openLanguagesComponent, bannerVisible }) => {
     const [updateCustomizerClient] = useCustomizerMutationClient();
 
     const [whichInnerSidebar, setWhichInnerSidebar] = useState(openLanguagesComponent ? 2 : 0);
@@ -625,7 +642,7 @@ const CustomizerSidebar = ({ openLanguagesComponent }) => {
                 />
             </div>
             <div className="customizer-menu">
-                {whichComponentToRender(whichInnerSidebar, setWhichInnerSidebar)}
+                {whichComponentToRender(whichInnerSidebar, setWhichInnerSidebar, bannerVisible)}
             </div>
         </div>
     );

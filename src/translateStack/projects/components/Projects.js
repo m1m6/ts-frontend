@@ -1,5 +1,6 @@
 import { message, Skeleton, Table, Tag } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Grid } from 'svg-loaders-react';
 import LoadingBar from 'react-top-loading-bar';
 import { format } from 'date-fns';
 import Button from '../../../form/components/Button';
@@ -20,6 +21,7 @@ import { useAddSinglePageMutation } from '../useMutations';
 import { getProjectTranslationsPercentage, getProjectWordsAndStringsCount } from '../utils';
 import { getTranslationsPercentageByLanguage } from '../../translation/utils';
 import { useUserLanguagesQuery } from '../../../user/useQueries';
+import { OnboardinButton } from '../../onboarding/components/Onboarding';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -100,9 +102,18 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
                     />
                 </div>
                 <div className="setup-p-d-s">
-                    <Button
-                        className="wf-btn-primary"
-                        children="TEST SETUP"
+                    <OnboardinButton
+                        isActive={true}
+                        // className={classNames('wf-btn-primary', {
+                        //     active: dirty && Object.keys(errors).length === 0,
+                        // })}
+                        label={
+                            isSubmitting ? (
+                                <Grid style={{ width: '17px', height: '17px' }} />
+                            ) : (
+                                'TEST SETUP'
+                            )
+                        }
                         disabled={isSubmitting}
                         onClick={async () => {
                             setIsSubmitting(true);
@@ -174,7 +185,11 @@ const mapRows = (pages, userLanguagesData) => {
                 </span>
             );
             row.strings = page.pageString.length;
-            row.translated = `${getTranslationsPercentageByLanguage(page.pageString, null, userLanguagesData.userLanguages.length)}%`;
+            row.translated = `${getTranslationsPercentageByLanguage(
+                page.pageString,
+                null,
+                userLanguagesData.userLanguages.length
+            )}%`;
             row.lastEdit = format(new Date(page.updatedAt).getTime(), 'd. MMM');
             row.pageId = page.id;
 
@@ -196,26 +211,29 @@ const Projects = ({ routerHistory }) => {
 
     let dataSource = placeHolderRow;
 
-    useEffect(() => {
-        if (loading || userLoading || userLanguagesLoading) {
-            setProgress(100);
-        }
-        return () => {
-            setProgress(0);
-        };
-    }, []);
+    // useEffect(() => {
+    //     if (loading || userLoading || userLanguagesLoading) {
+    //         setProgress(100);
+    //     }
+    //     // return () => {
+    //     //     setProgress(0);
+    //     // };
+    // }, []);
 
     if (error) {
-        return <div style={{margin: "0 auto"}}>Unable to parse your request </div>;
+        return <div style={{ margin: '0 auto' }}>Unable to parse your request </div>;
     }
 
     if (loading || userLoading || userLanguagesLoading) {
         return (
-            <LoadingBar
-                color="#a172ff"
-                progress={progress}
-                onLoaderFinished={() => setProgress(0)}
-            />
+            <>
+                Loading...
+                {/* <LoadingBar
+                    color="#a172ff"
+                    progress={progress}
+                    onLoaderFinished={() => setProgress(0)}
+                /> */}
+            </>
         );
     } else {
         if (data && data.userPages) {
@@ -227,7 +245,11 @@ const Projects = ({ routerHistory }) => {
     let apiKey = userData && userData.me ? userData.me.apiKey : '';
 
     let { wordsCount, stringCount } = getProjectWordsAndStringsCount(data.userPages);
-    let percentageTranslations = getProjectTranslationsPercentage(data.userPages, stringCount, userLanguagesData ? userLanguagesData.userLanguages.length: 1);
+    let percentageTranslations = getProjectTranslationsPercentage(
+        data.userPages,
+        stringCount,
+        userLanguagesData ? userLanguagesData.userLanguages.length : 1
+    );
 
     return (
         <div className="projects-page-wrapper">
@@ -236,7 +258,9 @@ const Projects = ({ routerHistory }) => {
                     <div className="projects-inner-title">Project</div>
                     <div className="project-name">
                         {hasFinishedSetup
-                            ? data.userPages && data.userPages[0] && data.userPages[0].pageUrl.substring(
+                            ? data.userPages &&
+                              data.userPages[0] &&
+                              data.userPages[0].pageUrl.substring(
                                   0,
                                   data.userPages[0].pageUrl.indexOf('/') > 0
                                       ? data.userPages[0].pageUrl.indexOf('/')

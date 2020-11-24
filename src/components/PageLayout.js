@@ -12,20 +12,20 @@ const PageLayout = ({
 }) => {
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (loading) {
-            setLoading(false);
-        }
-    }, []);
+    // // useEffect(() => {
+    // //     if (loading) {
+    // //         setLoading(false);
+    // //     }
+    // // }, [loading]);
 
-    if (loading) {
-        return (
-            <LoadingBar
-                color="#a172ff"
-                progress={50}
-            />
-        );
-    }
+    // if (loading) {
+    //     return (
+    //         <LoadingBar
+    //             color="#a172ff"
+    //             progress={50}
+    //         />
+    //     );
+    // }
     if (isOpenCustomizer) {
         return (
             <div className="customizer-page-layout">

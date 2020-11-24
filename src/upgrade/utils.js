@@ -63,7 +63,7 @@ export const mapPlans = (plansData, cycle = 'YEARLY') => {
                             }}
                         >
                             {cycle === 'YEARLY'
-                                ? `$${plan.yearlyPriceAmount}/y`
+                                ? `$${plan.yearlyPriceAmount}/m`
                                 : `$${plan.monthlyPriceAmount}/m`}
                         </span>
                     </div>

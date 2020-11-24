@@ -1,7 +1,8 @@
-import React, { useContext, useState, useEffect, useRef, Children } from 'react';
+import React, { useContext, useState, useEffect, Children } from 'react';
 import { Table, Input, Form, message, Popover } from 'antd';
 import { parse, format } from 'date-fns';
 import { DeleteOutlined, SyncOutlined } from '@ant-design/icons';
+import classNames from 'classnames';
 
 import GoBack from '../../../components/GoBack';
 import { useGetPageQuery } from '../useQueries';
@@ -309,12 +310,15 @@ const Translation = (props) => {
                 style={{ cursor: 'pointer' }}
                 onClick={async () => {
                     try {
+                        setVisible(false);
+
+                        message.success(
+                            "Your page is being processed, please come back later when it's ready."
+                        );
+                        browserHistory.push('/');
+
                         const result = await refetchPage({ variables: { pageId } });
                         if (result && result.data && result.data.refetchPage) {
-                            message.success(
-                                "Your page is being processed, please come back later when it's ready."
-                            );
-                            browserHistory.push('/');
                         } else {
                             message.error('Unable to handle your request');
                         }
@@ -331,6 +335,7 @@ const Translation = (props) => {
                 style={{ marginTop: '30px', marginBottom: '30px', cursor: 'pointer' }}
                 onClick={async () => {
                     try {
+                        setVisible(false);
                         const result = await deletePage({ variables: { pageId } });
                         if (result && result.data && result.data.deletePage) {
                             message.success('Your page is deleted successfully');
@@ -377,11 +382,12 @@ const Translation = (props) => {
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                         {dataUpdated && (
                             <Button
-                                className="wf-btn-primary"
+                                // className="wf-btn-primary"
+                                className={classNames('wf-btn-primary active')}
                                 children={'Publish Changes'}
                                 onClick={async (e) => {
                                     const updatedRows = rowsData
-                                        .filter((row) => row.isUpdated && row.translated !== '0')
+                                        .filter((row) => row.isUpdated && row.translated !== '')
                                         .map(({ translated, stringId, selectedLanguageId }) => {
                                             return { translated, stringId, selectedLanguageId };
                                         });
@@ -513,7 +519,11 @@ const TableWrapper = ({
         const index = newData.findIndex((item) => row.key === item.key);
         const item = newData[index];
         newData.splice(index, 1, { ...item, ...row, isUpdated: true });
-        setDataUpdated(true);
+        if (row.translated !== '') {
+            setDataUpdated(true);
+        } else {
+            setDataUpdated(false);
+        }
         setRows(newData);
         setRowsData(newData);
     };

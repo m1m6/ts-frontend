@@ -37,7 +37,7 @@ const HeaderLogo = () => {
 
 const OnboardingSteps = ({ currentStep, updateOnboardingClient }) => {
     return (
-        <div className="onboarding-wrapper" >
+        <div className="onboarding-wrapper">
             {currentStep > 1 && (
                 <GoBack
                     onClickCB={async (e) => {
@@ -104,23 +104,15 @@ const OnboardingSteps = ({ currentStep, updateOnboardingClient }) => {
     );
 };
 
-const Sidebar = ({ isOpenCustomizer, openLanguagesComponent }) => {
+const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible }) => {
+    let [activeMenu, setActiveMenu] = useState('Projects');
+    const [progress, setProgress] = useState(70);
     const { data, loading, error } = useMeQuery();
     const { data: onboardingData } = useOnboardingQueryClient();
     const [updateUser] = useUpdateUserMutation();
     const [updateOnboardingClient] = useOnboardingMutationClient();
     const [updateCustomizerClient] = useCustomizerMutationClient();
-    let [activeMenu, setActiveMenu] = useState('Projects');
-    const [progress, setProgress] = useState(70);
 
-    useEffect(() => {
-        if (loading) {
-            setProgress(100);
-        }
-        return () => {
-            setProgress(0);
-        };
-    }, []);
 
     if (loading) {
         return (
@@ -162,7 +154,7 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent }) => {
                     />
                 </>
             ) : isOpenCustomizer ? (
-                <CustomizerSidebar openLanguagesComponent={openLanguagesComponent} />
+                <CustomizerSidebar openLanguagesComponent={openLanguagesComponent} bannerVisible={bannerVisible}/>
             ) : (
                 <div className="menu-wrapper">
                     <div
@@ -219,7 +211,10 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent }) => {
                         </Link>
                     </div>
 
-                    <div className="bottom-items">
+                    <div
+                        className="bottom-items"
+                        style={{ bottom: bannerVisible ? '80px' : '30px' }}
+                    >
                         <div
                             className={classNames('menu-item', {
                                 activeMenu: activeMenu === 'Settings',

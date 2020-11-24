@@ -21,7 +21,7 @@ import { useUserSubscriptionPlan } from '../../../user/useQueries';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
-const OnboardinButton = ({ disabled = false, label, isActive, ...props }) => {
+export const OnboardinButton = ({ disabled = false, label, isActive, ...props }) => {
     return (
         <Button
             children={label}
