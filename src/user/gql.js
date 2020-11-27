@@ -64,3 +64,9 @@ export const USER_SUBSCRIPTION_PLAN = gql`
         }
     }
 `;
+
+export const CUSTOMER_CARDS = gql`
+    query getCustomerCard {
+        getCustomerCard
+    }
+`;

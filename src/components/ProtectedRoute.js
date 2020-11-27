@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Route, Redirect } from 'react-router-dom';
+import { browserHistory } from '../browserHistory';
 import { auth } from '../signupLogin/auth';
 
 const hasAccess = (roles, userRole) => {
@@ -11,11 +12,18 @@ const ProtectedRoute = ({ component: Component, userRole, isNew, roles, ...rest 
     const [isAuth, setIsAuth] = useState(false);
     let isAuthorizedToAccess;
     let isSkippedOnboarding = false;
-    useEffect(() => {
-        setIsAuth(hasAccess(roles, userRole));
-    }, [roles, userRole]);
 
+    // useEffect(() => {
+    //     setIsAuth(hasAccess(roles, userRole));
+    // }, [roles, userRole]);
+    useLayoutEffect(() => {
+        const token = auth.getAccessToken();
+        if (token && !hasAccess(roles, userRole)) {
+            browserHistory.push('/');
+        }
+    }, []);
 
+    console.log('isAuth', isAuth);
     return token ? (
         <Route {...rest} render={(matchProps) => <Component {...matchProps} />} />
     ) : (

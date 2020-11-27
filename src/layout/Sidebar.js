@@ -16,6 +16,7 @@ import GoBack from '../components/GoBack';
 import { ReactComponent as RightArrow } from '../assets/right-arrow-angle.svg';
 import CustomizerSidebar from './CustomizerSidebar';
 import LoadingBar from 'react-top-loading-bar';
+import { isAdmin, isEditor } from '../signupLogin/utils';
 
 const { Sider } = Layout;
 const { Step } = Steps;
@@ -104,7 +105,7 @@ const OnboardingSteps = ({ currentStep, updateOnboardingClient }) => {
     );
 };
 
-const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible }) => {
+const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, userRole }) => {
     let [activeMenu, setActiveMenu] = useState(
         window.location.pathname.includes('settings') ? 'Settings' : 'Projects'
     );
@@ -177,64 +178,73 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible }) =>
                             Projects
                         </Link>
                     </div>
-                    {isNew && (
+                    {isNew &&
+                        !isEditor(userRole)(
+                            <div className="menu-item">
+                                <Link
+                                    title="Setup"
+                                    onClick={async (e) => {
+                                        await updateOnboardingClient({
+                                            variables: { currentStep: 1 },
+                                        });
+                                        await updateUser({
+                                            variables: { skippedOnboarding: false },
+                                        });
+                                        browserHistory.push('/onboarding');
+                                    }}
+                                >
+                                    Setup
+                                    <Rings
+                                        style={{
+                                            width: '20px',
+                                            height: '20px',
+                                            stroke: '#9966ff',
+                                            verticalAlign: 'middle',
+                                        }}
+                                    />
+                                </Link>
+                            </div>
+                        )}
+
+                    {!isEditor(userRole) && (
                         <div className="menu-item">
                             <Link
-                                title="Setup"
+                                to="#"
+                                title="Customizer"
                                 onClick={async (e) => {
-                                    await updateOnboardingClient({ variables: { currentStep: 1 } });
-                                    await updateUser({ variables: { skippedOnboarding: false } });
-                                    browserHistory.push('/onboarding');
+                                    setActiveMenu('Projects');
+                                    e.preventDefault();
+                                    await updateCustomizerClient({ variables: { isOpen: true } });
+                                    browserHistory.push('/customizer');
                                 }}
                             >
-                                Setup
-                                <Rings
-                                    style={{
-                                        width: '20px',
-                                        height: '20px',
-                                        stroke: '#9966ff',
-                                        verticalAlign: 'middle',
-                                    }}
-                                />
+                                Customizer
                             </Link>
                         </div>
                     )}
-
-                    <div className="menu-item">
-                        <Link
-                            to="#"
-                            title="Customizer"
-                            onClick={async (e) => {
-                                setActiveMenu('Projects');
-                                e.preventDefault();
-                                await updateCustomizerClient({ variables: { isOpen: true } });
-                                browserHistory.push('/customizer');
-                            }}
-                        >
-                            Customizer
-                        </Link>
-                    </div>
 
                     <div
                         className="bottom-items"
                         style={{ bottom: bannerVisible ? '80px' : '30px' }}
                     >
-                        <div
-                            className={classNames('menu-item', {
-                                activeMenu: activeMenu === 'Settings',
-                            })}
-                        >
-                            <Link
-                                to="/settings"
-                                title="Settings"
-                                onClick={(e) => setActiveMenu('Settings')}
-                                className={classNames({
-                                    activeLink: activeMenu === 'Settings',
+                        {isAdmin(userRole) && (
+                            <div
+                                className={classNames('menu-item', {
+                                    activeMenu: activeMenu === 'Settings',
                                 })}
                             >
-                                Settings
-                            </Link>
-                        </div>
+                                <Link
+                                    to="/settings"
+                                    title="Settings"
+                                    onClick={(e) => setActiveMenu('Settings')}
+                                    className={classNames({
+                                        activeLink: activeMenu === 'Settings',
+                                    })}
+                                >
+                                    Settings
+                                </Link>
+                            </div>
+                        )}
                         <div className="menu-item">
                             <Link
                                 to="#"

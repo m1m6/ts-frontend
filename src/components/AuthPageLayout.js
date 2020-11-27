@@ -6,12 +6,12 @@ import { ReactComponent as CheckLogo } from '../assets/check.svg';
 import Link from '../form/components/Link';
 
 const AuthPageLayout = ({ history, Component, title, headerLink, ...rest }) => {
-    useLayoutEffect(() => {
-        const token = auth.getAccessToken();
-        if (token !== null) {
-            history.push('/');
-        }
-    }, []);
+    // useLayoutEffect(() => {
+    //     const token = auth.getAccessToken();
+    //     if (token !== null) {
+    //         history.push('/');
+    //     }
+    // }, []);
 
     return (
         <div className="auth-page-layout">

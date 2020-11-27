@@ -22,6 +22,7 @@ import { getProjectTranslationsPercentage, getProjectWordsAndStringsCount } from
 import { getTranslationsPercentageByLanguage } from '../../translation/utils';
 import { useUserLanguagesQuery } from '../../../user/useQueries';
 import { OnboardinButton } from '../../onboarding/components/Onboarding';
+import { isDeveloper, isEditor } from '../../../signupLogin/utils';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -240,6 +241,7 @@ const Projects = ({ routerHistory }) => {
 
     let hasFinishedSetup = userData && userData.me ? !userData.me.isNew : false;
     let apiKey = userData && userData.me ? userData.me.apiKey : '';
+    let userRole = userData && userData.me ? userData.me.role : '';
 
     let { wordsCount, stringCount } = getProjectWordsAndStringsCount(data.userPages);
     let percentageTranslations = getProjectTranslationsPercentage(
@@ -294,19 +296,21 @@ const Projects = ({ routerHistory }) => {
                     </div>
                 </div>
                 <div className="rs">
-                    <Button
-                        className="wf-btn-primary"
-                        children={hasFinishedSetup ? 'ADD PAGE' : 'START NOW'}
-                        onClick={async (e) => {
-                            if (hasFinishedSetup) {
-                                setShowPopup(true);
-                            } else {
-                                await updateOnboardingClient({ variables: { currentStep: 1 } });
-                                await updateUser({ variables: { skippedOnboarding: false } });
-                                browserHistory.push('/onboarding');
-                            }
-                        }}
-                    />
+                    {!isEditor(userRole) && (
+                        <Button
+                            className="wf-btn-primary"
+                            children={hasFinishedSetup ? 'ADD PAGE' : 'START NOW'}
+                            onClick={async (e) => {
+                                if (hasFinishedSetup) {
+                                    setShowPopup(true);
+                                } else {
+                                    await updateOnboardingClient({ variables: { currentStep: 1 } });
+                                    await updateUser({ variables: { skippedOnboarding: false, isNew: true } });
+                                    browserHistory.push('/onboarding');
+                                }
+                            }}
+                        />
+                    )}
                 </div>
             </div>
             <div className="projects-page-sub-header">
@@ -352,7 +356,13 @@ const Projects = ({ routerHistory }) => {
                     pagination={false}
                     onRow={(row) => {
                         return {
-                            onClick: () => routerHistory.push(`/translation/${row.pageId}`),
+                            onClick: () => {
+                                if (!isDeveloper(userRole)) {
+                                    routerHistory.push(`/translation/${row.pageId}`);
+                                } else {
+                                    message.warn("You don't have permissions to access this page");
+                                }
+                            },
                         };
                     }}
                 />

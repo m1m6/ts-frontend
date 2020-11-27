@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Col, Row, Avatar, Tabs, message } from 'antd';
 import * as Yup from 'yup';
 import classNames from 'classnames';
@@ -8,6 +8,11 @@ import InputField from '../../../form/components/InputField';
 import Button from '../../../form/components/Button';
 import { useUpdateUserMetaDataMutation } from '../useMutations';
 import { auth } from '../../../signupLogin/auth';
+import { useCustomerCarsdQuery, useUserSubscriptionPlan } from '../../../user/useQueries';
+import { capitalizeFirstLetter } from '../../../upgrade/utils';
+import Upgrade from '../../../upgrade/components/Upgrade';
+import Popup from '../../../components/Popup';
+import InviteUser from './InviteUser';
 
 const InputCustomStyle = {
     width: '22.7vw',
@@ -15,34 +20,102 @@ const InputCustomStyle = {
 };
 
 const Subscription = () => {
+    // const { data, loading, error } = useMeQuery();
+    const [showUpgradePopup, setShowUpgradePopup] = useState(false);
+    const { data: userPlan, loading: userPlanLoading, error } = useUserSubscriptionPlan();
+    const { data: customCards, loading: customCardsLoading } = useCustomerCarsdQuery();
+
+    if (userPlanLoading || customCardsLoading) {
+        return <></>;
+    }
+
+    const plan =
+        userPlan && userPlan.getUserPlan && userPlan.getUserPlan.plan
+            ? userPlan.getUserPlan.plan
+            : { type: 'na', targetLanguages: 0, pages: 0 };
+
+    let cards =
+        customCards && customCards.getCustomerCard !== ''
+            ? JSON.parse(customCards.getCustomerCard)
+            : [];
+
+    let cc,
+        mon,
+        year,
+        type = '';
+
+    if (cards && cards[0]) {
+        cc = '**** **** **** ' + cards[0].last4;
+        mon = cards[0].exp_month + '';
+        year = cards[0].exp_year;
+    }
+
+    const initialValues = {
+        plan: `${capitalizeFirstLetter(plan.type)} Plan (${plan.pages} Pages, ${
+            plan.targetLanguages
+        } Languages)`,
+        cc: `${cc}         ${mon && mon.length === 1 ? `0${mon}` : mon} / ${year}`,
+    };
+
     return (
-        <Formik
-        // initialValues={initialValues}
-        // validationSchema={loginSchema}
-        // onSubmit={async (values, { setSubmitting }) => {
-        //     try {
-        //         const result = await login({ variables: { ...values } });
-        //         if (result) {
-        //             auth.logIn(result.data.login.token);
-        //             if (isAdmin(result.data.login.user.role))
-        //                 // and first time
-        //                 window.location.assign('/onboarding');
-        //             else {
-        //                 // go to dashboard
-        //                 window.location.assign('/home');
-        //             }
-        //         }
-        //     } catch (error) {
-        //         setSubmitting(false);
-        //         showAllGraphQLErrors(error.graphQLErrors);
-        //     }
-        // }}
-        >
+        <Formik initialValues={initialValues}>
             {({ values, isSubmitting, dirty, errors }) => (
                 <Form className="subscription-form">
                     <Row gutter={[48, 16]} style={{ width: '80%' }}>
-                        Coming sooon...
+                        <Col span={12} lg={12} md={12} sm={24} xs={24}>
+                            <div>
+                                <div className="field-name">Plan</div>
+                                <InputField
+                                    name="plan"
+                                    type="text"
+                                    style={InputCustomStyle}
+                                    shouldShowError={false}
+                                    disabled={true}
+                                />
+                            </div>
+                        </Col>
+                        <Col span={12} lg={12} md={12} sm={24} xs={24}>
+                            <div>
+                                <div className="field-name">
+                                    Credit Card{' '}
+                                    <span
+                                        style={{
+                                            float: 'right',
+                                            fontSize: '14px',
+                                            color: '#9966ff',
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={(e) => setShowUpgradePopup(true)}
+                                    >
+                                        Change
+                                    </span>
+                                </div>
+                                <InputField
+                                    name="cc"
+                                    type="text"
+                                    disabled={true}
+                                    style={InputCustomStyle}
+                                    shouldShowError={false}
+                                />
+                            </div>
+                        </Col>
                     </Row>
+
+                    {showUpgradePopup && (
+                        <Popup
+                            component={() => {
+                                return <Upgrade setShowPopup={setShowUpgradePopup} preStep={2} />;
+                            }}
+                            closePopup={(e) => setShowUpgradePopup(false)}
+                            style={{
+                                minHeight: '700px',
+                                width: '986px',
+                                marginLeft: '0px',
+                                marginRight: '0px',
+                                margin: '0 auto',
+                            }}
+                        />
+                    )}
                 </Form>
             )}
         </Formik>
@@ -50,34 +123,97 @@ const Subscription = () => {
 };
 
 const Team = () => {
+    // show only for admin
+    const [showInvitePopup, setShowInvitePopup] = useState(false);
+    const { data: userData, loading: userDataLoading, error } = useMeQuery();
+    const { data: customCards, loading: customCardsLoading } = useCustomerCarsdQuery();
+
+    if (userDataLoading || customCardsLoading) {
+        return <></>;
+    }
+
+    const user = userData && userData.me ? userData.me : { me: { email: '', fullName: '' } };
+
+    let cards =
+        customCards && customCards.getCustomerCard !== ''
+            ? JSON.parse(customCards.getCustomerCard)
+            : [];
+
+    let cc,
+        mon,
+        year,
+        type = '';
+
+    if (cards && cards[0]) {
+        cc = '**** **** **** ' + cards[0].last4;
+        mon = cards[0].exp_month + '';
+        year = cards[0].exp_year;
+    }
+
+    const initialValues = {
+        member: `${user.fullName} (you)`,
+        role: user.role,
+    };
+
     return (
-        <Formik
-        // initialValues={initialValues}
-        // validationSchema={loginSchema}
-        // onSubmit={async (values, { setSubmitting }) => {
-        //     try {
-        //         const result = await login({ variables: { ...values } });
-        //         if (result) {
-        //             auth.logIn(result.data.login.token);
-        //             if (isAdmin(result.data.login.user.role))
-        //                 // and first time
-        //                 window.location.assign('/onboarding');
-        //             else {
-        //                 // go to dashboard
-        //                 window.location.assign('/home');
-        //             }
-        //         }
-        //     } catch (error) {
-        //         setSubmitting(false);
-        //         showAllGraphQLErrors(error.graphQLErrors);
-        //     }
-        // }}
-        >
+        <Formik initialValues={initialValues}>
             {({ values, isSubmitting, dirty, errors }) => (
                 <Form className="subscription-form">
                     <Row gutter={[48, 16]} style={{ width: '80%' }}>
-                        Coming sooon...
+                        <Col span={12} lg={12} md={12} sm={24} xs={24}>
+                            <div>
+                                <div className="field-name">Member</div>
+                                <InputField
+                                    name="member"
+                                    type="text"
+                                    style={InputCustomStyle}
+                                    shouldShowError={false}
+                                    disabled={true}
+                                />
+                            </div>
+                        </Col>
+                        <Col span={12} lg={12} md={12} sm={24} xs={24}>
+                            <div>
+                                <div className="field-name">
+                                    Role{' '}
+                                    <span
+                                        style={{
+                                            float: 'right',
+                                            fontSize: '14px',
+                                            color: '#9966ff',
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={(e) => setShowInvitePopup(true)}
+                                    >
+                                        Add User
+                                    </span>
+                                </div>
+                                <InputField
+                                    name="role"
+                                    type="text"
+                                    disabled={true}
+                                    style={InputCustomStyle}
+                                    shouldShowError={false}
+                                />
+                            </div>
+                        </Col>
                     </Row>
+
+                    {showInvitePopup && (
+                        <Popup
+                            component={() => {
+                                return <InviteUser />;
+                            }}
+                            closePopup={(e) => setShowInvitePopup(false)}
+                            style={{
+                                minHeight: '700px',
+                                width: '986px',
+                                marginLeft: '0px',
+                                marginRight: '0px',
+                                margin: '0 auto',
+                            }}
+                        />
+                    )}
                 </Form>
             )}
         </Formik>

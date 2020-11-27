@@ -12,3 +12,9 @@ export const updateUserMetaDataGQL = gql`
         }
     }
 `;
+
+export const INVITE_USER_GQL = gql`
+    mutation inviteUser($email: String!, $role: UserRole!, $fullName: String!) {
+        inviteUser(email: $email, role: $role, fullName: $fullName)
+    }
+`;

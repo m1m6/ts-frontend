@@ -77,6 +77,6 @@ export const mapPlans = (plansData, cycle = 'YEARLY') => {
     return options;
 };
 
-function capitalizeFirstLetter(string) {
+export const capitalizeFirstLetter = (string) => {
     return string[0].toUpperCase() + string.slice(1).toLowerCase();
-}
+};

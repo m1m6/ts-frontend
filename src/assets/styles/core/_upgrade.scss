@@ -1,5 +1,4 @@
-.upgrade-popup {
-
+.upgrade-popup, .invite-popup {
     .popup-title {
         font-family: 'Open Sans';
         font-size: 30px;
@@ -51,5 +50,14 @@
                 color: $dark-indigo;
             }
         }
+    }
+}
+
+.invite-popup {
+    margin-left: 87px;
+    margin-right: 100px;    
+    
+    .invite-user-form {
+        margin-top: 60px;
     }
 }

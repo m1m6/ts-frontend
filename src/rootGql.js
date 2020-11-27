@@ -11,6 +11,7 @@ export const ME_QUERY = gql`
             skippedOnboarding
             apiKey
             sourceLanguage
+            subscription
             customizer {
                 id
                 position

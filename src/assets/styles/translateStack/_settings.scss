@@ -17,12 +17,17 @@
         width: 68%;
     }
 
-    .profile-form {
+    .profile-form, .subscription-form {
         .field-name {
+            width: 22.7vw;
             margin-bottom: 14px;
             font-family: 'Open Sans';
             font-size: 14px;
             color: $dark-indigo;
+        }
+
+        .ant-input {
+            padding-left: 24px !important;
         }
     }
 

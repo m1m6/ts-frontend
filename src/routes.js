@@ -51,7 +51,7 @@ const Routes = ({ userRole, isNew, skippedOnboarding, isOpenCustomizer }) => {
                         isOpenCustomizer={isOpenCustomizer}
                     />
                 )}
-                roles={[ROLES.ADMIN]}
+                roles={[ROLES.ADMIN, ROLES.EDITOR, ROLES.DEVELOPER]}
                 userRole={userRole}
             />
 
@@ -68,7 +68,7 @@ const Routes = ({ userRole, isNew, skippedOnboarding, isOpenCustomizer }) => {
                         isOpenCustomizer={isOpenCustomizer}
                     />
                 )}
-                roles={[ROLES.ADMIN]}
+                roles={[ROLES.ADMIN, ROLES.DEVELOPER]}
                 userRole={userRole}
                 isNew={isNew}
                 skippedOnboarding={skippedOnboarding}
@@ -85,7 +85,7 @@ const Routes = ({ userRole, isNew, skippedOnboarding, isOpenCustomizer }) => {
                         isOpenCustomizer={isOpenCustomizer}
                     />
                 )}
-                roles={[ROLES.ADMIN]}
+                roles={[ROLES.ADMIN, ROLES.EDITOR]}
                 userRole={userRole}
             />
 
@@ -100,7 +100,7 @@ const Routes = ({ userRole, isNew, skippedOnboarding, isOpenCustomizer }) => {
                         isOpenCustomizer={isOpenCustomizer}
                     />
                 )}
-                roles={[ROLES.ADMIN]}
+                roles={[ROLES.ADMIN, ROLES.DEVELOPER]}
                 userRole={userRole}
             />
 
