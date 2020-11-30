@@ -1,22 +1,24 @@
 import React from 'react';
-import { Row, Icon } from 'antd';
+import { Row, Icon, message } from 'antd';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import classNames from 'classnames';
 import InputField from '../../../form/components/InputField';
 import Button from '../../../form/components/Button';
 import { showAllGraphQLErrors } from '../../../helper/graphqlErrors';
+import { useResetPassword } from '../../signup/useMutations';
+import { browserHistory } from '../../../browserHistory';
 
 const initialValues = {
     email: '',
 };
 
 const resetPasswordSchema = Yup.object().shape({
-    email: Yup.string().email("Please enter valid email").required('*Required'),
+    email: Yup.string().email('Please enter valid email').required('*Required'),
 });
 
 const ResetPassword = ({ routerHistory }) => {
-    // const [login] = useLogin();
+    const [resetPassword] = useResetPassword();
     return (
         <div className="login-wrapper">
             <p
@@ -37,17 +39,15 @@ const ResetPassword = ({ routerHistory }) => {
                 validationSchema={resetPasswordSchema}
                 onSubmit={async (values, { setSubmitting }) => {
                     try {
-                        // const result = await login({ variables: { ...values } });
-                        // if (result) {
-                        //     auth.logIn(result.data.login.token);
-                        //     if (
-                        //         isAdmin(result.data.login.user.role)
-                        //     )
-                        //         window.location.assign('/discover');
-                        //     else {
-                        //         window.location.assign('/discover');
-                        //     }
-                        // }
+                        const result = await resetPassword({ variables: { ...values } });
+                        if (result && result.data && result.data.resetPassword) {
+                            message.success(
+                                `Your password has been reset, please check your email.`
+                            );
+                            browserHistory.push('/login');
+                        } else {
+                            message.error(`Unable to reset your password`);
+                        }
                     } catch (error) {
                         setSubmitting(false);
                         showAllGraphQLErrors(error.graphQLErrors);

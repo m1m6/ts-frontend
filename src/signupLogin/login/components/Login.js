@@ -17,7 +17,7 @@ const initialValues = {
 };
 
 const loginSchema = Yup.object().shape({
-    email: Yup.string().email("Please enter valid email").required('*Required'),
+    email: Yup.string().email('Please enter valid email').required('*Required'),
     password: Yup.string().required('*Required'),
 });
 
@@ -38,7 +38,7 @@ const Login = ({ routerHistory }) => {
                                 window.location.assign('/onboarding');
                             else {
                                 // go to dashboard
-                                window.location.assign('/home');
+                                window.location.assign('/');
                             }
                         }
                     } catch (error) {

@@ -32,7 +32,7 @@ const PageLayout = ({
                 <Component routerHistory={history} isNew={isNew} {...rest} />
             </div>
         );
-    } else if (isNew && !skippedOnboarding) {
+    } else if (isNew) {
         return (
             <div className="onboarding-page-layout">
                 <Component routerHistory={history} isNew={isNew} {...rest} />

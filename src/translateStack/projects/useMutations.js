@@ -4,5 +4,5 @@ import { ADD_SINGLE_PAGE } from './gql';
 export const useAddSinglePageMutation = () =>
     useMutation(ADD_SINGLE_PAGE, {
         refetchQueries: ['userPages', 'getUserPlan'],
-        fetchPolicy:"network-only"
+        fetchPolicy: 'no-cache',
     });

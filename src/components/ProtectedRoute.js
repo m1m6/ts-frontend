@@ -13,14 +13,15 @@ const ProtectedRoute = ({ component: Component, userRole, isNew, roles, ...rest 
     let isAuthorizedToAccess;
     let isSkippedOnboarding = false;
 
-    // useEffect(() => {
-    //     setIsAuth(hasAccess(roles, userRole));
-    // }, [roles, userRole]);
-    useLayoutEffect(() => {
+    useEffect(() => {
         const token = auth.getAccessToken();
-        if (token && !hasAccess(roles, userRole)) {
-            browserHistory.push('/');
-        }
+        // setIsAuth();
+
+        setTimeout(() => {
+            if (token && !hasAccess(roles, userRole)) {
+                browserHistory.push('/');
+            }
+        }, 5000);
     }, []);
 
     console.log('isAuth', isAuth);

@@ -161,14 +161,13 @@ const mapRows = (pages, userLanguagesData) => {
                                 alignItems: 'center',
                             }}
                         >
-                            <Rings
-                                style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    background: '#9966ff',
-                                    borderRadius: '50%',
-                                }}
-                            />
+                            <div
+                                className="ring-container"
+                                style={{ marginTop: '0px', width: '25px', height: '25px' }}
+                            >
+                                <div className="ringring" style={{ top: '0px', left: '0px' }}></div>
+                                <div className="circle" style={{ top: '5px', left: '5px' }}></div>
+                            </div>
                             <span
                                 style={{
                                     color: '#9966ff',
@@ -267,30 +266,40 @@ const Projects = ({ routerHistory }) => {
                               )
                             : ''}
                     </div>
-                    <div id="project-status" className="project-status">
+                    <div id="project-status" className="project-status" style={{ display: 'flex' }}>
                         {hasFinishedSetup ? (
                             <>
-                                <CheckLogo
-                                    style={{
-                                        width: '16px',
-                                        height: '16px',
-                                        fill: '#9966ff',
-                                        borderRadius: '50%',
-                                    }}
-                                />
-                                INSTALLATION COMPLETED
+                                <div
+                                    style={{  width: '25px', height: '25px' }}
+                                >
+                                    <CheckLogo
+                                        style={{
+                                            width: '16px',
+                                            height: '16px',
+                                            fill: '#9966ff',
+                                            borderRadius: '50%',
+                                        }}
+                                    />
+                                </div>
+
+                                <span>INSTALLATION COMPLETED</span>
                             </>
                         ) : (
                             <>
-                                <Rings
-                                    style={{
-                                        width: '16px',
-                                        height: '16px',
-                                        background: '#9966ff',
-                                        borderRadius: '50%',
-                                    }}
-                                />
-                                INSTALLATION NOT COMPLETED
+                                <div
+                                    className="ring-container"
+                                    style={{ marginTop: '10px', width: '25px', height: '25px' }}
+                                >
+                                    <div
+                                        className="ringring"
+                                        style={{ top: '0px', left: '0px' }}
+                                    ></div>
+                                    <div
+                                        className="circle"
+                                        style={{ top: '5px', left: '5px' }}
+                                    ></div>
+                                </div>
+                                <span>INSTALLATION NOT COMPLETED</span>
                             </>
                         )}
                     </div>
@@ -305,7 +314,9 @@ const Projects = ({ routerHistory }) => {
                                     setShowPopup(true);
                                 } else {
                                     await updateOnboardingClient({ variables: { currentStep: 1 } });
-                                    await updateUser({ variables: { skippedOnboarding: false, isNew: true } });
+                                    await updateUser({
+                                        variables: { skippedOnboarding: false, isNew: true },
+                                    });
                                     browserHistory.push('/onboarding');
                                 }
                             }}

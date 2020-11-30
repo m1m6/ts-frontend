@@ -18,3 +18,14 @@ export const INVITE_USER_GQL = gql`
         inviteUser(email: $email, role: $role, fullName: $fullName)
     }
 `;
+
+export const TEAM_MEMBERS_QUERY = gql`
+    query teamMembers {
+        teamMembers {
+            id
+            fullName
+            role
+            email
+        }
+    }
+`;

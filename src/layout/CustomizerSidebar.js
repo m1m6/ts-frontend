@@ -10,7 +10,10 @@ import {
     useCustomizerMutationClient,
     useUpdateTargetLanguagesMutation,
 } from '../translateStack/customizer/useMutations';
-import { useCustomizerQueryClient } from '../translateStack/customizer/useQueries';
+import {
+    useCustomizerQueryClient,
+    useCustomizerQueryServer,
+} from '../translateStack/customizer/useQueries';
 import Button from '../form/components/Button';
 import { useLanugagesListQuery, useMeQuery } from '../rootUseQuery';
 import { mapLanguages } from '../translateStack/translation/utils';
@@ -196,19 +199,21 @@ const CustomDirectionStyle = () => {
     };
 };
 
-const PositionComponent = ({ bannerVisible }) => {
-    console.log('bannerVisible', bannerVisible);
-    const { data, loading: meLoading } = useMeQuery();
-    const [updateCustomizer] = useCustomizerMutation();
-    const [updateCustomizerClient] = useCustomizerMutationClient();
+const PositionComponent = ({ bannerVisible, setPrevPosition }) => {
     const [btnActive, setBtnActive] = useState(false);
     const [userPosition, setUserPosition] = useState(null);
     const [customPosition, setCustomPosition] = useState(null);
     const [customDirection, setCustomDirection] = useState(null);
+    // const [prevPosition, setPrevPosition] = useState(null);
 
-    if (meLoading) return <></>;
+    // const { data, loading: meLoading } = useMeQuery();
+    const { data: customizerData, loading: customizerLoading } = useCustomizerQueryServer();
+    const [updateCustomizer] = useCustomizerMutation();
+    const [updateCustomizerClient] = useCustomizerMutationClient();
 
-    let customizer = data && data.me ? data.me.customizer : {};
+    if (customizerLoading) return <></>;
+
+    let customizer = customizerData.getUserCustomizer; //data && data.me ? data.me.customizer : {};
 
     if (customizer && userPosition === null) {
         setUserPosition(customizer.position || 'LEFT');
@@ -238,6 +243,7 @@ const PositionComponent = ({ bannerVisible }) => {
                 <Radio.Group
                     value={userPosition}
                     onChange={async (e) => {
+                        setPrevPosition(userPosition);
                         setUserPosition(e.target.value);
 
                         if (e.target.value !== 'CUSTOM') {
@@ -312,6 +318,8 @@ const PositionComponent = ({ bannerVisible }) => {
                         children="SAVE"
                         className={classNames('wf-btn-primary active', { active: btnActive })}
                         onClick={async (e) => {
+                            setPrevPosition(userPosition);
+
                             if (userPosition === 'CUSTOM' && !customPosition) {
                                 message.error('Please enter valid DIV ID.');
                                 return;
@@ -321,7 +329,7 @@ const PositionComponent = ({ bannerVisible }) => {
 
                             const results = await updateCustomizer({
                                 variables: {
-                                    ...data.me.customizer,
+                                    ...customizer,
                                     position: userPosition,
                                     customDivId: customPosition,
                                     customDivDirection: customDirection
@@ -347,17 +355,18 @@ const PositionComponent = ({ bannerVisible }) => {
     );
 };
 
-const TextComponent = ({}) => {
-    const { data, loading: meLoading } = useMeQuery();
+const TextComponent = ({ setPrevText }) => {
+    // const { data, loading: meLoading } = useMeQuery();
     const [updateCustomizer] = useCustomizerMutation();
     const [updateCustomizerClient] = useCustomizerMutationClient();
+    const { data: customizerData, loading: customizerLoading } = useCustomizerQueryServer();
 
     const [userText, setUserText] = useState(null);
     const [btnActive, setBtnActive] = useState(false);
 
-    if (meLoading) return <>Loading...</>;
+    if (customizerLoading) return <>Loading...</>;
 
-    let customizer = data && data.me ? data.me.customizer : {};
+    let customizer = customizerData.getUserCustomizer;
 
     if (customizer && userText === null) {
         setUserText(customizer.text || 'FULL');
@@ -374,6 +383,7 @@ const TextComponent = ({}) => {
                 <Radio.Group
                     value={userText}
                     onChange={async (e) => {
+                        setPrevText(userText);
                         setUserText(e.target.value);
                         setBtnActive(true);
                         await updateCustomizerClient({
@@ -393,11 +403,13 @@ const TextComponent = ({}) => {
                         children="SAVE"
                         className={classNames('wf-btn-primary active')}
                         onClick={async (e) => {
+                            setPrevText(userText);
+
                             setBtnActive(false);
 
                             const results = await updateCustomizer({
                                 variables: {
-                                    ...data.me.customizer,
+                                    ...customizer,
                                     text: userText,
                                 },
                             });
@@ -414,7 +426,7 @@ const TextComponent = ({}) => {
     );
 };
 
-const LanguagesComponent = ({}) => {
+const LanguagesComponent = ({ setLanguagesSaved }) => {
     const [selectedLanguages, setSelectedLanguages] = useState(null);
     const [isInitialValues, setIsInitialValues] = useState(true);
 
@@ -431,8 +443,15 @@ const LanguagesComponent = ({}) => {
     const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
     const [updateCustomizer] = useCustomizerMutation();
     const [updateTargetLanguages] = useUpdateTargetLanguagesMutation();
+    const { data: customizerData, loading: customizerLoading } = useCustomizerQueryServer();
 
-    if (meLoading || langLoading || customizerLocalLoading || userLanguagesLoading)
+    if (
+        meLoading ||
+        langLoading ||
+        customizerLocalLoading ||
+        userLanguagesLoading ||
+        customizerLoading
+    )
         return <>Loading...</>;
 
     let userLanguages =
@@ -442,7 +461,7 @@ const LanguagesComponent = ({}) => {
     let systemLanguages = langData.languagesList.filter((l) => l.id != sourceLanguage);
 
     let mappedLangs = mapLanguages(systemLanguages);
-    let customizer = meData && meData.me ? meData.me.customizer : {};
+    let customizer = customizerData.getUserCustomizer;
 
     if (customizer && selectedLanguages === null && isInitialValues) {
         let selectedTargetLangs = mapLanguages(userLanguages.filter(({ isActive }) => isActive));
@@ -450,6 +469,7 @@ const LanguagesComponent = ({}) => {
     }
 
     const changeHandler = async (value, action) => {
+        setLanguagesSaved(false);
         setSelectedLanguages(value);
         setBtnActive(true);
         setIsInitialValues(false);
@@ -503,6 +523,7 @@ const LanguagesComponent = ({}) => {
                         children="SAVE"
                         className={classNames('wf-btn-primary active')}
                         onClick={async (e) => {
+                            setLanguagesSaved(true);
                             setBtnActive(false);
                             let selectedLanguagesIds = selectedLanguages
                                 ? selectedLanguages.map((l) => l.value)
@@ -530,18 +551,18 @@ const LanguagesComponent = ({}) => {
     );
 };
 
-const AppearanceComponent = ({}) => {
-    const { data, loading: meLoading } = useMeQuery();
+const AppearanceComponent = ({ setPrevAppearance }) => {
     const [updateCustomizer] = useCustomizerMutation();
     const [updateCustomizerClient] = useCustomizerMutationClient();
+    const { data: customizerData, loading: customizerLoading } = useCustomizerQueryServer();
 
     const [btnActive, setBtnActive] = useState(false);
 
     const [userBranding, setUserBranding] = useState(null);
 
-    if (meLoading) return <></>;
+    if (customizerLoading) return <></>;
 
-    let customizer = data && data.me ? data.me.customizer : {};
+    let customizer = customizerData.getUserCustomizer;
 
     if (customizer && userBranding === null) {
         setUserBranding(customizer.appearance || 'WITH_BRANDING');
@@ -558,6 +579,7 @@ const AppearanceComponent = ({}) => {
                 <Radio.Group
                     value={userBranding}
                     onChange={async (e) => {
+                        setPrevAppearance(userBranding);
                         setUserBranding(e.target.value);
                         setBtnActive(true);
                         await updateCustomizerClient({
@@ -575,10 +597,11 @@ const AppearanceComponent = ({}) => {
                         children="SAVE"
                         className={classNames('wf-btn-primary active')}
                         onClick={async (e) => {
+                            setPrevAppearance(userBranding);
                             setBtnActive(false);
                             const results = await updateCustomizer({
                                 variables: {
-                                    ...data.me.customizer,
+                                    ...customizer,
                                     appearance: userBranding,
                                 },
                             });
@@ -595,7 +618,15 @@ const AppearanceComponent = ({}) => {
     );
 };
 
-const whichComponentToRender = (whichInnerSidebar, setWhichInnerSidebar, bannerVisible) => {
+const whichComponentToRender = (
+    whichInnerSidebar,
+    setWhichInnerSidebar,
+    bannerVisible,
+    setPrevPosition,
+    setPrevText,
+    setPrevAppearance,
+    setLanguagesSaved
+) => {
     switch (whichInnerSidebar) {
         case 0:
             return (
@@ -606,15 +637,30 @@ const whichComponentToRender = (whichInnerSidebar, setWhichInnerSidebar, bannerV
             );
 
         case 1:
-            return <PositionComponent bannerVisible={bannerVisible} />;
+            return (
+                <PositionComponent
+                    bannerVisible={bannerVisible}
+                    setPrevPosition={setPrevPosition}
+                />
+            );
 
         case 2:
-            return <LanguagesComponent bannerVisible={bannerVisible} />;
+            return (
+                <LanguagesComponent
+                    bannerVisible={bannerVisible}
+                    setLanguagesSaved={setLanguagesSaved}
+                />
+            );
 
         case 3:
-            return <AppearanceComponent bannerVisible={bannerVisible} />;
+            return (
+                <AppearanceComponent
+                    bannerVisible={bannerVisible}
+                    setPrevAppearance={setPrevAppearance}
+                />
+            );
         case 4:
-            return <TextComponent bannerVisible={bannerVisible} />;
+            return <TextComponent bannerVisible={bannerVisible} setPrevText={setPrevText} />;
     }
 };
 
@@ -622,6 +668,10 @@ const CustomizerSidebar = ({ openLanguagesComponent, bannerVisible }) => {
     const [updateCustomizerClient] = useCustomizerMutationClient();
 
     const [whichInnerSidebar, setWhichInnerSidebar] = useState(openLanguagesComponent ? 2 : 0);
+    const [prevPosition, setPrevPosition] = useState(null);
+    const [prevText, setPrevText] = useState(null);
+    const [prevAppearance, setPrevAppearance] = useState(null);
+    const [languagesSaved, setLanguagesSaved] = useState(null);
 
     return (
         <div className="customizer-sidebar-wrapper">
@@ -635,14 +685,28 @@ const CustomizerSidebar = ({ openLanguagesComponent, bannerVisible }) => {
                         }
 
                         await updateCustomizerClient({
-                            variables: { openLanguagesComponent: false },
+                            variables: {
+                                openLanguagesComponent: false,
+                                position: prevPosition,
+                                text: prevText,
+                                branding: prevAppearance,
+                                ...(!languagesSaved && { removedItems: [], languages: null }),
+                            },
                         });
                     }}
                     routerHistory={browserHistory}
                 />
             </div>
             <div className="customizer-menu">
-                {whichComponentToRender(whichInnerSidebar, setWhichInnerSidebar, bannerVisible)}
+                {whichComponentToRender(
+                    whichInnerSidebar,
+                    setWhichInnerSidebar,
+                    bannerVisible,
+                    setPrevPosition,
+                    setPrevText,
+                    setPrevAppearance,
+                    setLanguagesSaved
+                )}
             </div>
         </div>
     );

@@ -16,6 +16,19 @@ export const CUSTOMIZER_QUERY = gql`
     }
 `;
 
+export const CUSTOMIZER_QUERY_SERVER = gql`
+    query getUserCustomizer {
+        getUserCustomizer {
+            id
+            customDivId
+            position
+            text
+            appearance
+            customDivDirection
+        }
+    }
+`;
+
 export const CUSTOMIZER_MUTATION = gql`
     mutation setCustomizerData(
         $isOpen: Boolean

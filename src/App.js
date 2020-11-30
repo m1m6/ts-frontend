@@ -20,20 +20,20 @@ const token = auth.getAccessToken();
 
 const App = () => {
     const { loading, data, error } = useMeQuery();
-    const [userRole, setUserRole] = useState(undefined);
+    // const [userRole, setUserRole] = useState('ADMIN');
     const { data: customizerData, loading: customizerLoading } = useCustomizerQueryClient();
     const [updateCustomizerClient] = useCustomizerMutationClient();
     const [bannerVisible, setBannerVisible] = useState(false);
 
     const [setUserData] = useUserData();
 
-    async function setUserDataAsync() {
-        if (!loading) {
-            const { id, fullName, email, role, isNew } = data.me;
-            setUserRole(role);
-            await setUserData({ variables: { id, fullName, email, role, isNew } });
-        }
-    }
+    // async function setUserDataAsync() {
+    //     if (!loading) {
+    //         const { id, fullName, email, role, isNew } = data.me;
+    //         setUserRole(role);
+    //         await setUserData({ variables: { id, fullName, email, role, isNew } });
+    //     }
+    // }
 
     async function updateCustomizerData(isOpen) {
         await updateCustomizerClient({ variables: { isOpen } });
@@ -54,15 +54,17 @@ const App = () => {
     //     return <></>;
     // }
 
-    if (userRole === undefined && data && data.me) {
-        setUserDataAsync();
-    }
+    // if (userRole === undefined && data && data.me) {
+    //     setUserDataAsync();
+    // }
 
     const isNew = data && data.me ? data.me.isNew : false;
     const skippedOnboarding = data && data.me ? data.me.skippedOnboarding : false;
     const isOpenCustomizer =
         customizerData && customizerData.customizer ? customizerData.customizer.isOpen : false;
 
+        // stupid hack!
+    const userRole = data && data.me ? data.me.role : 'ADMIN';
     const openLanguagesComponent =
         customizerData && customizerData.customizer
             ? customizerData.customizer.openLanguagesComponent
@@ -76,7 +78,7 @@ const App = () => {
                     style={{
                         marginLeft:
                             (isNew &&
-                                !skippedOnboarding &&
+                                // !skippedOnboarding &&
                                 browserHistory.location.pathname.includes('onboarding')) ||
                             isOpenCustomizer
                                 ? '323px'

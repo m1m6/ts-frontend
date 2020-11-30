@@ -137,7 +137,7 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, user
         <Sider
             width={
                 (isNew &&
-                    !skippedOnboarding &&
+                    // !skippedOnboarding &&
                     browserHistory.location.pathname.includes('onboarding')) ||
                 isOpenCustomizer
                     ? 323
@@ -147,7 +147,7 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, user
         >
             <HeaderLogo />
             {isNew &&
-            !skippedOnboarding &&
+            // !skippedOnboarding &&
             browserHistory.location.pathname.includes('onboarding') ? (
                 <>
                     <OnboardingSteps
@@ -178,33 +178,36 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, user
                             Projects
                         </Link>
                     </div>
-                    {isNew &&
-                        !isEditor(userRole)(
-                            <div className="menu-item">
-                                <Link
-                                    title="Setup"
-                                    onClick={async (e) => {
-                                        await updateOnboardingClient({
-                                            variables: { currentStep: 1 },
-                                        });
-                                        await updateUser({
-                                            variables: { skippedOnboarding: false },
-                                        });
-                                        browserHistory.push('/onboarding');
-                                    }}
-                                >
-                                    Setup
-                                    <Rings
+                    {isNew && !isEditor(userRole) && (
+                        <div className="menu-item">
+                            <Link
+                                title="Setup"
+                                onClick={async (e) => {
+                                    await updateOnboardingClient({
+                                        variables: { currentStep: 1 },
+                                    });
+                                    await updateUser({
+                                        variables: { skippedOnboarding: false },
+                                    });
+                                    browserHistory.push('/onboarding');
+                                }}
+                            >
+                                Setup
+                                {/* <Rings
                                         style={{
                                             width: '20px',
                                             height: '20px',
                                             stroke: '#9966ff',
                                             verticalAlign: 'middle',
                                         }}
-                                    />
-                                </Link>
+                                    /> */}
+                            </Link>
+                            <div className="ring-container">
+                                <div className="ringring"></div>
+                                <div className="circle"></div>
                             </div>
-                        )}
+                        </div>
+                    )}
 
                     {!isEditor(userRole) && (
                         <div className="menu-item">

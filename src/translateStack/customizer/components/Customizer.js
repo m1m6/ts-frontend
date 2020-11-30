@@ -3,7 +3,7 @@ import Select, { components } from 'react-select';
 import classNames from 'classnames';
 import { browserHistory } from '../../../browserHistory';
 import { useCustomizerMutationClient } from '../useMutations';
-import { useCustomizerQueryClient } from '../useQueries';
+import { useCustomizerQueryClient, useCustomizerQueryServer } from '../useQueries';
 import { useMeQuery, useLanugagesListQuery } from '../../../rootUseQuery';
 import { mapLanguages } from '../../translation/utils';
 import EmptyCustomizer from './EmptyCustomizer';
@@ -22,12 +22,18 @@ const CustomStyle = (text) => {
                 fontWeight: 'bold',
                 '&:active': { backgroundColor: 'rgba(227, 232, 238, 0.01)' },
                 '&:hover': { backgroundColor: '#e8eaef' },
-
             };
         },
         menu: (provided, state) => ({
             ...provided,
-            width: state.selectProps.width,
+            width:
+                text === 'FULL' || text === 'TEXT_ONLY'
+                    ? '200px'
+                    : text === 'SHORTENED'
+                    ? '120px'
+                    : text === 'FLAG_ONLY'
+                    ? '90px'
+                    : '120px',
         }),
         container: (base, { selectProps: { width, height } }) => ({
             ...base,
@@ -62,9 +68,10 @@ const CustomStyle = (text) => {
 };
 
 const Customizer = ({ routerHistory, location }) => {
-    const { loading, data } = useCustomizerQueryClient();
+    const { loading, data, error } = useCustomizerQueryClient();
     const { data: langData, loading: langLoading } = useLanugagesListQuery();
     const { data: meData, loading: meLoading } = useMeQuery();
+    const { data: customizerData, loading: customizerLoading } = useCustomizerQueryServer();
     const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
     const [progress, setProgress] = useState(100);
 
@@ -80,10 +87,9 @@ const Customizer = ({ routerHistory, location }) => {
                 await updateCustomizerData(false);
             }
         });
-
     }, []);
 
-    if (loading || meLoading || langLoading || userLanguagesLoading) {
+    if (loading || meLoading || langLoading || userLanguagesLoading || customizerLoading) {
         return (
             <>
                 <LoadingBar
@@ -96,7 +102,8 @@ const Customizer = ({ routerHistory, location }) => {
         );
     }
 
-    let customizer = meData && meData.me && meData.me.customizer ? meData.me.customizer : {};
+    let customizer = customizerData.getUserCustomizer;
+
     let userLanguages =
         userLanguagesData && userLanguagesData.userLanguages ? userLanguagesData.userLanguages : [];
     let systemLanguages = langData && langData.languagesList ? langData.languagesList : [];
@@ -149,10 +156,10 @@ const Customizer = ({ routerHistory, location }) => {
                             fontSize: '9px',
                             lineHeight: '5.22',
                             textAlign: 'center',
-                            cursor: "pointer"
+                            cursor: 'pointer',
                         }}
-                        onClick={e => {
-                            window.open("https://translatestack.com/", "_blank")
+                        onClick={(e) => {
+                            window.open('https://translatestack.com/', '_blank');
                         }}
                     >
                         ⚡ by translatestack

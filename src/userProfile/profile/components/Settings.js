@@ -13,6 +13,8 @@ import { capitalizeFirstLetter } from '../../../upgrade/utils';
 import Upgrade from '../../../upgrade/components/Upgrade';
 import Popup from '../../../components/Popup';
 import InviteUser from './InviteUser';
+import { useTeamMembersQuery } from '../userQueries';
+import Input from '../../../form/components/Input';
 
 const InputCustomStyle = {
     width: '22.7vw',
@@ -26,7 +28,7 @@ const Subscription = () => {
     const { data: customCards, loading: customCardsLoading } = useCustomerCarsdQuery();
 
     if (userPlanLoading || customCardsLoading) {
-        return <></>;
+        return <>Loading...</>;
     }
 
     const plan =
@@ -54,7 +56,9 @@ const Subscription = () => {
         plan: `${capitalizeFirstLetter(plan.type)} Plan (${plan.pages} Pages, ${
             plan.targetLanguages
         } Languages)`,
-        cc: `${cc}         ${mon && mon.length === 1 ? `0${mon}` : mon} / ${year}`,
+        cc: `${cc || 'N/A'}         ${mon && mon.length === 1 ? `0${mon}` : mon || 'N/A'} / ${
+            year || 'N/A'
+        }`,
     };
 
     return (
@@ -123,100 +127,92 @@ const Subscription = () => {
 };
 
 const Team = () => {
-    // show only for admin
     const [showInvitePopup, setShowInvitePopup] = useState(false);
     const { data: userData, loading: userDataLoading, error } = useMeQuery();
-    const { data: customCards, loading: customCardsLoading } = useCustomerCarsdQuery();
+    const { data: team } = useTeamMembersQuery();
 
-    if (userDataLoading || customCardsLoading) {
-        return <></>;
+    if (userDataLoading) {
+        return <>Loading...</>;
     }
 
     const user = userData && userData.me ? userData.me : { me: { email: '', fullName: '' } };
 
-    let cards =
-        customCards && customCards.getCustomerCard !== ''
-            ? JSON.parse(customCards.getCustomerCard)
-            : [];
+    let teamMembers = team && team.teamMembers ? JSON.parse(JSON.stringify(team.teamMembers)) : [];
 
-    let cc,
-        mon,
-        year,
-        type = '';
+    const filteredMembers = teamMembers.filter((member) => member.email !== user.email);
 
-    if (cards && cards[0]) {
-        cc = '**** **** **** ' + cards[0].last4;
-        mon = cards[0].exp_month + '';
-        year = cards[0].exp_year;
+    if (filteredMembers.length !== 1) {
+        filteredMembers.unshift(user);
     }
 
-    const initialValues = {
-        member: `${user.fullName} (you)`,
-        role: user.role,
-    };
-
     return (
-        <Formik initialValues={initialValues}>
-            {({ values, isSubmitting, dirty, errors }) => (
-                <Form className="subscription-form">
-                    <Row gutter={[48, 16]} style={{ width: '80%' }}>
-                        <Col span={12} lg={12} md={12} sm={24} xs={24}>
-                            <div>
-                                <div className="field-name">Member</div>
-                                <InputField
-                                    name="member"
-                                    type="text"
-                                    style={InputCustomStyle}
-                                    shouldShowError={false}
-                                    disabled={true}
-                                />
-                            </div>
-                        </Col>
-                        <Col span={12} lg={12} md={12} sm={24} xs={24}>
-                            <div>
-                                <div className="field-name">
-                                    Role{' '}
-                                    <span
-                                        style={{
-                                            float: 'right',
-                                            fontSize: '14px',
-                                            color: '#9966ff',
-                                            cursor: 'pointer',
-                                        }}
-                                        onClick={(e) => setShowInvitePopup(true)}
-                                    >
-                                        Add User
-                                    </span>
+        <div>
+            <div className="subscription-form">
+                {teamMembers.reverse().map((member, index) => {
+                    return (
+                        <Row gutter={[48, 16]} style={{ width: '80%' }}>
+                            <Col span={12} lg={12} md={12} sm={24} xs={24}>
+                                <div>
+                                    {index === 0 && <div className="field-name">Member</div>}
+                                    <Input
+                                        name="member"
+                                        type="text"
+                                        style={InputCustomStyle}
+                                        disabled={true}
+                                        value={member.fullName + ' ' + (index == 0 ? '(you)' : '')}
+                                    />
                                 </div>
-                                <InputField
-                                    name="role"
-                                    type="text"
-                                    disabled={true}
-                                    style={InputCustomStyle}
-                                    shouldShowError={false}
-                                />
-                            </div>
-                        </Col>
-                    </Row>
+                            </Col>
+                            <Col span={12} lg={12} md={12} sm={24} xs={24}>
+                                <div>
+                                    <div className="field-name">
+                                        {index === 0 && (
+                                            <div className="field-name">
+                                                Role
+                                                <span
+                                                    style={{
+                                                        float: 'right',
+                                                        fontSize: '14px',
+                                                        color: '#9966ff',
+                                                        cursor: 'pointer',
+                                                    }}
+                                                    onClick={(e) => setShowInvitePopup(true)}
+                                                >
+                                                    Add User
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <Input
+                                        name="role"
+                                        type="text"
+                                        disabled={true}
+                                        style={InputCustomStyle}
+                                        value={member.role}
+                                    />
+                                </div>
+                            </Col>
+                        </Row>
+                    );
+                })}
 
-                    {showInvitePopup && (
-                        <Popup
-                            component={() => {
-                                return <InviteUser />;
-                            }}
-                            closePopup={(e) => setShowInvitePopup(false)}
-                            style={{
-                                minHeight: '700px',
-                                width: '986px',
-                                marginLeft: '0px',
-                                marginRight: '0px',
-                                margin: '0 auto',
-                            }}
-                        />
-                    )}
-                </Form>
-            )}
-        </Formik>
+                {showInvitePopup && (
+                    <Popup
+                        component={() => {
+                            return <InviteUser close={setShowInvitePopup} />;
+                        }}
+                        closePopup={(e) => setShowInvitePopup(false)}
+                        style={{
+                            minHeight: '700px',
+                            width: '986px',
+                            marginLeft: '0px',
+                            marginRight: '0px',
+                            margin: '0 auto',
+                        }}
+                    />
+                )}
+            </div>
+        </div>
     );
 };
 
@@ -235,10 +231,6 @@ const Profile = () => {
         fullName: Yup.string().required('*Required'),
         password: Yup.string().required('*Required'),
     });
-
-    // if (loading) {
-    //     return <></>;
-    // }
 
     const { me } = data ? data : { me: { email: '', password: '', fullName: '' } };
     initialValues.email = me.email;

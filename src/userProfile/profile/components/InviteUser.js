@@ -19,7 +19,7 @@ const inviteSchema = Yup.object().shape({
     fullName: Yup.string().required('*Required'),
 });
 
-const InviteUser = () => {
+const InviteUser = ({ close }) => {
     const plansOptions = [
         { label: 'ADMIN', value: 'ADMIN' },
         { label: 'EDITOR', value: 'EDITOR' },
@@ -40,6 +40,7 @@ const InviteUser = () => {
             validationSchema={inviteSchema}
             onSubmit={async (values, { setSubmitting }) => {
                 try {
+                    console.log("values", values);
                     const result = await inviteUser({
                         variables: { ...values, role: values.role.value },
                     });
@@ -47,6 +48,7 @@ const InviteUser = () => {
                         message.success(
                             'User invited successfully, an email sent to him with his credentials.'
                         );
+                        close(false);
                     } else {
                         message.success('Unable to invite user');
                     }
@@ -75,7 +77,7 @@ const InviteUser = () => {
                                         // value={values.role}
                                         onChange={(e) => {
                                             console.log(e);
-                                            setFieldValue(e);
+                                            setFieldValue('role', e);
                                         }}
                                         onBlur={setFieldTouched}
                                         width="100%"
