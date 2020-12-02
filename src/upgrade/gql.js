@@ -36,3 +36,19 @@ export const subscription = gql`
         }
     }
 `;
+
+export const setUpgradeDataGQL = gql`
+    mutation setUpgradeData($shouldShowUpgradePopup: Boolean!) {
+        setUpgradeData(shouldShowUpgradePopup: $shouldShowUpgradePopup) @client {
+            shouldShowUpgradePopup
+        }
+    }
+`;
+
+export const UPGRADE_DATA_GQL = gql`
+    query getUpgradeData {
+        upgrade @client {
+            shouldShowUpgradePopup
+        }
+    }
+`;

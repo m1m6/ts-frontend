@@ -20,6 +20,7 @@ import { mapLanguages } from '../translateStack/translation/utils';
 import Select from 'react-select';
 import Input from '../form/components/Input';
 import { useUserLanguagesQuery } from '../user/useQueries';
+import { useSetUpgradeDataClient } from '../upgrade/useMutation';
 
 const MainComponent = ({ setWhichInnerSidebar }) => {
     const [updateCustomizerClient] = useCustomizerMutationClient();
@@ -216,7 +217,7 @@ const PositionComponent = ({ bannerVisible, setPrevPosition }) => {
     let customizer = customizerData.getUserCustomizer; //data && data.me ? data.me.customizer : {};
 
     if (customizer && userPosition === null) {
-        setUserPosition(customizer.position || 'LEFT');
+        setUserPosition(customizer.position || 'RIGHT');
     }
 
     if (customizer && customPosition === null) {
@@ -256,8 +257,8 @@ const PositionComponent = ({ bannerVisible, setPrevPosition }) => {
                         });
                     }}
                 >
-                    <Radio.Button value="LEFT">LEFT</Radio.Button>
                     <Radio.Button value="RIGHT">RIGHT</Radio.Button>
+                    <Radio.Button value="LEFT">LEFT</Radio.Button>
                     <Radio.Button value="CUSTOM">CUSTOM</Radio.Button>
                 </Radio.Group>
                 {userPosition === 'CUSTOM' && (
@@ -444,6 +445,7 @@ const LanguagesComponent = ({ setLanguagesSaved }) => {
     const [updateCustomizer] = useCustomizerMutation();
     const [updateTargetLanguages] = useUpdateTargetLanguagesMutation();
     const { data: customizerData, loading: customizerLoading } = useCustomizerQueryServer();
+    const [updateUpgradeData] = useSetUpgradeDataClient();
 
     if (
         meLoading ||
@@ -537,6 +539,11 @@ const LanguagesComponent = ({ setLanguagesSaved }) => {
 
                             if (results.data && results.data.updateTargetLanguages) {
                                 message.success('Successfully saved.');
+                                await updateUpgradeData({
+                                    variables: {
+                                        shouldShowUpgradePopup: true,
+                                    },
+                                });
                             } else {
                                 message.warn(
                                     'An error occured during saving your changes, please try again later.'
@@ -554,6 +561,8 @@ const LanguagesComponent = ({ setLanguagesSaved }) => {
 const AppearanceComponent = ({ setPrevAppearance }) => {
     const [updateCustomizer] = useCustomizerMutation();
     const [updateCustomizerClient] = useCustomizerMutationClient();
+    const [updateUpgradeData] = useSetUpgradeDataClient();
+
     const { data: customizerData, loading: customizerLoading } = useCustomizerQueryServer();
 
     const [btnActive, setBtnActive] = useState(false);
@@ -608,6 +617,14 @@ const AppearanceComponent = ({ setPrevAppearance }) => {
 
                             if (results.data && results.data.updateCustomizer) {
                                 message.success('Successfully saved.');
+
+                                if (userBranding === 'WITHOUT_BRANDING') {
+                                    await updateUpgradeData({
+                                        variables: {
+                                            shouldShowUpgradePopup: true,
+                                        },
+                                    });
+                                }
                             }
                         }}
                         style={{ ...sharedBtnStyles }}

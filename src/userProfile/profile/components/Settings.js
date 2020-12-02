@@ -15,6 +15,7 @@ import Popup from '../../../components/Popup';
 import InviteUser from './InviteUser';
 import { useTeamMembersQuery } from '../userQueries';
 import Input from '../../../form/components/Input';
+import AddCreditCard from './AddCreditCard';
 
 const InputCustomStyle = {
     width: '22.7vw',
@@ -22,8 +23,9 @@ const InputCustomStyle = {
 };
 
 const Subscription = () => {
-    // const { data, loading, error } = useMeQuery();
     const [showUpgradePopup, setShowUpgradePopup] = useState(false);
+    const [showCreditCardPopup, setShowCreditCardPopup] = useState(false);
+
     const { data: userPlan, loading: userPlanLoading, error } = useUserSubscriptionPlan();
     const { data: customCards, loading: customCardsLoading } = useCustomerCarsdQuery();
 
@@ -68,7 +70,20 @@ const Subscription = () => {
                     <Row gutter={[48, 16]} style={{ width: '80%' }}>
                         <Col span={12} lg={12} md={12} sm={24} xs={24}>
                             <div>
-                                <div className="field-name">Plan</div>
+                                <div className="field-name">
+                                    Plan
+                                    <span
+                                        style={{
+                                            float: 'right',
+                                            fontSize: '14px',
+                                            color: '#9966ff',
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={(e) => setShowUpgradePopup(true)}
+                                    >
+                                        Change
+                                    </span>
+                                </div>
                                 <InputField
                                     name="plan"
                                     type="text"
@@ -89,7 +104,7 @@ const Subscription = () => {
                                             color: '#9966ff',
                                             cursor: 'pointer',
                                         }}
-                                        onClick={(e) => setShowUpgradePopup(true)}
+                                        onClick={(e) => setShowCreditCardPopup(true)}
                                     >
                                         Change
                                     </span>
@@ -111,6 +126,22 @@ const Subscription = () => {
                                 return <Upgrade setShowPopup={setShowUpgradePopup} preStep={2} />;
                             }}
                             closePopup={(e) => setShowUpgradePopup(false)}
+                            style={{
+                                minHeight: '700px',
+                                width: '986px',
+                                marginLeft: '0px',
+                                marginRight: '0px',
+                                margin: '0 auto',
+                            }}
+                        />
+                    )}
+
+                    {showCreditCardPopup && (
+                        <Popup
+                            component={() => {
+                                return <AddCreditCard setShowPopup={setShowCreditCardPopup} />;
+                            }}
+                            closePopup={(e) => setShowCreditCardPopup(false)}
                             style={{
                                 minHeight: '700px',
                                 width: '986px',

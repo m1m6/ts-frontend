@@ -29,3 +29,19 @@ export const TEAM_MEMBERS_QUERY = gql`
         }
     }
 `;
+
+export const ADD_CREDIT_CARD_GQL = gql`
+    mutation addCustomerCreditCard(
+        $cardNumber: String!
+        $expMonth: String!
+        $expYear: String!
+        $cvc: String!
+    ) {
+        addCustomerCreditCard(
+            cardNumber: $cardNumber
+            expMonth: $expMonth
+            expYear: $expYear
+            cvc: $cvc
+        )
+    }
+`;

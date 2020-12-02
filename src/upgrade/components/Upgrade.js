@@ -9,8 +9,9 @@ import Input from '../../form/components/Input';
 import { useSubscriptionMutation } from '../useMutation';
 import { usePlansListQuery } from '../useQuery';
 import { mapPlans } from '../utils';
+import { useUserSubscriptionPlan } from '../../user/useQueries';
 
-const Upgrade = ({ preStep = 1 }) => {
+const Upgrade = ({ preStep = 1, subscriptionCycle, setShowPopup }) => {
     const [step, setStep] = useState(preStep);
 
     return (
@@ -45,7 +46,11 @@ const Upgrade = ({ preStep = 1 }) => {
                     </div>
                 </>
             ) : step === 2 ? (
-                <Step2 setStep={setStep} />
+                <Step2
+                    setStep={setStep}
+                    subscriptionCycle={subscriptionCycle}
+                    setShowPopup={setShowPopup}
+                />
             ) : (
                 <Step3 />
             )}
@@ -53,11 +58,13 @@ const Upgrade = ({ preStep = 1 }) => {
     );
 };
 
-const Step2 = ({ setStep }) => {
+const Step2 = ({ setStep, setShowPopup }) => {
     const subscriptionCycleOptions = [
         { label: 'YEARLY', value: 'yearly' },
         { label: 'MONTHLY', value: 'monthlu' },
     ];
+    const { data, loading } = usePlansListQuery();
+    const { data: userData, loading: userLoading } = useUserSubscriptionPlan();
 
     const [cycle, setCycle] = useState(subscriptionCycleOptions[0]);
     const [plan, setPlan] = useState(undefined);
@@ -83,12 +90,20 @@ const Step2 = ({ setStep }) => {
         }
     });
 
-    const { data, loading } = usePlansListQuery();
+    const { status, plan: currentPlan, subscriptionCycle } =
+        userData && userData.getUserPlan
+            ? userData.getUserPlan
+            : { status: 'BASIC', plan: { id: 1 } };
 
-    const plansOptions = mapPlans(data, cycle.label);
-    if (plan === undefined && plansOptions.length > 0) {
-        setPlan(plansOptions[0]);
-    }
+    const plansOptions = mapPlans(data, cycle.label, status, currentPlan);
+
+    useEffect(() => {
+        if (plan === undefined && plansOptions.length > 0) {
+            setPlan(plansOptions[currentPlan.id - 2]);
+        }
+    })
+
+    const shouldDisableCycleList = subscriptionCycle === 'yearly';
     return (
         <>
             <div className="popup-title">
@@ -102,6 +117,7 @@ const Step2 = ({ setStep }) => {
                     styles={CustomStyle(true)}
                     options={subscriptionCycleOptions}
                     defaultValue={subscriptionCycleOptions[0]}
+                    isDisabled={shouldDisableCycleList}
                     formatOptionLabel={(value) => {
                         if (value.label === 'YEARLY') {
                             return (
@@ -146,6 +162,7 @@ const Step2 = ({ setStep }) => {
                     width="100%"
                     isClearable={false}
                     isSearchable={false}
+                    isOptionDisabled={(option) => option.isdisabled}
                 />
 
                 <div
@@ -290,7 +307,9 @@ const Step2 = ({ setStep }) => {
                                     subscripeResults.data.subscription.status &&
                                     subscripeResults.data.subscription.status === 'PREMIUM'
                                 ) {
-                                    setStep(3);
+                                    message.success('Your subscription has been upgraded!');
+                                    setShowPopup(false);
+                                    // setStep(3);
                                 } else {
                                     console.log('subscripeResults', subscripeResults);
                                     message.error(
@@ -422,13 +441,17 @@ const CustomStyle = (isFirst) => {
             '&:hover': { borderColor: 'none' },
             height: isFirst ? '65px' : '100px',
         }),
-        singleValue: (base, { selectProps: { width, height } }) => ({
-            ...base,
-            width: '100%',
-            fontFamily: 'Open Sans',
-            fontSize: '14px',
-            color: '#0a2540',
-        }),
+        singleValue: (base, { isDisabled, selectProps: { width, height } }) => {
+            console.log('isDisabled', isDisabled);
+            return {
+                ...base,
+                width: '100%',
+                fontFamily: 'Open Sans',
+                fontSize: '14px',
+                // color: isDisabled ? '#ccc' : '#0a2540',
+                // opacity: isDisabled ? 0.5 : 1,
+            };
+        },
         indicatorSeparator: (base, state) => ({
             ...base,
             display: 'none',

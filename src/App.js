@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { differenceInDays } from 'date-fns';
 import Layout from './layout/Layout';
 import Sidebar from './layout/Sidebar';
 import Content from './layout/Content';
 import Routes from './routes';
 import { auth } from './signupLogin/auth';
 import { useMeQuery } from './rootUseQuery';
-import { useUserData } from './signupLogin/login/useUserDataMutations';
 import { useCustomizerQueryClient } from './translateStack/customizer/useQueries';
 import { browserHistory } from './browserHistory';
 import { useCustomizerMutationClient } from './translateStack/customizer/useMutations';
@@ -15,25 +15,16 @@ import Link from './form/components/Link';
 import Upgrade from './upgrade/components/Upgrade';
 import Popup from './components/Popup';
 import { ReactComponent as Stars } from './assets/stars.svg';
+import { useUpgradeDataQueryClient } from './upgrade/useQuery';
+import { useSetUpgradeDataClient } from './upgrade/useMutation';
 
 const token = auth.getAccessToken();
 
 const App = () => {
     const { loading, data, error } = useMeQuery();
-    // const [userRole, setUserRole] = useState('ADMIN');
     const { data: customizerData, loading: customizerLoading } = useCustomizerQueryClient();
     const [updateCustomizerClient] = useCustomizerMutationClient();
     const [bannerVisible, setBannerVisible] = useState(false);
-
-    const [setUserData] = useUserData();
-
-    // async function setUserDataAsync() {
-    //     if (!loading) {
-    //         const { id, fullName, email, role, isNew } = data.me;
-    //         setUserRole(role);
-    //         await setUserData({ variables: { id, fullName, email, role, isNew } });
-    //     }
-    // }
 
     async function updateCustomizerData(isOpen) {
         await updateCustomizerClient({ variables: { isOpen } });
@@ -50,30 +41,29 @@ const App = () => {
             updateCustomizerData(true);
         }
     }, []);
-    // if (loading || customizerLoading) {
-    //     return <></>;
-    // }
-
-    // if (userRole === undefined && data && data.me) {
-    //     setUserDataAsync();
-    // }
 
     const isNew = data && data.me ? data.me.isNew : false;
     const skippedOnboarding = data && data.me ? data.me.skippedOnboarding : false;
     const isOpenCustomizer =
         customizerData && customizerData.customizer ? customizerData.customizer.isOpen : false;
 
-        // stupid hack!
+    // stupid hack!
     const userRole = data && data.me ? data.me.role : 'ADMIN';
     const openLanguagesComponent =
         customizerData && customizerData.customizer
             ? customizerData.customizer.openLanguagesComponent
             : false;
 
+    const subscriptionCycle = data && data.me ? data.me.subscriptionCycle : '';
+
     if (token) {
         return (
             <>
-                <Banner setBannerVisible={setBannerVisible} bannerVisible={bannerVisible} />
+                <Banner
+                    setBannerVisible={setBannerVisible}
+                    bannerVisible={bannerVisible}
+                    subscriptionCycle={subscriptionCycle}
+                />
                 <Layout
                     style={{
                         marginLeft:
@@ -108,32 +98,21 @@ const App = () => {
     }
 };
 
-const Banner = ({ setBannerVisible, bannerVisible }) => {
+const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle }) => {
     const [showUpgradePopup, setShowUpgradePopup] = useState(false);
     const { data: userPlan, loading } = useUserSubscriptionPlan();
+    const { data: upgradeData, loading: upgradeLoading } = useUpgradeDataQueryClient();
+    const [updateUpgradeData] = useSetUpgradeDataClient();
 
-    if (loading) {
+    if (loading || upgradeLoading) {
         return <></>;
     }
 
-    // useEffect(() => {
-    //     const shouldShowBanner =
-    //     userPlan &&
-    //     userPlan.getUserPlan &&
-    //     userPlan.getUserPlan.plan &&
-    //     userPlan.getUserPlan.plan.id > 1
-    //         ? true
-    //         : false;
-
-    // const userStatus = shouldShowBanner ? userPlan.getUserPlan.status : '';
-    // const userPlanData = shouldShowBanner ? userPlan.getUserPlan.plan : {};
-
-    //     if (shouldShowBanner && userStatus === 'BASIC' && bannerVisible === false) {
-    //         setBannerVisible(true)
-    //     }
-    // }, [bannerVisible]);
+    let { isInTrialPeriod, trialEnds } = userPlan.getUserPlan;
+    let shouldShowPopup = upgradeData.upgrade.shouldShowUpgradePopup || showUpgradePopup;
 
     const shouldShowBanner =
+        isInTrialPeriod &&
         userPlan &&
         userPlan.getUserPlan &&
         userPlan.getUserPlan.plan &&
@@ -143,12 +122,27 @@ const Banner = ({ setBannerVisible, bannerVisible }) => {
 
     const userStatus = shouldShowBanner ? userPlan.getUserPlan.status : '';
     const userPlanData = shouldShowBanner ? userPlan.getUserPlan.plan : {};
-    if (shouldShowBanner && userStatus === 'BASIC' && bannerVisible === false) {
+    if (
+        shouldShowBanner &&
+        (userStatus === 'BASIC' || userStatus === 'PREMIUM') &&
+        bannerVisible === false
+    ) {
         setBannerVisible(true);
     }
+
+    let now = Date.now();
+    let difference = isInTrialPeriod ? differenceInDays(new Date(trialEnds), now) : 30;
+
     return (
-        <div style={{ marginBottom: shouldShowBanner && userStatus === 'BASIC' ? '50px' : 0 }}>
-            {shouldShowBanner && userStatus === 'BASIC' && (
+        <div
+            style={{
+                marginBottom:
+                    shouldShowBanner && (userStatus === 'BASIC' || userStatus === 'PREMIUM')
+                        ? '50px'
+                        : 0,
+            }}
+        >
+            {shouldShowBanner && (userStatus === 'BASIC' || userStatus === 'PREMIUM') && (
                 <>
                     <div
                         style={{
@@ -171,7 +165,7 @@ const Banner = ({ setBannerVisible, bannerVisible }) => {
                             }}
                         >
                             You are using features of the {userPlanData.type.toLowerCase()} plan.
-                            Upgrade now to continue using those. 30 days left.
+                            Upgrade now to continue using those. {difference} days left.
                         </span>
                         <span>
                             <Button
@@ -211,17 +205,38 @@ const Banner = ({ setBannerVisible, bannerVisible }) => {
                 </>
             )}
 
-            {showUpgradePopup && (
+            {shouldShowPopup && (
                 <Popup
                     component={() => {
                         return (
                             <Upgrade
-                                setShowPopup={setShowUpgradePopup}
-                                preStep={userStatus !== 'BASIC' ? 3 : 1}
+                                setShowPopup={async () => {
+                                    setShowUpgradePopup(false);
+                                    await updateUpgradeData({
+                                        variables: {
+                                            shouldShowUpgradePopup: false,
+                                        },
+                                    });
+                                }}
+                                preStep={
+                                    isInTrialPeriod &&
+                                    userStatus !== 'BASIC' &&
+                                    userStatus !== 'PREMIUM'
+                                        ? 3
+                                        : 1
+                                }
+                                subscriptionCycle={subscriptionCycle}
                             />
                         );
                     }}
-                    closePopup={(e) => setShowUpgradePopup(false)}
+                    closePopup={async (e) => {
+                        setShowUpgradePopup(false);
+                        await updateUpgradeData({
+                            variables: {
+                                shouldShowUpgradePopup: false,
+                            },
+                        });
+                    }}
                     style={{
                         minHeight: '700px',
                         width: '986px',

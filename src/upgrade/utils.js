@@ -1,7 +1,7 @@
 import React from 'react';
 import centerLogo from '../assets/imgs/signupLogin/icon-bubble.png';
 
-export const mapPlans = (plansData, cycle = 'YEARLY') => {
+export const mapPlans = (plansData, cycle = 'YEARLY', status, currentPlan) => {
     let options = [];
     if (plansData && plansData.plans && plansData.plans.length) {
         let plansOptions = JSON.parse(JSON.stringify(plansData.plans));
@@ -10,6 +10,8 @@ export const mapPlans = (plansData, cycle = 'YEARLY') => {
 
         filteredOptions.forEach((plan) => {
             const option = {};
+
+            option.isdisabled = status === 'PREMIUM' && plan.id <= currentPlan.id;
 
             option.value =
                 cycle === 'YEARLY'
@@ -31,7 +33,7 @@ export const mapPlans = (plansData, cycle = 'YEARLY') => {
                             style={{
                                 fontSize: '20px',
                                 fontWeight: 'bold',
-                                color: '#0a2540',
+                                color: !option.isdisabled ? '#0a2540' : '#ccc',
                                 fontFamily: 'Open Sans',
                             }}
                         >
@@ -42,7 +44,8 @@ export const mapPlans = (plansData, cycle = 'YEARLY') => {
                                 marginLeft: '5px',
                                 fontFamily: 'Open Sans',
                                 fontSize: '16px',
-                                color: '#0a2540',
+                                color: !option.isdisabled ? '#0a2540' : '#ccc',
+                                
                             }}
                         >
                             (
@@ -56,7 +59,7 @@ export const mapPlans = (plansData, cycle = 'YEARLY') => {
                                 marginLeft: '10px',
                                 fontFamily: 'Open Sans',
                                 fontSize: '20px',
-                                color: '#0a2540',
+                                color: !option.isdisabled ? '#0a2540' : '#ccc',
                                 fontWeight: 'bold',
                                 float: 'right',
                                 marginRight: '40px',

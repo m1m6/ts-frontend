@@ -1,4 +1,4 @@
-.upgrade-popup, .invite-popup {
+.upgrade-popup, .invite-popup, .credit-card-popup {
     .popup-title {
         font-family: 'Open Sans';
         font-size: 30px;
@@ -32,7 +32,7 @@
         }
     }
 
-    .subscription-form {
+    .subscription-form, .credit-card-form {
         margin-left: 87px;
         margin-right: 100px;
         margin-top: 60px;
@@ -60,4 +60,8 @@
     .invite-user-form {
         margin-top: 60px;
     }
+}
+
+.credit-card-inner-form {
+    margin-top: 60px;
 }

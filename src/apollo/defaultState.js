@@ -21,6 +21,10 @@ export default {
         languages: null,
         branding: null,
         removedItems: [],
-        openLanguagesComponent: false
+        openLanguagesComponent: false,
+    },
+    upgrade: {
+        __typename: 'upgrade',
+        shouldShowUpgradePopup: false,
     },
 };

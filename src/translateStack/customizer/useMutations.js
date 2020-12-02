@@ -11,7 +11,7 @@ export const useCustomizerMutationClient = () =>
     });
 export const useCustomizerMutation = () =>
     useMutation(CUSTOMIZER_MUTATION_SERVER, {
-        // refetchQueries: ['MeQuery'],
+        refetchQueries: ['getUserPlan'],
     });
 
 export const useUpdateTargetLanguagesMutation = () =>

@@ -1,8 +1,10 @@
 import { useMutation } from '@apollo/react-hooks';
-import { subscription } from './gql';
+import { subscription, setUpgradeDataGQL } from './gql';
 
 export const useSubscriptionMutation = () =>
     useMutation(subscription, {
         refetchQueries: ['getUserPlan'],
-        awaitRefetchQueries: true
+        awaitRefetchQueries: true,
     });
+
+export const useSetUpgradeDataClient = () => useMutation(setUpgradeDataGQL);

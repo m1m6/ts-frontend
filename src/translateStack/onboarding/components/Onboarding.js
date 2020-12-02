@@ -315,14 +315,13 @@ const Step3 = ({
                     <Button children="COPY" onClick={(e) => copyToClipboard('code-snippet')} />
                     <SyntaxHighlighter language="javascript" style={dark} id="code-snippet">
                         {`
-    <script type="text/javascript">
-        var tsstack = function () {
-            var tss = document.createElement('script'); tss.type = 'text/javascript'; tss.async = true;
-            tss.src = 'https://app.translatestack.com/sdk/sdk.js?apiKey=${apiKey}';
-            tss.id = "tss-script";
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(tss);
-        }
-        window.onload = tsstack
+    <script id="tss-script" src="https://app.translatestack.com/sdk/sdk.js?apiKey=${apiKey}"></script>
+        <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function (e) {
+            if (initTsStackTranslator) {
+                initTsStackTranslator()
+            }
+        });
     </script>`}
                     </SyntaxHighlighter>
                 </div>

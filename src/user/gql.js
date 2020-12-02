@@ -51,6 +51,9 @@ export const USER_SUBSCRIPTION_PLAN = gql`
             subscription
             planId
             status
+            isInTrialPeriod
+            trialEnds
+            subscriptionCycle
             plan {
                 id
                 type

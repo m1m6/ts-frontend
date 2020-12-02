@@ -23,6 +23,7 @@ import { getTranslationsPercentageByLanguage } from '../../translation/utils';
 import { useUserLanguagesQuery } from '../../../user/useQueries';
 import { OnboardinButton } from '../../onboarding/components/Onboarding';
 import { isDeveloper, isEditor } from '../../../signupLogin/utils';
+import { useSetUpgradeDataClient } from '../../../upgrade/useMutation';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -63,6 +64,8 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
     let [pageUrl, setPageUrl] = useState(undefined);
     let [isSubmitting, setIsSubmitting] = useState(false);
     const [useAddSinglePage] = useAddSinglePageMutation();
+    const [updateUpgradeData] = useSetUpgradeDataClient();
+
     return (
         <div className="setup-popup-wrapper">
             <div className="setup-p-title">Add another page</div>
@@ -75,14 +78,13 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
                     <Button children="COPY" onClick={(e) => copyToClipboard('code-snippet')} />
                     <SyntaxHighlighter language="javascript" style={dark} id="code-snippet">
                         {`
-    <script type="text/javascript">
-        var tsstack = function () {
-            var tss = document.createElement('script'); tss.type = 'text/javascript'; tss.async = true;
-            tss.src = 'https://app.translatestack.com/sdk/sdk.js?apiKey=${apiKey}';
-            tss.id = "tss-script";
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(tss);
-        }
-        window.onload = tsstack
+    <script id="tss-script" src="https://app.translatestack.com/sdk/sdk.js?apiKey=${apiKey}"></script>
+        <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function (e) {
+            if (initTsStackTranslator) {
+                initTsStackTranslator()
+            }
+        });
     </script>`}
                     </SyntaxHighlighter>
                 </div>
@@ -126,6 +128,11 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
                                 if (results && results.data && results.data.addSinglePage) {
                                     message.success('Page successfully added');
                                     setShowPopup(false);
+                                    await updateUpgradeData({
+                                        variables: {
+                                            shouldShowUpgradePopup: true,
+                                        },
+                                    });
                                 } else {
                                     message.warn('Unable to verify the page');
                                 }
@@ -269,9 +276,7 @@ const Projects = ({ routerHistory }) => {
                     <div id="project-status" className="project-status" style={{ display: 'flex' }}>
                         {hasFinishedSetup ? (
                             <>
-                                <div
-                                    style={{  width: '25px', height: '25px' }}
-                                >
+                                <div style={{ width: '25px', height: '25px' }}>
                                     <CheckLogo
                                         style={{
                                             width: '16px',

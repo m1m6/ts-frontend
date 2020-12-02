@@ -12,6 +12,7 @@ export const ME_QUERY = gql`
             apiKey
             sourceLanguage
             subscription
+            subscriptionCycle
             customizer {
                 id
                 position
