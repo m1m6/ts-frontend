@@ -403,6 +403,10 @@ const Step3 = ({
                             updateUser({
                                 variables: { sourceLanguage: sourceLanguage[0].value },
                             });
+                        } else if (sourceLanguage && sourceLanguage.value) {
+                            updateUser({
+                                variables: { sourceLanguage: sourceLanguage.value },
+                            });
                         }
 
                         await updateUser({
@@ -429,15 +433,6 @@ const Onboarding = ({ isNew, routerHistory }) => {
     const { data: subscriptionData, loading: subscriptionLoading } = useUserSubscriptionPlan();
 
     useEffect(() => {
-        /*
-
-        React.useEffect(() => {
-    return () => {
-            props.history.goForward();
-        }
-    }
-}, []);
-        */
         if (routerHistory.location.pathname === '/onboarding') {
             window.history.pushState(null, document.title, window.location.href);
             window.addEventListener('popstate', function (event) {

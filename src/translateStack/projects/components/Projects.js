@@ -374,7 +374,9 @@ const Projects = ({ routerHistory }) => {
                         return {
                             onClick: () => {
                                 if (!isDeveloper(userRole)) {
-                                    routerHistory.push(`/translation/${row.pageId}`);
+                                    routerHistory.push(`/translation`, {
+                                        pageId: row.pageId,
+                                    });
                                 } else {
                                     message.warn("You don't have permissions to access this page");
                                 }

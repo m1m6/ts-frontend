@@ -8,6 +8,7 @@ const PageLayout = ({
     isNew,
     skippedOnboarding,
     isOpenCustomizer,
+    userRole,
     ...rest
 }) => {
     const [loading, setLoading] = useState(true);
@@ -42,7 +43,7 @@ const PageLayout = ({
         return (
             <div className="page-layout">
                 {/* <h1 className="page-title">{title}</h1> */}
-                <Component routerHistory={history} isNew={isNew} {...rest} />
+                <Component routerHistory={history} isNew={isNew} userRole={userRole} {...rest} />
             </div>
         );
 };

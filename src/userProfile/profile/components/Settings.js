@@ -16,6 +16,7 @@ import InviteUser from './InviteUser';
 import { useTeamMembersQuery } from '../userQueries';
 import Input from '../../../form/components/Input';
 import AddCreditCard from './AddCreditCard';
+import { isAdmin } from '../../../signupLogin/utils';
 
 const InputCustomStyle = {
     width: '22.7vw',
@@ -278,7 +279,7 @@ const Profile = () => {
                 onSubmit={async (values, { setSubmitting }) => {
                     try {
                         if (values.password === '***********') {
-                            delete values.password;
+                            delete values.password; // stupid hack
                         }
 
                         const result = await updateUser({ variables: { ...values } });
@@ -360,19 +361,29 @@ const Profile = () => {
 };
 
 const Settings = ({}) => {
+    const { data, loading, error } = useMeQuery();
+
+    if (loading) return <></>;
+
+    const role = data.me.role;
+
+    const isAdminUser = isAdmin(role);
     return (
         <>
             <Profile />
 
-            <div className="settings-wrapper">
-                <div className="settings-header">Subscription</div>
-                <Subscription />
-            </div>
-
-            <div className="settings-wrapper">
-                <div className="settings-header">Team</div>
-                <Team />
-            </div>
+            {isAdminUser && (
+                <>
+                    <div className="settings-wrapper">
+                        <div className="settings-header">Subscription</div>
+                        <Subscription />
+                    </div>
+                    <div className="settings-wrapper">
+                        <div className="settings-header">Team</div>
+                        <Team />
+                    </div>
+                </>
+            )}
         </>
     );
 };

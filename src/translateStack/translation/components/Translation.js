@@ -272,8 +272,8 @@ const mapRows = (strings, selectedLanguageId) => {
 
 const Translation = (props) => {
     let pageId;
-    if (props.match && props.match.params) {
-        pageId = parseInt(props.match.params.pageId);
+    if (props.location && props.location.state) {
+        pageId = parseInt(props.location.state.pageId);
     }
     const [progress, setProgress] = useState(0);
     let [rowsData, setRowsData] = useState([]);
@@ -309,7 +309,6 @@ const Translation = (props) => {
     }
 
     if (error) {
-        message.warn('Unauthorized!');
         return <Redirect to="/" />;
     }
     const content = (

@@ -22,7 +22,7 @@ export const ROUTE_PATHS = {
     notFound: '*',
     app: {
         onboarding: '/onboarding',
-        translation: '/translation/:pageId',
+        translation: '/translation',
         customizer: '/customizer',
         settings: '/settings',
     },
@@ -115,9 +115,10 @@ const Routes = ({ userRole, isNew, skippedOnboarding, isOpenCustomizer }) => {
                         isNew={isNew}
                         skippedOnboarding={skippedOnboarding}
                         isOpenCustomizer={isOpenCustomizer}
+                        userRole={userRole}
                     />
                 )}
-                roles={[ROLES.ADMIN]}
+                roles={[ROLES.ADMIN, ROLES.EDITOR, ROLES.DEVELOPER]}
                 userRole={userRole}
                 isNew={isNew}
                 skippedOnboarding={skippedOnboarding}

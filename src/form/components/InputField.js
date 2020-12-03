@@ -18,6 +18,7 @@ const InputField = ({ label, iconType, shouldShowError=true, ...props }) => {
                 {...props}
                 prefix={<Icon type={iconType} />}
                 className={classNames({ required: meta.touched && meta.error })}
+                autoComplete="chrome-off"
             />
         </div>
     );
