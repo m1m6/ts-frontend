@@ -388,9 +388,6 @@ const Step3 = ({
                     onClick={async (e) => {
                         let selectedLanguagesIds = selectedLanguages.map((l) => l.value);
 
-                        console.log('selectedLanguagesIds', selectedLanguagesIds);
-                        console.log('sourceLanguage', sourceLanguage);
-
                         if (selectedLanguagesIds) {
                             updateTargetLanguages({
                                 variables: {
