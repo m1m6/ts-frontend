@@ -38,9 +38,11 @@ export const subscription = gql`
 `;
 
 export const setUpgradeDataGQL = gql`
-    mutation setUpgradeData($shouldShowUpgradePopup: Boolean!) {
-        setUpgradeData(shouldShowUpgradePopup: $shouldShowUpgradePopup) @client {
+    mutation setUpgradeData($shouldShowUpgradePopup: Boolean!, $targetPlan: Int!) {
+        setUpgradeData(shouldShowUpgradePopup: $shouldShowUpgradePopup, targetPlan: $targetPlan)
+            @client {
             shouldShowUpgradePopup
+            targetPlan
         }
     }
 `;
@@ -49,6 +51,7 @@ export const UPGRADE_DATA_GQL = gql`
     query getUpgradeData {
         upgrade @client {
             shouldShowUpgradePopup
+            targetPlan
         }
     }
 `;

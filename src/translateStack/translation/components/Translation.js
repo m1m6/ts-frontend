@@ -257,7 +257,30 @@ const mapRows = (strings, selectedLanguageId) => {
             );
 
             row.key = i;
-            row.id = string.id;
+            row.id = (
+                <div>
+                    {string.id}
+                    {string.tagType !== '' && (
+                        <div
+                            style={{
+                                backgroundColor: 'rgb(108 34 255)',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                width: '90px',
+                                padding: '4px',
+                                borderRadius: '4px',
+                                boxShadow: '0 2px 20px -5px #e8eaef',
+                            }}
+                        >
+                            {string.tagType === 'description'
+                                ? 'META DESC'
+                                : string.tagType === 'title'
+                                ? 'META TITLE'
+                                : null}
+                        </div>
+                    )}
+                </div>
+            );
             row.original = string.original;
             row.translated = translatedStringValue;
             row.lastEdit = format(new Date(updatedAtValue).getTime(), 'd. MMM');

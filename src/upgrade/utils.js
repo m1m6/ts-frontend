@@ -1,7 +1,7 @@
 import React from 'react';
 import centerLogo from '../assets/imgs/signupLogin/icon-bubble.png';
 
-export const mapPlans = (plansData, cycle = 'YEARLY', status, currentPlan) => {
+export const mapPlans = (plansData, cycle = 'YEARLY', status, targetPlan) => {
     let options = [];
     if (plansData && plansData.plans && plansData.plans.length) {
         let plansOptions = JSON.parse(JSON.stringify(plansData.plans));
@@ -11,7 +11,7 @@ export const mapPlans = (plansData, cycle = 'YEARLY', status, currentPlan) => {
         filteredOptions.forEach((plan) => {
             const option = {};
 
-            option.isdisabled = status === 'PREMIUM' && plan.id <= currentPlan.id;
+            option.isdisabled = status === 'PREMIUM' && plan.id <= targetPlan;
 
             option.value =
                 cycle === 'YEARLY'

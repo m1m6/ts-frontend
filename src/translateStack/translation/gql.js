@@ -10,6 +10,7 @@ export const getPageQuery = gql`
                 id
                 original
                 updatedAt
+                tagType
                 translations {
                     id
                     languageId

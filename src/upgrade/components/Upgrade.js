@@ -11,7 +11,7 @@ import { usePlansListQuery } from '../useQuery';
 import { mapPlans } from '../utils';
 import { useUserSubscriptionPlan } from '../../user/useQueries';
 
-const Upgrade = ({ preStep = 1, subscriptionCycle, setShowPopup }) => {
+const Upgrade = ({ preStep = 1, subscriptionCycle, setShowPopup, targetPlan}) => {
     const [step, setStep] = useState(preStep);
 
     return (
@@ -50,6 +50,7 @@ const Upgrade = ({ preStep = 1, subscriptionCycle, setShowPopup }) => {
                     setStep={setStep}
                     subscriptionCycle={subscriptionCycle}
                     setShowPopup={setShowPopup}
+                    targetPlan={targetPlan}
                 />
             ) : (
                 <Step3 />
@@ -58,7 +59,7 @@ const Upgrade = ({ preStep = 1, subscriptionCycle, setShowPopup }) => {
     );
 };
 
-const Step2 = ({ setStep, setShowPopup }) => {
+const Step2 = ({ setStep, setShowPopup, targetPlan }) => {
     const subscriptionCycleOptions = [
         { label: 'YEARLY', value: 'yearly' },
         { label: 'MONTHLY', value: 'monthlu' },
@@ -95,11 +96,11 @@ const Step2 = ({ setStep, setShowPopup }) => {
             ? userData.getUserPlan
             : { status: 'BASIC', plan: { id: 1 } };
 
-    const plansOptions = mapPlans(data, cycle.label, status, currentPlan);
+    const plansOptions = mapPlans(data, cycle.label, status, targetPlan);
 
     useEffect(() => {
         if (plan === undefined && plansOptions.length > 0) {
-            setPlan(plansOptions[currentPlan.id - 2]);
+            setPlan(plansOptions[targetPlan - 2]);
         }
     })
 

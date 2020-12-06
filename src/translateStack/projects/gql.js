@@ -14,6 +14,7 @@ export const userPagesQuery = gql`
                 id
                 original
                 updatedAt
+                tagType
                 translations {
                     translatedString
                     pageStringId

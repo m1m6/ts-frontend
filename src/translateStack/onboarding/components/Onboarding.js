@@ -314,15 +314,7 @@ const Step3 = ({
                 <div className="onboarding-step-code">
                     <Button children="COPY" onClick={(e) => copyToClipboard('code-snippet')} />
                     <SyntaxHighlighter language="javascript" style={dark} id="code-snippet">
-                        {`
-    <script id="tss-script" src="https://app.translatestack.com/sdk/sdk.js?apiKey=${apiKey}"></script>
-        <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function (e) {
-            if (initTsStackTranslator) {
-                initTsStackTranslator()
-            }
-        });
-    </script>`}
+                        {`<script id="tss-script" src="https://app.translatestack.com/sdk/sdk.js?apiKey=${apiKey}"></script>`}
                     </SyntaxHighlighter>
                 </div>
             </div>

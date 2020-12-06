@@ -26,5 +26,6 @@ export default {
     upgrade: {
         __typename: 'upgrade',
         shouldShowUpgradePopup: false,
+        targetPlan: 2, // go to starter plan by default
     },
 };

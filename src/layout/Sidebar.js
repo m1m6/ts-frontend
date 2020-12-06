@@ -230,7 +230,7 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, user
                         className="bottom-items"
                         style={{ bottom: bannerVisible ? '80px' : '30px' }}
                     >
-                        {isAdmin(userRole) && (
+                        {(isAdmin(userRole) || isEditor(userRole)) && (
                             <div
                                 className={classNames('menu-item', {
                                     activeMenu: activeMenu === 'Settings',

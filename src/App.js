@@ -55,7 +55,7 @@ const App = () => {
             : false;
 
     const subscriptionCycle = data && data.me ? data.me.subscriptionCycle : '';
-
+    const numberOfPages = data && data.me ? data.me.pages : 0;
     if (token) {
         return (
             <>
@@ -63,6 +63,7 @@ const App = () => {
                     setBannerVisible={setBannerVisible}
                     bannerVisible={bannerVisible}
                     subscriptionCycle={subscriptionCycle}
+                    numberOfPages={numberOfPages}
                 />
                 <Layout
                     style={{
@@ -98,7 +99,7 @@ const App = () => {
     }
 };
 
-const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle }) => {
+const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle, numberOfPages }) => {
     const [showUpgradePopup, setShowUpgradePopup] = useState(false);
     const { data: userPlan, loading } = useUserSubscriptionPlan();
     const { data: upgradeData, loading: upgradeLoading } = useUpgradeDataQueryClient();
@@ -111,38 +112,35 @@ const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle }) => {
     let { isInTrialPeriod, trialEnds } = userPlan.getUserPlan;
     let shouldShowPopup = upgradeData.upgrade.shouldShowUpgradePopup || showUpgradePopup;
 
+    let targetPlan = upgradeData.upgrade.targetPlan;
+
     const shouldShowBanner =
-        isInTrialPeriod &&
+        numberOfPages.length > 0 &&
         userPlan &&
         userPlan.getUserPlan &&
         userPlan.getUserPlan.plan &&
-        userPlan.getUserPlan.plan.id > 1
+        userPlan.getUserPlan.plan.id === 1
             ? true
             : false;
 
     const userStatus = shouldShowBanner ? userPlan.getUserPlan.status : '';
     const userPlanData = shouldShowBanner ? userPlan.getUserPlan.plan : {};
-    if (
-        shouldShowBanner &&
-        (userStatus === 'BASIC' || userStatus === 'PREMIUM') &&
-        bannerVisible === false
-    ) {
+
+    if (shouldShowBanner && userStatus === 'BASIC' && bannerVisible === false) {
         setBannerVisible(true);
     }
 
     let now = Date.now();
     let difference = isInTrialPeriod ? differenceInDays(new Date(trialEnds), now) : 30;
 
+    console.log("shouldShowBanner", shouldShowBanner, numberOfPages);
     return (
         <div
             style={{
-                marginBottom:
-                    shouldShowBanner && (userStatus === 'BASIC' || userStatus === 'PREMIUM')
-                        ? '50px'
-                        : 0,
+                marginBottom: shouldShowBanner && userStatus === 'BASIC' ? '50px' : 0,
             }}
         >
-            {shouldShowBanner && (userStatus === 'BASIC' || userStatus === 'PREMIUM') && (
+            {shouldShowBanner && userStatus === 'BASIC' && (
                 <>
                     <div
                         style={{
@@ -164,8 +162,8 @@ const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle }) => {
                                 lineHeight: '3.36',
                             }}
                         >
-                            You are using features of the {userPlanData.type.toLowerCase()} plan.
-                            Upgrade now to continue using those. {difference} days left.
+                            Enjoy more features in higher plans like adding more languages or to
+                            remove the branding.”
                         </span>
                         <span>
                             <Button
@@ -226,6 +224,7 @@ const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle }) => {
                                         : 1
                                 }
                                 subscriptionCycle={subscriptionCycle}
+                                targetPlan={targetPlan}
                             />
                         );
                     }}

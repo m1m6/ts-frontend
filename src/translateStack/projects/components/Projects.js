@@ -20,7 +20,7 @@ import Popup from '../../../components/Popup';
 import { useAddSinglePageMutation } from '../useMutations';
 import { getProjectTranslationsPercentage, getProjectWordsAndStringsCount } from '../utils';
 import { getTranslationsPercentageByLanguage } from '../../translation/utils';
-import { useUserLanguagesQuery } from '../../../user/useQueries';
+import { useUserLanguagesQuery, useUserSubscriptionPlan } from '../../../user/useQueries';
 import { OnboardinButton } from '../../onboarding/components/Onboarding';
 import { isDeveloper, isEditor } from '../../../signupLogin/utils';
 import { useSetUpgradeDataClient } from '../../../upgrade/useMutation';
@@ -60,32 +60,27 @@ const placeHolderRow = [
     },
 ];
 
-const SetupPopup = ({ setShowPopup, apiKey }) => {
+const SetupPopup = ({ setShowPopup, apiKey, pagesCount }) => {
     let [pageUrl, setPageUrl] = useState(undefined);
     let [isSubmitting, setIsSubmitting] = useState(false);
     const [useAddSinglePage] = useAddSinglePageMutation();
     const [updateUpgradeData] = useSetUpgradeDataClient();
+    const { data: userPlan, loading } = useUserSubscriptionPlan();
+
+    if (loading) return <></>;
 
     return (
         <div className="setup-popup-wrapper">
             <div className="setup-p-title">Add another page</div>
             <div className="setup-p-description">
-                Copy your code snippet below and place it in the &#60;head&#62; of your page.
+                Copy your code snippet below and place it above the closing tag &#60;/head&#62; of your page.
                 Afterwards, enter the URL to test your integration.
             </div>
             <div className="setup-p-code">
                 <div className="setup-code">
                     <Button children="COPY" onClick={(e) => copyToClipboard('code-snippet')} />
                     <SyntaxHighlighter language="javascript" style={dark} id="code-snippet">
-                        {`
-    <script id="tss-script" src="https://app.translatestack.com/sdk/sdk.js?apiKey=${apiKey}"></script>
-        <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function (e) {
-            if (initTsStackTranslator) {
-                initTsStackTranslator()
-            }
-        });
-    </script>`}
+                        {`<script id="tss-script" src="https://app.translatestack.com/sdk/sdk.js?apiKey=${apiKey}"></script>`}
                     </SyntaxHighlighter>
                 </div>
             </div>
@@ -119,28 +114,64 @@ const SetupPopup = ({ setShowPopup, apiKey }) => {
                         }
                         disabled={isSubmitting}
                         onClick={async () => {
-                            setIsSubmitting(true);
-                            if (pageUrl && /^(http|https):\/\/[^ "]+$/.test(pageUrl)) {
-                                const results = await useAddSinglePage({
-                                    variables: { pageUrl },
+                            const currentUserPlan =
+                                userPlan && userPlan.getUserPlan && userPlan.getUserPlan.plan
+                                    ? userPlan.getUserPlan.plan.id
+                                    : 1;
+
+                            if (
+                                currentUserPlan === 1 &&
+                                pagesCount.length > 5 &&
+                                pagesCount.length <= 10
+                            ) {
+                                await updateUpgradeData({
+                                    variables: {
+                                        shouldShowUpgradePopup: true,
+                                        targetPlan: 2,
+                                    },
                                 });
-
-                                if (results && results.data && results.data.addSinglePage) {
-                                    message.success('Page successfully added');
-                                    setShowPopup(false);
-                                    await updateUpgradeData({
-                                        variables: {
-                                            shouldShowUpgradePopup: true,
-                                        },
-                                    });
-                                } else {
-                                    message.warn('Unable to verify the page');
-                                }
+                            } else if (
+                                currentUserPlan === 2 &&
+                                pagesCount.length > 10 &&
+                                pagesCount.length <= 20
+                            ) {
+                                await updateUpgradeData({
+                                    variables: {
+                                        shouldShowUpgradePopup: true,
+                                        targetPlan: 3,
+                                    },
+                                });
+                            } else if (currentUserPlan === 3 && pagesCount.length > 20) {
+                                await updateUpgradeData({
+                                    variables: {
+                                        shouldShowUpgradePopup: true,
+                                        targetPlan: 4,
+                                    },
+                                });
                             } else {
-                                message.error('Please enter a valid page url');
-                            }
+                                setIsSubmitting(true);
+                                if (pageUrl && /^(http|https):\/\/[^ "]+$/.test(pageUrl)) {
+                                    const results = await useAddSinglePage({
+                                        variables: { pageUrl },
+                                    });
 
-                            setIsSubmitting(false);
+                                    if (results && results.data && results.data.addSinglePage) {
+                                        message.success('Page successfully added');
+                                        setShowPopup(false);
+                                        await updateUpgradeData({
+                                            variables: {
+                                                shouldShowUpgradePopup: true,
+                                            },
+                                        });
+                                    } else {
+                                        message.warn('Unable to verify the page');
+                                    }
+                                } else {
+                                    message.error('Please enter a valid page url');
+                                }
+
+                                setIsSubmitting(false);
+                            }
                         }}
                     />
                 </div>
@@ -391,7 +422,17 @@ const Projects = ({ routerHistory }) => {
                 <Popup
                     text="test"
                     component={() => {
-                        return <SetupPopup setShowPopup={setShowPopup} apiKey={apiKey} />;
+                        return (
+                            <SetupPopup
+                                setShowPopup={setShowPopup}
+                                apiKey={apiKey}
+                                pagesCount={
+                                    data.userPages && data.userPages.length
+                                        ? data.userPages.length
+                                        : 0
+                                }
+                            />
+                        );
                     }}
                     closePopup={(e) => setShowPopup(false)}
                 />

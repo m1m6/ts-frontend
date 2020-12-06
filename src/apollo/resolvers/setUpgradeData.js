@@ -1,11 +1,12 @@
 import gql from 'graphql-tag';
 import { apolloClient } from '../apolloClient';
 
-export default (_, { shouldShowUpgradePopup }, { cache }) => {
+export default (_, { shouldShowUpgradePopup, targetPlan }, { cache }) => {
     const query = gql`
         query getUpgradeData {
             upgrade @client {
                 shouldShowUpgradePopup
+                targetPlan
             }
         }
     `;
@@ -14,6 +15,7 @@ export default (_, { shouldShowUpgradePopup }, { cache }) => {
         upgrade: {
             ...previousState.upgrade,
             shouldShowUpgradePopup,
+            targetPlan,
         },
     };
 
