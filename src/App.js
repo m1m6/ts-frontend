@@ -163,7 +163,7 @@ const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle, numberOfPa
                             }}
                         >
                             Enjoy more features in higher plans like adding more languages or to
-                            remove the branding.”
+                            remove the branding.
                         </span>
                         <span>
                             <Button
