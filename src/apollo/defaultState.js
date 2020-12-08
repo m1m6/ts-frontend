@@ -27,5 +27,9 @@ export default {
         __typename: 'upgrade',
         shouldShowUpgradePopup: false,
         targetPlan: 2, // go to starter plan by default
+        shouldResetUpgradeData: null,
+        selectedLanguagesIds: [],
+        tempUserBranding: null,
+        tempPageUrl: null
     },
 };

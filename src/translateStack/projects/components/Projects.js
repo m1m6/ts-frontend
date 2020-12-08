@@ -24,6 +24,7 @@ import { useUserLanguagesQuery, useUserSubscriptionPlan } from '../../../user/us
 import { OnboardinButton } from '../../onboarding/components/Onboarding';
 import { isDeveloper, isEditor } from '../../../signupLogin/utils';
 import { useSetUpgradeDataClient } from '../../../upgrade/useMutation';
+import { useUpgradeDataQueryClient } from '../../../upgrade/useQuery';
 
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 
@@ -63,18 +64,96 @@ const placeHolderRow = [
 const SetupPopup = ({ setShowPopup, apiKey, pagesCount }) => {
     let [pageUrl, setPageUrl] = useState(undefined);
     let [isSubmitting, setIsSubmitting] = useState(false);
+
     const [useAddSinglePage] = useAddSinglePageMutation();
     const [updateUpgradeData] = useSetUpgradeDataClient();
     const { data: userPlan, loading } = useUserSubscriptionPlan();
+    const { data: upgradeData, loading: upgradeLoading } = useUpgradeDataQueryClient();
 
-    if (loading) return <></>;
+    useEffect(() => {
+        if (
+            upgradeData &&
+            upgradeData.upgrade &&
+            upgradeData.upgrade.shouldResetUpgradeData === false &&
+            upgradeData.upgrade.tempPageUrl &&
+            !pageUrl
+        ) {
+            setPageUrl(upgradeData.upgrade.tempPageUrl);
+            saveHandler(null, upgradeData.upgrade.tempPageUrl);
+        }
+    });
+
+    if (loading || upgradeLoading) return <></>;
+
+    const saveHandler = async (e, tempPageUrl) => {
+        let currentPageUrl = tempPageUrl || pageUrl;
+        if (currentPageUrl && /^(http|https):\/\/[^ "]+$/.test(currentPageUrl)) {
+            const currentUserPlan =
+                userPlan && userPlan.getUserPlan && userPlan.getUserPlan.plan
+                    ? userPlan.getUserPlan.plan.id
+                    : 1;
+            if (currentUserPlan === 1 && pagesCount >= 5 && pagesCount < 10) {
+                setShowPopup(false);
+                await updateUpgradeData({
+                    variables: {
+                        shouldShowUpgradePopup: true,
+                        targetPlan: 2,
+                        tempPageUrl: pageUrl,
+                    },
+                });
+            } else if (currentUserPlan === 2 && pagesCount >= 10 && pagesCount < 20) {
+                setShowPopup(false);
+
+                await updateUpgradeData({
+                    variables: {
+                        shouldShowUpgradePopup: true,
+                        targetPlan: 3,
+                        tempPageUrl: currentPageUrl,
+                    },
+                });
+            } else if (currentUserPlan === 3 && pagesCount >= 20) {
+                setShowPopup(false);
+
+                await updateUpgradeData({
+                    variables: {
+                        shouldShowUpgradePopup: true,
+                        targetPlan: 4,
+                        tempPageUrl: currentPageUrl,
+                    },
+                });
+            } else {
+                setIsSubmitting(true);
+                const results = await useAddSinglePage({
+                    variables: { pageUrl: currentPageUrl },
+                });
+
+                if (results && results.data && results.data.addSinglePage) {
+                    message.success('Page successfully added');
+                    await updateUpgradeData({
+                        variables: {
+                            shouldShowUpgradePopup: false,
+                            tempPageUrl: null,
+                            shouldResetUpgradeData: null,
+                        },
+                    });
+                    setShowPopup(false);
+                } else {
+                    message.warn('Unable to verify the page');
+                }
+
+                setIsSubmitting(false);
+            }
+        } else {
+            message.error('Please enter a valid page url');
+        }
+    };
 
     return (
         <div className="setup-popup-wrapper">
             <div className="setup-p-title">Add another page</div>
             <div className="setup-p-description">
-                Copy your code snippet below and place it above the closing tag &#60;/head&#62; of your page.
-                Afterwards, enter the URL to test your integration.
+                Copy your code snippet below and place it above the closing tag &#60;/head&#62; of
+                your page. Afterwards, enter the URL to test your integration.
             </div>
             <div className="setup-p-code">
                 <div className="setup-code">
@@ -113,66 +192,7 @@ const SetupPopup = ({ setShowPopup, apiKey, pagesCount }) => {
                             )
                         }
                         disabled={isSubmitting}
-                        onClick={async () => {
-                            const currentUserPlan =
-                                userPlan && userPlan.getUserPlan && userPlan.getUserPlan.plan
-                                    ? userPlan.getUserPlan.plan.id
-                                    : 1;
-
-                            if (
-                                currentUserPlan === 1 &&
-                                pagesCount.length > 5 &&
-                                pagesCount.length <= 10
-                            ) {
-                                await updateUpgradeData({
-                                    variables: {
-                                        shouldShowUpgradePopup: true,
-                                        targetPlan: 2,
-                                    },
-                                });
-                            } else if (
-                                currentUserPlan === 2 &&
-                                pagesCount.length > 10 &&
-                                pagesCount.length <= 20
-                            ) {
-                                await updateUpgradeData({
-                                    variables: {
-                                        shouldShowUpgradePopup: true,
-                                        targetPlan: 3,
-                                    },
-                                });
-                            } else if (currentUserPlan === 3 && pagesCount.length > 20) {
-                                await updateUpgradeData({
-                                    variables: {
-                                        shouldShowUpgradePopup: true,
-                                        targetPlan: 4,
-                                    },
-                                });
-                            } else {
-                                setIsSubmitting(true);
-                                if (pageUrl && /^(http|https):\/\/[^ "]+$/.test(pageUrl)) {
-                                    const results = await useAddSinglePage({
-                                        variables: { pageUrl },
-                                    });
-
-                                    if (results && results.data && results.data.addSinglePage) {
-                                        message.success('Page successfully added');
-                                        setShowPopup(false);
-                                        await updateUpgradeData({
-                                            variables: {
-                                                shouldShowUpgradePopup: true,
-                                            },
-                                        });
-                                    } else {
-                                        message.warn('Unable to verify the page');
-                                    }
-                                } else {
-                                    message.error('Please enter a valid page url');
-                                }
-
-                                setIsSubmitting(false);
-                            }
-                        }}
+                        onClick={saveHandler}
                     />
                 </div>
             </div>
@@ -246,23 +266,27 @@ const Projects = ({ routerHistory }) => {
     const [updateUser] = useUpdateUserMutation();
     const [updateOnboardingClient] = useOnboardingMutationClient();
     const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
+    const { data: upgradeData, loading: upgradeLoading } = useUpgradeDataQueryClient();
 
     let dataSource = placeHolderRow;
 
-    // useEffect(() => {
-    //     if (loading || userLoading || userLanguagesLoading) {
-    //         setProgress(100);
-    //     }
-    //     // return () => {
-    //     //     setProgress(0);
-    //     // };
-    // }, []);
+    useEffect(() => {
+        if (
+            upgradeData &&
+            upgradeData.upgrade &&
+            upgradeData.upgrade.shouldResetUpgradeData === false &&
+            upgradeData.upgrade.tempPageUrl &&
+            !showPopup
+        ) {
+            setShowPopup(true);
+        }
+    });
 
     if (error) {
         return <div style={{ margin: '0 auto' }}>Unable to parse your request </div>;
     }
 
-    if (loading || userLoading || userLanguagesLoading) {
+    if (loading || userLoading || userLanguagesLoading || upgradeLoading) {
         return (
             <LoadingBar
                 color="#a172ff"
@@ -416,8 +440,6 @@ const Projects = ({ routerHistory }) => {
                     }}
                 />
             </div>
-            <div id="sidebar-id"></div>
-
             {showPopup && (
                 <Popup
                     text="test"

@@ -16,7 +16,7 @@ import GoBack from '../components/GoBack';
 import { ReactComponent as RightArrow } from '../assets/right-arrow-angle.svg';
 import CustomizerSidebar from './CustomizerSidebar';
 import LoadingBar from 'react-top-loading-bar';
-import { isAdmin, isEditor } from '../signupLogin/utils';
+import { isAdmin, isDeveloper, isEditor } from '../signupLogin/utils';
 
 const { Sider } = Layout;
 const { Step } = Steps;
@@ -230,7 +230,7 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, user
                         className="bottom-items"
                         style={{ bottom: bannerVisible ? '80px' : '30px' }}
                     >
-                        {(isAdmin(userRole) || isEditor(userRole)) && (
+                        {(isAdmin(userRole) || isEditor(userRole) || isDeveloper(userRole)) && (
                             <div
                                 className={classNames('menu-item', {
                                     activeMenu: activeMenu === 'Settings',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { message, Radio } from 'antd';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
@@ -21,6 +21,7 @@ import Select from 'react-select';
 import Input from '../form/components/Input';
 import { useUserLanguagesQuery, useUserSubscriptionPlan } from '../user/useQueries';
 import { useSetUpgradeDataClient } from '../upgrade/useMutation';
+import { useUpgradeDataQueryClient } from '../upgrade/useQuery';
 
 const MainComponent = ({ setWhichInnerSidebar }) => {
     const [updateCustomizerClient] = useCustomizerMutationClient();
@@ -212,9 +213,7 @@ const PositionComponent = ({ bannerVisible, setPrevPosition }) => {
     const [updateCustomizer] = useCustomizerMutation();
     const [updateCustomizerClient] = useCustomizerMutationClient();
 
-    if (customizerLoading) return <></>;
-
-    let customizer = customizerData.getUserCustomizer; //data && data.me ? data.me.customizer : {};
+    let customizer = customizerData ? customizerData.getUserCustomizer : null;
 
     if (customizer && userPosition === null) {
         setUserPosition(customizer.position || 'RIGHT');
@@ -365,9 +364,7 @@ const TextComponent = ({ setPrevText }) => {
     const [userText, setUserText] = useState(null);
     const [btnActive, setBtnActive] = useState(false);
 
-    if (customizerLoading) return <>Loading...</>;
-
-    let customizer = customizerData.getUserCustomizer;
+    let customizer = customizerData ? customizerData.getUserCustomizer : null;
 
     if (customizer && userText === null) {
         setUserText(customizer.text || 'FULL');
@@ -430,8 +427,9 @@ const TextComponent = ({ setPrevText }) => {
 const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
     const [selectedLanguages, setSelectedLanguages] = useState(null);
     const [isInitialValues, setIsInitialValues] = useState(true);
-
+    const [isSubmitting, setSubmitting] = useState(false);
     const [btnActive, setBtnActive] = useState(false);
+
     const { data: langData, loading: langLoading } = useLanugagesListQuery();
     const {
         data: customizerLocalData,
@@ -442,17 +440,44 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
 
     const { data: meData, loading: meLoading } = useMeQuery();
     const { data: userLanguagesData, loading: userLanguagesLoading } = useUserLanguagesQuery();
-    const [updateCustomizer] = useCustomizerMutation();
     const [updateTargetLanguages] = useUpdateTargetLanguagesMutation();
     const { data: customizerData, loading: customizerLoading } = useCustomizerQueryServer();
     const [updateUpgradeData] = useSetUpgradeDataClient();
+    const { data: upgradeData, loading: upgradeLoading } = useUpgradeDataQueryClient();
+
+    useEffect(() => {
+        if (
+            upgradeData &&
+            upgradeData.upgrade &&
+            upgradeData.upgrade.shouldResetUpgradeData &&
+            selectedLanguages &&
+            selectedLanguages.length > 0
+        ) {
+            resetSelectedLanguages();
+        }
+    });
+
+    useEffect(() => {
+        if (
+            upgradeData &&
+            upgradeData.upgrade &&
+            upgradeData.upgrade.shouldResetUpgradeData === false &&
+            selectedLanguages &&
+            selectedLanguages.length > 0 &&
+            !isSubmitting
+        ) {
+            setSubmitting(true);
+            saveHandler();
+        }
+    });
 
     if (
         meLoading ||
         langLoading ||
         customizerLocalLoading ||
         userLanguagesLoading ||
-        customizerLoading
+        customizerLoading ||
+        upgradeLoading
     )
         return <>Loading...</>;
 
@@ -469,6 +494,20 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
         let selectedTargetLangs = mapLanguages(userLanguages.filter(({ isActive }) => isActive));
         setSelectedLanguages(selectedTargetLangs);
     }
+
+    const resetSelectedLanguages = () => {
+        let selectedTargetLangs = mapLanguages(userLanguages.filter(({ isActive }) => isActive));
+        setSelectedLanguages(null);
+        setBtnActive(false);
+        updateUpgradeData({
+            variables: {
+                shouldResetUpgradeData: null,
+                selectedLanguagesIds: []
+            },
+        }).then((e) => {
+            setSelectedLanguages(selectedTargetLangs);
+        });
+    };
 
     const changeHandler = async (value, action) => {
         setLanguagesSaved(false);
@@ -490,6 +529,88 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
                 removedItems: removedItems,
             },
         });
+    };
+
+    const saveHandler = async (e) => {
+        const currentUserPlan =
+            userPlan && userPlan.getUserPlan && userPlan.getUserPlan.plan
+                ? userPlan.getUserPlan.plan.id
+                : 1;
+
+        let selectedLanguagesIds = selectedLanguages ? selectedLanguages.map((l) => l.value) : [];
+
+        if (
+            currentUserPlan === 1 &&
+            selectedLanguages.length > 2 &&
+            selectedLanguages.length <= 5
+        ) {
+            await updateUpgradeData({
+                variables: {
+                    shouldShowUpgradePopup: true,
+                    targetPlan: 2,
+                    selectedLanguagesIds,
+                },
+            });
+        } else if (
+            currentUserPlan === 2 &&
+            selectedLanguages.length > 5 &&
+            selectedLanguages.length <= 10
+        ) {
+            await updateUpgradeData({
+                variables: {
+                    shouldShowUpgradePopup: true,
+                    targetPlan: 3,
+                    selectedLanguagesIds,
+                },
+            });
+        } else if (
+            currentUserPlan === 3 &&
+            selectedLanguages.length > 10 &&
+            selectedLanguages.length <= 40
+        ) {
+            await updateUpgradeData({
+                variables: {
+                    shouldShowUpgradePopup: true,
+                    targetPlan: 4,
+                    selectedLanguagesIds,
+                },
+            });
+        } else {
+            setLanguagesSaved(true);
+            setBtnActive(false);
+            let selectedLanguagesIds = selectedLanguages
+                ? selectedLanguages.map((l) => l.value)
+                : [];
+
+            if (
+                upgradeData &&
+                upgradeData.upgrade &&
+                upgradeData.upgrade.selectedLanguagesIds &&
+                upgradeData.upgrade.selectedLanguagesIds.length > 0
+            ) {
+                selectedLanguagesIds = upgradeData.upgrade.selectedLanguagesIds;
+            }
+            const results = await updateTargetLanguages({
+                variables: {
+                    selectedLanguagesIds,
+                },
+            });
+
+            if (results.data && results.data.updateTargetLanguages) {
+                message.success('Languages successfully saved.');
+                await updateUpgradeData({
+                    variables: {
+                        shouldShowUpgradePopup: false,
+                        shouldResetUpgradeData: null,
+                        selectedLanguagesIds: [],
+                    },
+                });
+            } else {
+                message.warn(
+                    'An error occured during saving your changes, please try again later.'
+                );
+            }
+        }
     };
 
     return (
@@ -524,72 +645,7 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
                     <Button
                         children="SAVE"
                         className={classNames('wf-btn-primary active')}
-                        onClick={async (e) => {
-                            const currentUserPlan =
-                                userPlan && userPlan.getUserPlan && userPlan.getUserPlan.plan
-                                    ? userPlan.getUserPlan.plan.id
-                                    : 1;
-
-                            if (
-                                currentUserPlan === 1 &&
-                                selectedLanguages.length > 2 &&
-                                selectedLanguages.length <= 5
-                            ) {
-                                await updateUpgradeData({
-                                    variables: {
-                                        shouldShowUpgradePopup: true,
-                                        targetPlan: 2,
-                                    },
-                                });
-                            } else if (
-                                currentUserPlan === 2 &&
-                                selectedLanguages.length > 5 &&
-                                selectedLanguages.length < 10
-                            ) {
-                                await updateUpgradeData({
-                                    variables: {
-                                        shouldShowUpgradePopup: true,
-                                        targetPlan: 3,
-                                    },
-                                });
-                            } else if (
-                                currentUserPlan === 3 &&
-                                selectedLanguages.length > 10 &&
-                                selectedLanguages.length <= 40
-                            ) {
-                                await updateUpgradeData({
-                                    variables: {
-                                        shouldShowUpgradePopup: true,
-                                        targetPlan: 4,
-                                    },
-                                });
-                            } else {
-                                setLanguagesSaved(true);
-                                setBtnActive(false);
-                                let selectedLanguagesIds = selectedLanguages
-                                    ? selectedLanguages.map((l) => l.value)
-                                    : [];
-
-                                const results = await updateTargetLanguages({
-                                    variables: {
-                                        selectedLanguagesIds,
-                                    },
-                                });
-
-                                if (results.data && results.data.updateTargetLanguages) {
-                                    message.success('Successfully saved.');
-                                    await updateUpgradeData({
-                                        variables: {
-                                            shouldShowUpgradePopup: true,
-                                        },
-                                    });
-                                } else {
-                                    message.warn(
-                                        'An error occured during saving your changes, please try again later.'
-                                    );
-                                }
-                            }
-                        }}
+                        onClick={saveHandler}
                         style={{ ...sharedBtnStyles }}
                     />
                 )}
@@ -599,23 +655,101 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
 };
 
 const AppearanceComponent = ({ setPrevAppearance, userPlan }) => {
+    const [btnActive, setBtnActive] = useState(false);
+    const [userBranding, setUserBranding] = useState(null);
+    const [isSubmitting, setSubmitting] = useState(false);
+
+    const { data: customizerData, loading: customizerLoading } = useCustomizerQueryServer();
+    const { data: upgradeData, loading: upgradeLoading } = useUpgradeDataQueryClient();
+
     const [updateCustomizer] = useCustomizerMutation();
     const [updateCustomizerClient] = useCustomizerMutationClient();
     const [updateUpgradeData] = useSetUpgradeDataClient();
 
-    const { data: customizerData, loading: customizerLoading } = useCustomizerQueryServer();
+    useEffect(() => {
+        if (
+            upgradeData &&
+            upgradeData.upgrade &&
+            upgradeData.upgrade.shouldResetUpgradeData &&
+            userBranding === 'WITHOUT_BRANDING'
+        ) {
+            updateUpgradeData({
+                variables: {
+                    shouldResetUpgradeData: null,
+                },
+            }).then((e) => {
+                setBtnActive(false);
+                setUserBranding('WITH_BRANDING');
+            });
+        }
+    });
 
-    const [btnActive, setBtnActive] = useState(false);
+    useEffect(() => {
+        if (
+            upgradeData &&
+            upgradeData.upgrade &&
+            upgradeData.upgrade.shouldResetUpgradeData === false &&
+            customizerData &&
+            userBranding === 'WITH_BRANDING' &&
+            !isSubmitting
+        ) {
+            setSubmitting(true);
+            setUserBranding('WITHOUT_BRANDING');
+            saveHandler();
+        }
+    });
 
-    const [userBranding, setUserBranding] = useState(null);
+    if (customizerLoading || upgradeLoading) return <></>;
 
-    if (customizerLoading) return <></>;
-
-    let customizer = customizerData.getUserCustomizer;
+    let customizer = customizerData ? customizerData.getUserCustomizer : null;
 
     if (customizer && userBranding === null) {
         setUserBranding(customizer.appearance || 'WITH_BRANDING');
     }
+
+    const saveHandler = async (e) => {
+        // check for user plan
+        const currentUserPlan =
+            userPlan && userPlan.getUserPlan && userPlan.getUserPlan.plan
+                ? userPlan.getUserPlan.plan.id
+                : 1;
+
+        if (currentUserPlan < 3 && userBranding === 'WITHOUT_BRANDING') {
+            await updateUpgradeData({
+                variables: {
+                    shouldShowUpgradePopup: true,
+                    targetPlan: 3,
+                    tempUserBranding: userBranding,
+                },
+            });
+        } else {
+            setPrevAppearance(userBranding);
+            setBtnActive(false);
+
+            let tempUserBranding;
+            if (upgradeData && upgradeData.upgrade && upgradeData.upgrade.tempUserBranding) {
+                tempUserBranding = upgradeData.upgrade.tempUserBranding;
+            }
+
+            const results = await updateCustomizer({
+                variables: {
+                    ...customizer,
+                    appearance: tempUserBranding || userBranding,
+                },
+            });
+
+            if (results.data && results.data.updateCustomizer) {
+                message.success('Appearance settings successfully saved.');
+                await updateUpgradeData({
+                    variables: {
+                        shouldShowUpgradePopup: false,
+                        shouldResetUpgradeData: null,
+                        tempUserBranding: null,
+                    },
+                });
+            }
+        }
+    };
 
     return (
         <>
@@ -644,37 +778,9 @@ const AppearanceComponent = ({ setPrevAppearance, userPlan }) => {
                 {btnActive && (
                     <Button
                         children="SAVE"
+                        id="appearnace-submit-btn"
                         className={classNames('wf-btn-primary active')}
-                        onClick={async (e) => {
-                            // check for user plan
-                            const currentUserPlan =
-                                userPlan && userPlan.getUserPlan && userPlan.getUserPlan.plan
-                                    ? userPlan.getUserPlan.plan.id
-                                    : 1;
-
-                            if (currentUserPlan !== 4 && userBranding === 'WITHOUT_BRANDING') {
-                                await updateUpgradeData({
-                                    variables: {
-                                        shouldShowUpgradePopup: true,
-                                        targetPlan: 4,
-                                    },
-                                });
-                            } else {
-                                setPrevAppearance(userBranding);
-                                setBtnActive(false);
-
-                                const results = await updateCustomizer({
-                                    variables: {
-                                        ...customizer,
-                                        appearance: userBranding,
-                                    },
-                                });
-
-                                if (results.data && results.data.updateCustomizer) {
-                                    message.success('Successfully saved.');
-                                }
-                            }
-                        }}
+                        onClick={saveHandler}
                         style={{ ...sharedBtnStyles }}
                     />
                 )}
@@ -743,6 +849,8 @@ const CustomizerSidebar = ({ openLanguagesComponent, bannerVisible }) => {
     const { data: userPlan, loading } = useUserSubscriptionPlan();
 
     if (loading) return <></>;
+
+    console.log('prevAppearance', prevAppearance);
     return (
         <div className="customizer-sidebar-wrapper">
             <div className="go-back">

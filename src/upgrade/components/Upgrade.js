@@ -11,11 +11,11 @@ import { usePlansListQuery } from '../useQuery';
 import { mapPlans } from '../utils';
 import { useUserSubscriptionPlan } from '../../user/useQueries';
 
-const Upgrade = ({ preStep = 1, subscriptionCycle, setShowPopup, targetPlan}) => {
+const Upgrade = ({ preStep = 1, subscriptionCycle, successCB, targetPlan }) => {
     const [step, setStep] = useState(preStep);
 
     return (
-        <div className="upgrade-popup">
+        <div className="upgrade-popup" >
             {step === 1 ? (
                 <>
                     <div
@@ -49,7 +49,7 @@ const Upgrade = ({ preStep = 1, subscriptionCycle, setShowPopup, targetPlan}) =>
                 <Step2
                     setStep={setStep}
                     subscriptionCycle={subscriptionCycle}
-                    setShowPopup={setShowPopup}
+                    successCB={successCB}
                     targetPlan={targetPlan}
                 />
             ) : (
@@ -59,7 +59,7 @@ const Upgrade = ({ preStep = 1, subscriptionCycle, setShowPopup, targetPlan}) =>
     );
 };
 
-const Step2 = ({ setStep, setShowPopup, targetPlan }) => {
+const Step2 = ({ setStep, successCB, targetPlan }) => {
     const subscriptionCycleOptions = [
         { label: 'YEARLY', value: 'yearly' },
         { label: 'MONTHLY', value: 'monthlu' },
@@ -102,7 +102,7 @@ const Step2 = ({ setStep, setShowPopup, targetPlan }) => {
         if (plan === undefined && plansOptions.length > 0) {
             setPlan(plansOptions[targetPlan - 2]);
         }
-    })
+    });
 
     const shouldDisableCycleList = subscriptionCycle === 'yearly';
     return (
@@ -286,10 +286,6 @@ const Step2 = ({ setStep, setShowPopup, targetPlan }) => {
                                 const cardNumberValue = cardNumber.replaceAll(' ', '');
                                 const [expMonth, expYear] = expiryDate.split('/');
 
-                                console.log(cardNumberValue, expMonth, expYear, cvc);
-                                console.log('plan', plan.value);
-                                console.log('cycle', cycle.value);
-
                                 const subscripeResults = await subscribe({
                                     variables: {
                                         cardNumber: cardNumberValue,
@@ -309,10 +305,10 @@ const Step2 = ({ setStep, setShowPopup, targetPlan }) => {
                                     subscripeResults.data.subscription.status === 'PREMIUM'
                                 ) {
                                     message.success('Your subscription has been upgraded!');
-                                    setShowPopup(false);
+                                    successCB(false);
+
                                     // setStep(3);
                                 } else {
-                                    console.log('subscripeResults', subscripeResults);
                                     message.error(
                                         'Oops, unable to complete this process, pleae try again later.'
                                     );

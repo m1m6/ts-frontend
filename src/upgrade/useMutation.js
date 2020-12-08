@@ -7,4 +7,7 @@ export const useSubscriptionMutation = () =>
         awaitRefetchQueries: true,
     });
 
-export const useSetUpgradeDataClient = () => useMutation(setUpgradeDataGQL);
+export const useSetUpgradeDataClient = () =>
+    useMutation(setUpgradeDataGQL, {
+        // refetchQueries: ["customizerQuery"],
+    });

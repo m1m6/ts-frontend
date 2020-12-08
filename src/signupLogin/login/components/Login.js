@@ -34,8 +34,11 @@ const Login = ({ routerHistory }) => {
                         if (result) {
                             auth.logIn(result.data.login.token);
                             if (isAdmin(result.data.login.user.role))
-                                // and first time
-                                window.location.assign('/onboarding');
+                                if (result.data.login.user.isNew) {
+                                    window.location.assign('/onboarding');
+                                } else {
+                                    window.location.assign('/');
+                                }
                             else {
                                 // go to dashboard
                                 window.location.assign('/');

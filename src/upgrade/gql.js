@@ -38,11 +38,28 @@ export const subscription = gql`
 `;
 
 export const setUpgradeDataGQL = gql`
-    mutation setUpgradeData($shouldShowUpgradePopup: Boolean!, $targetPlan: Int!) {
-        setUpgradeData(shouldShowUpgradePopup: $shouldShowUpgradePopup, targetPlan: $targetPlan)
-            @client {
+    mutation setUpgradeData(
+        $shouldShowUpgradePopup: Boolean!
+        $targetPlan: Int!
+        $shouldResetUpgradeData: Boolean!
+        $selectedLanguagesIds: [Int!]
+        $tempUserBranding: String
+        $tempPageUrl: String
+    ) {
+        setUpgradeData(
+            shouldShowUpgradePopup: $shouldShowUpgradePopup
+            targetPlan: $targetPlan
+            shouldResetUpgradeData: $shouldResetUpgradeData
+            selectedLanguagesIds: $selectedLanguagesIds
+            tempUserBranding: $tempUserBranding
+            tempPageUrl: $tempPageUrl
+        ) @client {
             shouldShowUpgradePopup
             targetPlan
+            shouldResetUpgradeData
+            selectedLanguagesIds
+            tempUserBranding
+            tempPageUrl
         }
     }
 `;
@@ -52,6 +69,10 @@ export const UPGRADE_DATA_GQL = gql`
         upgrade @client {
             shouldShowUpgradePopup
             targetPlan
+            shouldResetUpgradeData
+            selectedLanguagesIds
+            tempUserBranding
+            tempPageUrl
         }
     }
 `;

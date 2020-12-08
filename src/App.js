@@ -8,7 +8,10 @@ import { auth } from './signupLogin/auth';
 import { useMeQuery } from './rootUseQuery';
 import { useCustomizerQueryClient } from './translateStack/customizer/useQueries';
 import { browserHistory } from './browserHistory';
-import { useCustomizerMutationClient } from './translateStack/customizer/useMutations';
+import {
+    useCustomizerMutation,
+    useCustomizerMutationClient,
+} from './translateStack/customizer/useMutations';
 import { useUserSubscriptionPlan } from './user/useQueries';
 import Button from './form/components/Button';
 import Link from './form/components/Link';
@@ -104,6 +107,7 @@ const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle, numberOfPa
     const { data: userPlan, loading } = useUserSubscriptionPlan();
     const { data: upgradeData, loading: upgradeLoading } = useUpgradeDataQueryClient();
     const [updateUpgradeData] = useSetUpgradeDataClient();
+    const [updateCustomizerClient] = useCustomizerMutationClient();
 
     if (loading || upgradeLoading) {
         return <></>;
@@ -133,7 +137,6 @@ const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle, numberOfPa
     let now = Date.now();
     let difference = isInTrialPeriod ? differenceInDays(new Date(trialEnds), now) : 30;
 
-    console.log("shouldShowBanner", shouldShowBanner, numberOfPages);
     return (
         <div
             style={{
@@ -208,21 +211,16 @@ const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle, numberOfPa
                     component={() => {
                         return (
                             <Upgrade
-                                setShowPopup={async () => {
+                                successCB={async () => {
                                     setShowUpgradePopup(false);
                                     await updateUpgradeData({
                                         variables: {
                                             shouldShowUpgradePopup: false,
+                                            shouldResetUpgradeData: false,
                                         },
                                     });
                                 }}
-                                preStep={
-                                    isInTrialPeriod &&
-                                    userStatus !== 'BASIC' &&
-                                    userStatus !== 'PREMIUM'
-                                        ? 3
-                                        : 1
-                                }
+                                // preStep={userStatus !==   'BASIC' && userStatus !== 'PREMIUM' ? 3 : 1}
                                 subscriptionCycle={subscriptionCycle}
                                 targetPlan={targetPlan}
                             />
@@ -233,6 +231,14 @@ const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle, numberOfPa
                         await updateUpgradeData({
                             variables: {
                                 shouldShowUpgradePopup: false,
+                                shouldResetUpgradeData: true,
+                            },
+                        });
+
+                        await updateCustomizerClient({
+                            variables: {
+                                removedItems: [],
+                                languages: null,
                             },
                         });
                     }}
@@ -242,6 +248,7 @@ const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle, numberOfPa
                         marginLeft: '0px',
                         marginRight: '0px',
                         margin: '0 auto',
+                        zIndex: 1000000
                     }}
                 />
             )}
