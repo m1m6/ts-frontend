@@ -132,9 +132,9 @@ const SourceLanguageStep = ({
     return (
         <div className="onboarding-step-wrapper">
             <div className="onboarding-step-count">{currentStep} out of 4</div>
-            <div className="onboarding-step-title">Choose your source and target languages</div>
+            <div className="onboarding-step-title">Choose the root language of your website</div>
             <div className="onboarding-step-description">
-                Select the source language of your website.
+                Please choose the current language of your website in the drop down below.
             </div>
             <div style={{ marginBottom: '26px' }}>
                 <Select
@@ -146,7 +146,7 @@ const SourceLanguageStep = ({
                     value={currentLang}
                     onChange={changeHandler}
                     width="517px"
-                    placeholder="Select source language"
+                    placeholder="Select root language"
                     isClearable={false}
                 />
             </div>
@@ -206,10 +206,9 @@ const TargetLanguagesStep = ({
     return (
         <div className="onboarding-step-wrapper">
             <div className="onboarding-step-count">{currentStep} out of 4</div>
-            <div className="onboarding-step-title">Choose your source and target languages</div>
+            <div className="onboarding-step-title">Choose languages you want to add</div>
             <div className="onboarding-step-description">
-                Select the languages that your website should be translated to. You can always add
-                languages later, too.
+                Select the languages, that you would like to add to your page below.
             </div>
             <div style={{ marginBottom: '26px' }}>
                 <Select
@@ -226,7 +225,7 @@ const TargetLanguagesStep = ({
                     value={currentSelected}
                     onChange={changeHandler}
                     width="60%"
-                    placeholder="Select target languages"
+                    placeholder="Select new languages"
                     isDisabled={languagesList && languagesList.length == 0}
                 />
             </div>
@@ -251,10 +250,10 @@ const Step2 = ({ currentStep, onboardingMutation, pageUrl, setPageUrl }) => {
     return (
         <div className="onboarding-step-wrapper">
             <div className="onboarding-step-count">{currentStep} out of 4</div>
-            <div className="onboarding-step-title">Enter your domain</div>
+            <div className="onboarding-step-title">Enter a valid URL of your Website</div>
             <div className="onboarding-step-description">
-                Enter the URL of your project and get started translating your page within minutes.
-                Make sure it is a valid URL.
+                You need to validate in the next step this page. Make sure it is a valid one.
+
             </div>
             <div style={{ marginBottom: '26px', marginTop: '33px' }}>
                 <Input
@@ -305,10 +304,9 @@ const Step3 = ({
     return (
         <div className="onboarding-step-wrapper last">
             <div className="onboarding-step-count last">{currentStep} out of 4</div>
-            <div className="onboarding-step-title last">Final Set up</div>
+            <div className="onboarding-step-title last">Finalize your setup</div>
             <div className="onboarding-step-description last">
-                This is your unique code snippet. Copy & paste it and place in in the head of your
-                project. Only after this step you are able to get started.
+                Copy & paste the code snippet below and place it above the &lt;/body&gt; tag. You can find more information in the <a style={{ color: '#9966ff', textDecoration: 'underline'}} target="_blank" href="https://translatestack.gitbook.io/translatestack/">documentation guide</a>.
             </div>
             <div className="onboarding-step-code-wrapper">
                 <div className="onboarding-step-code">
@@ -320,7 +318,8 @@ const Step3 = ({
             </div>
             <div className="onboarding-step-title">Test your setup</div>
             <div className="onboarding-step-description last">
-                Let's validate if the code snippet is placed correctly in the head of your project.
+
+                Press the button below to validate if your snippet is placed correctly above the body tag in your project.
                 You are one click away to start translating.
             </div>
             <div>

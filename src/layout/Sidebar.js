@@ -56,7 +56,7 @@ const OnboardingSteps = ({ currentStep, updateOnboardingClient }) => {
             <div className="onboarding-steps">
                 <Steps progressDot current={currentStep - 1} direction="vertical">
                     <Step
-                        title="Source Language"
+                        title="Root Language"
                         onClick={async (e) => {
                             await updateOnboardingClient({
                                 variables: { currentStep: 1 },
@@ -67,7 +67,7 @@ const OnboardingSteps = ({ currentStep, updateOnboardingClient }) => {
                         }}
                     />
                     <Step
-                        title="Targeted Languages"
+                        title="New Languages"
                         onClick={async (e) => {
                             await updateOnboardingClient({
                                 variables: { currentStep: 2 },

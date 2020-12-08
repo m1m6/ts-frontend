@@ -70,7 +70,7 @@ const MainComponent = ({ setWhichInnerSidebar }) => {
                         });
                     }}
                 >
-                    Appearance
+                    Branding
                     <RightArrow className="right-arrow" />
                 </Link>
             </div>
@@ -236,7 +236,7 @@ const PositionComponent = ({ bannerVisible, setPrevPosition }) => {
         <>
             <div className="customizer-menu-title">Position</div>
             <div className="customizer-menu-sub-title">
-                Choose the position of the switcher below
+                Choose the position of the drop down below
             </div>
 
             <div className="customizer-menu-group">
@@ -374,7 +374,7 @@ const TextComponent = ({ setPrevText }) => {
         <>
             <div className="customizer-menu-title">Text</div>
             <div className="customizer-menu-sub-title">
-                Choose the position of the switcher below
+                Choose the style of the text from the options below
             </div>
 
             <div className="customizer-menu-group">
@@ -391,8 +391,8 @@ const TextComponent = ({ setPrevText }) => {
                         });
                     }}
                 >
-                    <Radio.Button value="FULL">FULL</Radio.Button>
-                    <Radio.Button value="SHORTENED">SHORTENED</Radio.Button>
+                    <Radio.Button value="FULL">FLAG + WRITTEN OUT</Radio.Button>
+                    <Radio.Button value="SHORTENED">FLAG + SHORTENED</Radio.Button>
                     <Radio.Button value="TEXT_ONLY">TEXT ONLY</Radio.Button>
                     <Radio.Button value="FLAG_ONLY">FLAG ONLY</Radio.Button>
                 </Radio.Group>
@@ -755,7 +755,7 @@ const AppearanceComponent = ({ setPrevAppearance, userPlan }) => {
         <>
             <div className="customizer-menu-title">Branding</div>
             <div className="customizer-menu-sub-title">
-                Choose the position of the switcher below
+                Choose between a branded non branded version
             </div>
 
             <div className="customizer-menu-group">

@@ -85,7 +85,7 @@ const Signup = ({ routerHistory, role }) => {
                                 <Checkbox
                                     name="termsAndConditions"
                                     type="checkbox"
-                                    label="Ich möchte keine E-Mails zu Produktaktualisierungen erhalten. Sofern Sie dieses Feld nicht markieren, erhalten Sie gelegentlich hilfreiche und für Sie relevante E-Mails von Stripe. Sie können sich jedoch jederzeit abmelden. Privacy Policy."
+                                    label="I agree to the terms & conditions of Translatestack and would like to get product updates regulary."
                                 />
                             </Row>
 

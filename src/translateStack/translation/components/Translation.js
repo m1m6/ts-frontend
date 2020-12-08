@@ -368,8 +368,8 @@ const Translation = (props) => {
                     }
                 }}
             >
-                <SyncOutlined style={{ width: '10px', height: '11px' }} />
-                <span style={{ marginLeft: '16px' }}>Fetch again</span>
+                <SyncOutlined style={{ width: '10px', height: '11px', color: '#0a2540'  }} />
+                <span style={{ marginLeft: '16px', color: '#0a2540' }}>Fetch again</span>
             </div>
             <div
                 style={{ marginTop: '30px', marginBottom: '30px', cursor: 'pointer' }}
@@ -390,8 +390,8 @@ const Translation = (props) => {
                     }
                 }}
             >
-                <DeleteOutlined style={{ width: '10px', height: '11px' }} />
-                <span style={{ marginLeft: '16px' }}>Delete Page</span>
+                <DeleteOutlined style={{ width: '10px', height: '11px',color: '#0a2540' }} />
+                <span style={{ marginLeft: '16px',color: '#0a2540' }}>Delete Page</span>
             </div>
         </div>
     );

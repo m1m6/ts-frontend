@@ -130,7 +130,7 @@ const Routes = ({ userRole, isNew, skippedOnboarding, isOpenCustomizer }) => {
                 render={(matchProps) => (
                     <AuthPageLayout
                         Component={Signup}
-                        title="Create new account!"
+                        title="Create new account"
                         headerLink={{
                             title: 'Log in',
                             to: ROUTE_PATHS.auth.login,
