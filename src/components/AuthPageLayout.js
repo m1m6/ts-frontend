@@ -88,7 +88,7 @@ const AuthPageLayout = ({ history, Component, title, headerLink, ...rest }) => {
                         color: '#0a2540',
                     }}
                 >
-                    <span>translatestack 2020</span>
+                    <span>translatestack 2020 ©</span>
                     <span style={{ paddingLeft: '44px' }}>Terms & Conditions</span>
                 </div>
             </div>

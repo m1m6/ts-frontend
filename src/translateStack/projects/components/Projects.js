@@ -40,7 +40,7 @@ const columns = [
         key: 'strings',
     },
     {
-        title: 'Translated',
+        title: 'TRANSLATED',
         dataIndex: 'translated',
         key: 'translated',
     },
@@ -152,8 +152,8 @@ const SetupPopup = ({ setShowPopup, apiKey, pagesCount }) => {
         <div className="setup-popup-wrapper">
             <div className="setup-p-title">Add another page</div>
             <div className="setup-p-description">
-                Copy your code snippet below and place it above the closing tag &#60;/head&#62; of
-                your page. Afterwards, enter the URL to test your integration.
+                Copy your code snippet below and place it above the closing &#60;/body&#62; tag of
+                your page. The code snippet only works properly, if it got placed correctly. You'll find more information in the <a style={{ color: '#9966ff', textDecoration: 'underline'}} target="_blank" href="https://translatestack.gitbook.io/translatestack/">documentation guide</a>.
             </div>
             <div className="setup-p-code">
                 <div className="setup-code">
@@ -164,10 +164,9 @@ const SetupPopup = ({ setShowPopup, apiKey, pagesCount }) => {
                 </div>
             </div>
             <div className="setup-p-d-w">
-                <div className="setup-p-d-t">Enter URL of the page</div>
+                <div className="setup-p-d-t">Enter URL of new page</div>
                 <div className="setup-p-d-d">
-                    After you placed the code snippet in the new page, you can test the
-                    implementation. Just enter the valid URL and press the button.
+                    Once you've deployed the code snippet into the new page you want to add, you can enter the URL to validate your setup. Only if you validated your set up, the drop down will appear.
                 </div>
                 <div className="setup-p-d-i">
                     <Input
