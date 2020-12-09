@@ -11,7 +11,7 @@ export const mapPlans = (plansData, cycle = 'YEARLY', status, targetPlan) => {
         filteredOptions.forEach((plan) => {
             const option = {};
 
-            option.isdisabled = status === 'PREMIUM' && plan.id < targetPlan;
+            option.isdisabled =  plan.id < targetPlan;
 
             option.value =
                 cycle === 'YEARLY'

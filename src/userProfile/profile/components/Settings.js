@@ -133,9 +133,12 @@ const Subscription = () => {
                                 return (
                                     <Upgrade
                                         setShowPopup={setShowUpgradePopup}
-                                        targetPlan={targetPlan }
+                                        targetPlan={targetPlan}
                                         preStep={2}
                                         subscriptionCycle={subscriptionCycle}
+                                        successCB={async () => {
+                                            setShowUpgradePopup(false);
+                                        }}
                                     />
                                 );
                             }}
