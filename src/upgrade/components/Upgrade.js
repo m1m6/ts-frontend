@@ -30,11 +30,11 @@ const Upgrade = ({ preStep = 1, subscriptionCycle, successCB, targetPlan }) => {
                         <img src={centerLogo} width="40%" style={{ marginLeft: '-10%' }} />
                     </div>
                     <div className="popup-title">
-                        Ups, you need to upgrade to <br /> use premium features
+                        Ups, you need to upgrade <br /> to use this feature
                     </div>
                     <div className="popup-sub-title">
-                        Es ist essentiell, dass du deine Bachelorarbeit auf etablierte
-                        <br /> internationale Journals und Research Paper stützt. Verwend
+                        This feature is in your current plan not available.
+                        <br /> Upgrade now in order to enjoy this and more features.
                     </div>
 
                     <div className="popup-next-btn">

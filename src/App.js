@@ -192,7 +192,7 @@ const Banner = ({ setBannerVisible, bannerVisible, subscriptionCycle, numberOfPa
                             />
                         </span>
                         <Link
-                            to="#"
+                            to="/settings"
                             label="Learn More"
                             style={{
                                 marginLeft: '20px',
