@@ -59,7 +59,7 @@ const Upgrade = ({ preStep = 1, subscriptionCycle, successCB, targetPlan }) => {
     );
 };
 
-const Step2 = ({ setStep, successCB, targetPlan }) => {
+const Step2 = ({ setStep, successCB, targetPlan = 2 }) => {
     const subscriptionCycleOptions = [
         { label: 'YEARLY', value: 'yearly' },
         { label: 'MONTHLY', value: 'monthlu' },
@@ -318,7 +318,7 @@ const Step2 = ({ setStep, successCB, targetPlan }) => {
                                     setSubmitting(false);
                                 }, 100);
                             } catch (error) {
-                                message.error('Unable to subscripe now, please try again later!');
+                                // message.error('Unable to subscripe now, please try again later!');
                                 setSubmitting(false);
                             }
                         }}

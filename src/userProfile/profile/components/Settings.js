@@ -64,6 +64,12 @@ const Subscription = () => {
         }`,
     };
 
+    let subscriptionCycle =
+        userPlan && userPlan.getUserPlan && userPlan.getUserPlan.subscriptionCycle
+            ? userPlan.getUserPlan.subscriptionCycle
+            : 'yearly';
+
+    let targetPlan = plan.id !== 4 ? plan.id + 1 : plan.id;
     return (
         <Formik initialValues={initialValues}>
             {({ values, isSubmitting, dirty, errors }) => (
@@ -124,7 +130,14 @@ const Subscription = () => {
                     {showUpgradePopup && (
                         <Popup
                             component={() => {
-                                return <Upgrade setShowPopup={setShowUpgradePopup} preStep={2} />;
+                                return (
+                                    <Upgrade
+                                        setShowPopup={setShowUpgradePopup}
+                                        targetPlan={targetPlan }
+                                        preStep={2}
+                                        subscriptionCycle={subscriptionCycle}
+                                    />
+                                );
                             }}
                             closePopup={(e) => setShowUpgradePopup(false)}
                             style={{
