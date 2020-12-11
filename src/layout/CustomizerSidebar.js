@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { message, Radio } from 'antd';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
+import { Grid } from 'svg-loaders-react';
+
 import { browserHistory } from '../browserHistory';
 import GoBack from '../components/GoBack';
 import { ReactComponent as RightArrow } from '../assets/right-arrow-angle.svg';
@@ -479,7 +481,7 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
         customizerLoading ||
         upgradeLoading
     )
-        return <>Loading...</>;
+        return <Grid style={{ marginLeft: '10%', fill: '#9966ff' }} />;
 
     let userLanguages =
         userLanguagesData && userLanguagesData.userLanguages ? userLanguagesData.userLanguages : [];
@@ -502,7 +504,7 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
         updateUpgradeData({
             variables: {
                 shouldResetUpgradeData: null,
-                selectedLanguagesIds: []
+                selectedLanguagesIds: [],
             },
         }).then((e) => {
             setSelectedLanguages(selectedTargetLangs);
@@ -699,7 +701,8 @@ const AppearanceComponent = ({ setPrevAppearance, userPlan }) => {
         }
     });
 
-    if (customizerLoading || upgradeLoading) return <></>;
+    if (customizerLoading || upgradeLoading)
+        return <Grid style={{ marginLeft: '10%', fill: '#9966ff' }} />;
 
     let customizer = customizerData ? customizerData.getUserCustomizer : null;
 
@@ -848,7 +851,7 @@ const CustomizerSidebar = ({ openLanguagesComponent, bannerVisible }) => {
     const [languagesSaved, setLanguagesSaved] = useState(null);
     const { data: userPlan, loading } = useUserSubscriptionPlan();
 
-    if (loading) return <></>;
+    if (loading) return <Grid style={{ marginLeft: "10%",fill: '#9966ff' }} />;
 
     console.log('prevAppearance', prevAppearance);
     return (

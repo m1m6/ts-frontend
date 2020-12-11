@@ -141,7 +141,7 @@ const SourceLanguageStep = ({
                     styles={CustomStyle(currentLang)}
                     options={languagesList}
                     isLoading={languagesList && languagesList.length == 0}
-                    loadingMessage="Loading..."
+                    loadingMessage=""
                     isMulti={false}
                     value={currentLang}
                     onChange={changeHandler}

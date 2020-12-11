@@ -1,6 +1,7 @@
 import React from 'react';
 import { Row, Icon, message } from 'antd';
 import { Formik, Form } from 'formik';
+import { Grid } from 'svg-loaders-react';
 import * as Yup from 'yup';
 import classNames from 'classnames';
 import InputField from '../../../form/components/InputField';
@@ -8,6 +9,7 @@ import Button from '../../../form/components/Button';
 import { showAllGraphQLErrors } from '../../../helper/graphqlErrors';
 import { useResetPassword } from '../../signup/useMutations';
 import { browserHistory } from '../../../browserHistory';
+import { ReactComponent as Back } from '../../../assets/arrow-down-sign-to-navigate.svg';
 
 const initialValues = {
     email: '',
@@ -32,7 +34,9 @@ const ResetPassword = ({ routerHistory }) => {
                 }}
                 onClick={() => routerHistory.goBack()}
             >
-                &lt; GO BACK
+                <Back
+                style={{ width: '8px', height: '9px', color: '#9966ff', transform: 'scale(-1,1)' }}
+            /> GO BACK
             </p>
             <Formik
                 initialValues={initialValues}
@@ -69,7 +73,7 @@ const ResetPassword = ({ routerHistory }) => {
                                 })}
                                 style={{ marginTop: '19px' }}
                             >
-                                {isSubmitting ? 'SENDING...' : <>SEND EMAIL</>}
+                                {isSubmitting ? <Grid style={{ width: '17px', height: '17px' }} /> : <>SEND EMAIL</>}
                             </Button>
                         </Row>
                     </Form>

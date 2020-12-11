@@ -1,13 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Select from 'react-select/';
-import * as Yup from 'yup';
+import { Grid } from 'svg-loaders-react';
 import { message } from 'antd';
 import classNames from 'classnames';
 import Button from '../../../form/components/Button';
-import { Formik, Form } from 'formik';
-import InputField from '../../../form/components/InputField';
 import { useAddCreditCardMutation, useInviteUserMutation } from '../useMutations';
-import { showAllGraphQLErrors } from '../../../helper/graphqlErrors';
 import { formatCardNumber, formatExpiryDate } from '../../../upgrade/components/Upgrade';
 
 const cardInput = {
@@ -211,7 +207,11 @@ const AddCreditCard = ({ setShowPopup }) => {
                                 }
                             }}
                         >
-                            {isSubmitting ? 'ADDING...' : <>ADD</>}
+                            {isSubmitting ? (
+                                <Grid style={{ width: '17px', height: '17px' }} />
+                            ) : (
+                                <>ADD</>
+                            )}
                         </Button>
                     </div>
                 </>

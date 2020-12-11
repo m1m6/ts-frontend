@@ -1,6 +1,8 @@
 import { message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
+import { Grid } from 'svg-loaders-react';
+
 import Select from 'react-select';
 import centerLogo from '../../assets/imgs/signupLogin/icon-bubble.png';
 import heart from '../../assets/heart.png';
@@ -15,7 +17,7 @@ const Upgrade = ({ preStep = 1, subscriptionCycle, successCB, targetPlan }) => {
     const [step, setStep] = useState(preStep);
 
     return (
-        <div className="upgrade-popup" >
+        <div className="upgrade-popup">
             {step === 1 ? (
                 <>
                     <div
@@ -62,12 +64,12 @@ const Upgrade = ({ preStep = 1, subscriptionCycle, successCB, targetPlan }) => {
 const Step2 = ({ setStep, successCB, targetPlan = 2 }) => {
     const subscriptionCycleOptions = [
         { label: 'YEARLY', value: 'yearly' },
-        { label: 'MONTHLY', value: 'monthlu' },
+        { label: 'MONTHLY', value: 'monthly' },
     ];
     const { data, loading } = usePlansListQuery();
     const { data: userData, loading: userLoading } = useUserSubscriptionPlan();
 
-    const [cycle, setCycle] = useState(subscriptionCycleOptions[0]);
+    const [cycle, setCycle] = useState(undefined);
     const [plan, setPlan] = useState(undefined);
     const [cardNumber, setCardNumber] = useState(null);
     const [expiryDate, setExpiryDate] = useState(null);
@@ -96,15 +98,28 @@ const Step2 = ({ setStep, successCB, targetPlan = 2 }) => {
             ? userData.getUserPlan
             : { status: 'BASIC', plan: { id: 1 } };
 
-    const plansOptions = mapPlans(data, cycle.label, status, targetPlan);
-
+    let plansOptions = cycle
+        ? mapPlans(data, cycle.label, status, targetPlan, subscriptionCycle)
+        : [];
     useEffect(() => {
         if (plan === undefined && plansOptions.length > 0) {
             setPlan(plansOptions[targetPlan - 2]);
         }
     });
 
+    useEffect(() => {
+        let selectedCycle = subscriptionCycleOptions.filter((o) => o.value === subscriptionCycle);
+        if (!cycle) {
+            setCycle(
+                selectedCycle && selectedCycle.length > 0
+                    ? selectedCycle[0]
+                    : subscriptionCycleOptions[0]
+            );
+        }
+    }, [cycle]);
+
     const shouldDisableCycleList = subscriptionCycle === 'yearly';
+
     return (
         <>
             <div className="popup-title">
@@ -117,7 +132,6 @@ const Step2 = ({ setStep, successCB, targetPlan = 2 }) => {
                 <Select
                     styles={CustomStyle(true)}
                     options={subscriptionCycleOptions}
-                    defaultValue={subscriptionCycleOptions[0]}
                     isDisabled={shouldDisableCycleList}
                     formatOptionLabel={(value) => {
                         if (value.label === 'YEARLY') {
@@ -239,7 +253,13 @@ const Step2 = ({ setStep, successCB, targetPlan = 2 }) => {
                 </div>
                 <div className="popup-next-btn">
                     <Button
-                        children={isSubmitting ? 'UPGRADING...' : 'UPGRADE'}
+                        children={
+                            isSubmitting ? (
+                                <Grid style={{ width: '17px', height: '17px' }} />
+                            ) : (
+                                'UPGRADE'
+                            )
+                        }
                         className={classNames('wf-btn-primary', {
                             disabled: isSubmitting,
                         })}
@@ -247,6 +267,16 @@ const Step2 = ({ setStep, successCB, targetPlan = 2 }) => {
                         onClick={async (e) => {
                             try {
                                 setSubmitting(true);
+                                if (
+                                    subscriptionCycle === 'monthly' &&
+                                    cycle.value === subscriptionCycle
+                                ) {
+                                    message.warn(
+                                        'You are already subscribed to this plan, please upgrade to Yearly cycle or to higher plan.'
+                                    );
+                                    setSubmitting(false);
+                                    return;
+                                }
                                 if (
                                     !cardNumber ||
                                     (cardNumber && cardNumber.replaceAll(' ', '').length !== 16)

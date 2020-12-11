@@ -166,11 +166,14 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, user
                         className={classNames('menu-item', {
                             activeMenu: activeMenu === 'Projects',
                         })}
+                        onClick={(e) => {
+                            setActiveMenu('Projects');
+                            browserHistory.push('/');
+                        }}
                     >
                         <Link
-                            to="/"
+                            to="#"
                             title="Projects"
-                            onClick={(e) => setActiveMenu('Projects')}
                             className={classNames({
                                 activeLink: activeMenu === 'Projects',
                             })}
@@ -179,29 +182,19 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, user
                         </Link>
                     </div>
                     {isNew && !isEditor(userRole) && (
-                        <div className="menu-item">
-                            <Link
-                                title="Setup"
-                                onClick={async (e) => {
-                                    await updateOnboardingClient({
-                                        variables: { currentStep: 1 },
-                                    });
-                                    await updateUser({
-                                        variables: { skippedOnboarding: false },
-                                    });
-                                    browserHistory.push('/onboarding');
-                                }}
-                            >
-                                Setup
-                                {/* <Rings
-                                        style={{
-                                            width: '20px',
-                                            height: '20px',
-                                            stroke: '#9966ff',
-                                            verticalAlign: 'middle',
-                                        }}
-                                    /> */}
-                            </Link>
+                        <div
+                            className="menu-item"
+                            onClick={async (e) => {
+                                await updateOnboardingClient({
+                                    variables: { currentStep: 1 },
+                                });
+                                await updateUser({
+                                    variables: { skippedOnboarding: false },
+                                });
+                                browserHistory.push('/onboarding');
+                            }}
+                        >
+                            <Link title="Setup">Setup</Link>
                             <div className="ring-container">
                                 <div className="ringring"></div>
                                 <div className="circle"></div>
@@ -210,17 +203,16 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, user
                     )}
 
                     {!isEditor(userRole) && (
-                        <div className="menu-item">
-                            <Link
-                                to="#"
-                                title="Customizer"
-                                onClick={async (e) => {
-                                    setActiveMenu('Projects');
-                                    e.preventDefault();
-                                    await updateCustomizerClient({ variables: { isOpen: true } });
-                                    browserHistory.push('/customizer');
-                                }}
-                            >
+                        <div
+                            className="menu-item"
+                            onClick={async (e) => {
+                                setActiveMenu('Projects');
+                                e.preventDefault();
+                                await updateCustomizerClient({ variables: { isOpen: true } });
+                                browserHistory.push('/customizer');
+                            }}
+                        >
+                            <Link to="#" title="Customizer">
                                 Customizer
                             </Link>
                         </div>
@@ -235,11 +227,14 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, user
                                 className={classNames('menu-item', {
                                     activeMenu: activeMenu === 'Settings',
                                 })}
+                                onClick={(e) => {
+                                    setActiveMenu('Settings');
+                                    browserHistory.push('/settings');
+                                }}
                             >
                                 <Link
-                                    to="/settings"
+                                    to="#"
                                     title="Settings"
-                                    onClick={(e) => setActiveMenu('Settings')}
                                     className={classNames({
                                         activeLink: activeMenu === 'Settings',
                                     })}
@@ -248,16 +243,15 @@ const Sidebar = ({ isOpenCustomizer, openLanguagesComponent, bannerVisible, user
                                 </Link>
                             </div>
                         )}
-                        <div className="menu-item">
-                            <Link
-                                to="#"
-                                title="Log out"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    auth.removeAccessToken();
-                                    window.location.reload();
-                                }}
-                            >
+                        <div
+                            className="menu-item"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                auth.removeAccessToken();
+                                window.location.reload();
+                            }}
+                        >
+                            <Link to="#" title="Log out">
                                 Log out
                             </Link>
                         </div>

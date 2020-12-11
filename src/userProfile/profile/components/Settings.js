@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Col, Row, Avatar, Tabs, message } from 'antd';
+import { Grid } from 'svg-loaders-react';
 import * as Yup from 'yup';
 import classNames from 'classnames';
 import { Form, Formik } from 'formik';
@@ -31,7 +32,7 @@ const Subscription = () => {
     const { data: customCards, loading: customCardsLoading } = useCustomerCarsdQuery();
 
     if (userPlanLoading || customCardsLoading) {
-        return <>Loading...</>;
+        return <Grid style={{ marginLeft: '45%', fill: '#9966ff' }} />;
     }
 
     const plan =
@@ -180,7 +181,7 @@ const Team = () => {
     const { data: team } = useTeamMembersQuery();
 
     if (userDataLoading) {
-        return <>Loading...</>;
+        return <Grid style={{ marginLeft: '45%', fill: '#9966ff' }} />;
     }
 
     const user = userData && userData.me ? userData.me : { me: { email: '', fullName: '' } };
@@ -364,7 +365,11 @@ const Profile = () => {
                                         })}
                                         style={{ marginTop: '55px' }}
                                     >
-                                        {isSubmitting ? 'UPDATING...' : <>UPDATE</>}
+                                        {isSubmitting ? (
+                                            <Grid style={{ width: '17px', height: '17px' }} />
+                                        ) : (
+                                            <>UPDATE</>
+                                        )}
                                     </Button>
                                 )}
                             </Col>

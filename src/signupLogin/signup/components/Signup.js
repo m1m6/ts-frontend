@@ -1,5 +1,6 @@
 import React from 'react';
 import { Row, Icon, Layout, Col } from 'antd';
+import { Grid } from 'svg-loaders-react';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import classNames from 'classnames';
@@ -20,7 +21,7 @@ const initialValues = {
 };
 
 const signupSchema = Yup.object().shape({
-    email: Yup.string().email("Please enter valid email").required('*Required'),
+    email: Yup.string().email('Please enter valid email').required('*Required'),
     password: Yup.string().required('*Required'),
     fullName: Yup.string().required('*Required'),
     termsAndConditions: Yup.boolean().oneOf([true]),
@@ -98,7 +99,11 @@ const Signup = ({ routerHistory, role }) => {
                                         active: dirty && Object.keys(errors).length === 0,
                                     })}
                                 >
-                                    {isSubmitting ? 'SIGNING UP...' : <>CREATE ACCOUNT</>}
+                                    {isSubmitting ? (
+                                        <Grid style={{ width: '17px', height: '17px' }} />
+                                    ) : (
+                                        <>CREATE ACCOUNT</>
+                                    )}
                                 </Button>
                             </Row>
                         </Form>

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Select from 'react-select/';
 import * as Yup from 'yup';
+import { Grid } from 'svg-loaders-react';
 import { message } from 'antd';
 import classNames from 'classnames';
 import Button from '../../../form/components/Button';
@@ -40,7 +41,7 @@ const InviteUser = ({ close }) => {
             validationSchema={inviteSchema}
             onSubmit={async (values, { setSubmitting }) => {
                 try {
-                    console.log("values", values);
+                    console.log('values', values);
                     const result = await inviteUser({
                         variables: { ...values, role: values.role.value },
                     });
@@ -120,7 +121,11 @@ const InviteUser = ({ close }) => {
                                         active: dirty && Object.keys(errors).length === 0,
                                     })}
                                 >
-                                    {isSubmitting ? 'ADDING...' : <>ADD</>}
+                                    {isSubmitting ? (
+                                        <Grid style={{ width: '17px', height: '17px' }} />
+                                    ) : (
+                                        <>ADD</>
+                                    )}
                                 </Button>
                             </div>
                         </>

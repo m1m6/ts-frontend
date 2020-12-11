@@ -1,5 +1,6 @@
 import React from 'react';
 import { Row, Icon } from 'antd';
+import { Grid } from 'svg-loaders-react';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import classNames from 'classnames';
@@ -72,7 +73,11 @@ const Login = ({ routerHistory }) => {
                                     active: dirty && Object.keys(errors).length === 0,
                                 })}
                             >
-                                {isSubmitting ? 'LOGGING IN...' : <>LOG IN</>}
+                                {isSubmitting ? (
+                                    <Grid style={{ width: '17px', height: '17px' }} />
+                                ) : (
+                                    <>LOG IN</>
+                                )}
                             </Button>
                         </Row>
                     </Form>
