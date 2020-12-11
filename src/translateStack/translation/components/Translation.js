@@ -266,9 +266,10 @@ const mapRows = (strings, selectedLanguageId) => {
                                 backgroundColor: 'rgb(108 34 255)',
                                 color: 'white',
                                 fontWeight: 'bold',
-                                width: '90px',
+                                width: '72px',
                                 padding: '4px',
                                 borderRadius: '4px',
+                                fontSize: '11px',
                                 boxShadow: '0 2px 20px -5px #e8eaef',
                             }}
                         >
@@ -506,6 +507,14 @@ const Translation = (props) => {
                     setDataUpdated={setDataUpdated}
                 />
             </div>
+
+
+<div style={{height: "100px"}}></div>
+
+
+
+
+
         </div>
     );
 };

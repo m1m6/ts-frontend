@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReactComponent as Back } from '../assets/right-arrow-angle.svg';
+import { ReactComponent as Back } from '../assets/right-arrow.svg';
 
 const GoBack = ({ onClickCB, routerHistory, style }) => {
     return (
@@ -26,6 +26,7 @@ const GoBack = ({ onClickCB, routerHistory, style }) => {
                     width: '8px',
                     height: '9px',
                     color: '#9966ff',
+                    fill: '#9966ff',
                     transform: 'scale(-1,1)',
                     marginRight: '6px',
                 }}
