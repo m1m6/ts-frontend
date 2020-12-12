@@ -9,7 +9,7 @@ import Button from '../../../form/components/Button';
 import { showAllGraphQLErrors } from '../../../helper/graphqlErrors';
 import { useResetPassword } from '../../signup/useMutations';
 import { browserHistory } from '../../../browserHistory';
-import { ReactComponent as Back } from '../../../assets/arrow-down-sign-to-navigate.svg';
+import { ReactComponent as Back } from '../../../assets/right-arrow.svg';
 
 const initialValues = {
     email: '',
@@ -35,7 +35,7 @@ const ResetPassword = ({ routerHistory }) => {
                 onClick={() => routerHistory.goBack()}
             >
                 <Back
-                style={{ width: '8px', height: '9px', color: '#9966ff', transform: 'scale(-1,1)' }}
+                style={{ width: '8px', height: '9px', color: '#9966ff', transform: 'scale(-1,-1)' }}
             /> GO BACK
             </p>
             <Formik
