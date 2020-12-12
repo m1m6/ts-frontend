@@ -481,7 +481,7 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
         customizerLoading ||
         upgradeLoading
     )
-        return <Grid style={{ marginLeft: '10%', fill: '#9966ff' }} />;
+        return <></>;
 
     let userLanguages =
         userLanguagesData && userLanguagesData.userLanguages ? userLanguagesData.userLanguages : [];
@@ -702,7 +702,7 @@ const AppearanceComponent = ({ setPrevAppearance, userPlan }) => {
     });
 
     if (customizerLoading || upgradeLoading)
-        return <Grid style={{ marginLeft: '10%', fill: '#9966ff' }} />;
+        return <></>;
 
     let customizer = customizerData ? customizerData.getUserCustomizer : null;
 
@@ -851,7 +851,7 @@ const CustomizerSidebar = ({ openLanguagesComponent, bannerVisible }) => {
     const [languagesSaved, setLanguagesSaved] = useState(null);
     const { data: userPlan, loading } = useUserSubscriptionPlan();
 
-    if (loading) return <Grid style={{ marginLeft: "10%",fill: '#9966ff' }} />;
+    if (loading) return <></>;
 
     console.log('prevAppearance', prevAppearance);
     return (
