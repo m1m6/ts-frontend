@@ -431,6 +431,7 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
     const [isInitialValues, setIsInitialValues] = useState(true);
     const [isSubmitting, setSubmitting] = useState(false);
     const [btnActive, setBtnActive] = useState(false);
+    const [newAddedLanguages, setNewAddedLanguages] = useState([]);
 
     const { data: langData, loading: langLoading } = useLanugagesListQuery();
     const {
@@ -524,6 +525,10 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
             removedItems.push(action.removedValue.value);
         }
 
+        if (action.action === "select-option") {
+            setNewAddedLanguages([...newAddedLanguages, action.option.value])
+        }
+
         removedItems = removedItems.filter((i) => !mappedValues.includes(i));
         await updateCustomizerClient({
             variables: {
@@ -595,6 +600,7 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
             const results = await updateTargetLanguages({
                 variables: {
                     selectedLanguagesIds,
+                    newAddedLanguages
                 },
             });
 

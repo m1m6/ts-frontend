@@ -131,7 +131,9 @@ const EditableCell = ({
 
         childNode = (
             <Input.TextArea
-                value={record[dataIndex]}
+                value={
+                    record[dataIndex] ? record[dataIndex].replaceAll('\n', '') : record[dataIndex]
+                }
                 onChange={async (e) => {
                     handleSave({ ...record, ...{ translated: e.target.value } });
                 }}
@@ -369,7 +371,7 @@ const Translation = (props) => {
                     }
                 }}
             >
-                <SyncOutlined style={{ width: '10px', height: '11px', color: '#0a2540'  }} />
+                <SyncOutlined style={{ width: '10px', height: '11px', color: '#0a2540' }} />
                 <span style={{ marginLeft: '16px', color: '#0a2540' }}>Fetch again</span>
             </div>
             <div
@@ -391,8 +393,8 @@ const Translation = (props) => {
                     }
                 }}
             >
-                <DeleteOutlined style={{ width: '10px', height: '11px',color: '#0a2540' }} />
-                <span style={{ marginLeft: '16px',color: '#0a2540' }}>Delete Page</span>
+                <DeleteOutlined style={{ width: '10px', height: '11px', color: '#0a2540' }} />
+                <span style={{ marginLeft: '16px', color: '#0a2540' }}>Delete Page</span>
             </div>
         </div>
     );
@@ -508,13 +510,7 @@ const Translation = (props) => {
                 />
             </div>
 
-
-<div style={{height: "100px"}}></div>
-
-
-
-
-
+            <div style={{ height: '100px' }}></div>
         </div>
     );
 };

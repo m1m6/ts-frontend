@@ -93,7 +93,7 @@ export const CUSTOMIZER_MUTATION_SERVER = gql`
 `;
 
 export const UPDATE_TARGET_LANGUAGES_MUTATION = gql`
-    mutation updateTargetLanguages($selectedLanguagesIds: [Int!]!) {
-        updateTargetLanguages(selectedLanguagesIds: $selectedLanguagesIds)
+    mutation updateTargetLanguages($selectedLanguagesIds: [Int!]!, $newAddedLanguages: [Int!]!) {
+        updateTargetLanguages(selectedLanguagesIds: $selectedLanguagesIds, newAddedLanguages: $newAddedLanguages)
     }
 `;
