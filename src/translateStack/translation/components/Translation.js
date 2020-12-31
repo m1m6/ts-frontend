@@ -431,7 +431,7 @@ const Translation = (props) => {
                                 children={'Publish Changes'}
                                 onClick={async (e) => {
                                     const updatedRows = rowsData
-                                        .filter((row) => row.isUpdated && row.translated !== '')
+                                        .filter((row) => row.isUpdated)
                                         .map(({ translated, stringId, selectedLanguageId }) => {
                                             return { translated, stringId, selectedLanguageId };
                                         });
@@ -565,7 +565,18 @@ const TableWrapper = ({
         const index = newData.findIndex((item) => row.key === item.key);
         const item = newData[index];
         newData.splice(index, 1, { ...item, ...row, isUpdated: true });
+
+        let alreadyHasTranslations = false;
+
+        newData.forEach((d) => {
+            if (d.translated !== 'true') {
+                alreadyHasTranslations = true;
+            }
+        });
+
         if (row.translated !== '') {
+            setDataUpdated(true);
+        } else if (row.translated === '' && alreadyHasTranslations){
             setDataUpdated(true);
         } else {
             setDataUpdated(false);
