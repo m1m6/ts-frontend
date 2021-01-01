@@ -123,22 +123,26 @@ const SetupPopup = ({ setShowPopup, apiKey, pagesCount }) => {
                 });
             } else {
                 setIsSubmitting(true);
-                const results = await useAddSinglePage({
-                    variables: { pageUrl: currentPageUrl },
-                });
-
-                if (results && results.data && results.data.addSinglePage) {
-                    message.success('Page successfully added');
-                    await updateUpgradeData({
-                        variables: {
-                            shouldShowUpgradePopup: false,
-                            tempPageUrl: null,
-                            shouldResetUpgradeData: null,
-                        },
+                try {
+                    const results = await useAddSinglePage({
+                        variables: { pageUrl: currentPageUrl },
                     });
-                    setShowPopup(false);
-                } else {
-                    message.warn('Unable to verify the page');
+
+                    if (results && results.data && results.data.addSinglePage) {
+                        message.success('Page successfully added');
+                        await updateUpgradeData({
+                            variables: {
+                                shouldShowUpgradePopup: false,
+                                tempPageUrl: null,
+                                shouldResetUpgradeData: null,
+                            },
+                        });
+                        setShowPopup(false);
+                    } else {
+                        message.warn('Unable to verify the page');
+                    }
+                } catch (e) {
+                    message.warn('An error occured while trying to add the page.');
                 }
 
                 setIsSubmitting(false);
@@ -153,7 +157,16 @@ const SetupPopup = ({ setShowPopup, apiKey, pagesCount }) => {
             <div className="setup-p-title">Add another page</div>
             <div className="setup-p-description">
                 Copy your code snippet below and place it above the closing &#60;/body&#62; tag of
-                your page. The code snippet only works properly, if it got placed correctly. You'll find more information in the <a style={{ color: '#9966ff', textDecoration: 'underline'}} target="_blank" href="https://translatestack.gitbook.io/translatestack/">documentation guide</a>.
+                your page. The code snippet only works properly, if it got placed correctly. You'll
+                find more information in the{' '}
+                <a
+                    style={{ color: '#9966ff', textDecoration: 'underline' }}
+                    target="_blank"
+                    href="https://translatestack.gitbook.io/translatestack/"
+                >
+                    documentation guide
+                </a>
+                .
             </div>
             <div className="setup-p-code">
                 <div className="setup-code">
@@ -166,7 +179,9 @@ const SetupPopup = ({ setShowPopup, apiKey, pagesCount }) => {
             <div className="setup-p-d-w">
                 <div className="setup-p-d-t">Enter URL of new page</div>
                 <div className="setup-p-d-d">
-                    Once you've deployed the code snippet into the new page you want to add, you can enter the URL to validate your setup. Only if you validated your set up, the drop down will appear.
+                    Once you've deployed the code snippet into the new page you want to add, you can
+                    enter the URL to validate your setup. Only if you validated your set up, the
+                    drop down will appear.
                 </div>
                 <div className="setup-p-d-i">
                     <Input

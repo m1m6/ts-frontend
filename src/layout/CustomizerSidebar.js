@@ -525,8 +525,8 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
             removedItems.push(action.removedValue.value);
         }
 
-        if (action.action === "select-option") {
-            setNewAddedLanguages([...newAddedLanguages, action.option.value])
+        if (action.action === 'select-option') {
+            setNewAddedLanguages([...newAddedLanguages, action.option.value]);
         }
 
         removedItems = removedItems.filter((i) => !mappedValues.includes(i));
@@ -548,6 +548,7 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
 
         if (
             currentUserPlan === 1 &&
+            selectedLanguages &&
             selectedLanguages.length > 2 &&
             selectedLanguages.length <= 5
         ) {
@@ -560,6 +561,7 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
             });
         } else if (
             currentUserPlan === 2 &&
+            selectedLanguages &&
             selectedLanguages.length > 5 &&
             selectedLanguages.length <= 10
         ) {
@@ -572,6 +574,7 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
             });
         } else if (
             currentUserPlan === 3 &&
+            selectedLanguages &&
             selectedLanguages.length > 10 &&
             selectedLanguages.length <= 40
         ) {
@@ -600,7 +603,7 @@ const LanguagesComponent = ({ setLanguagesSaved, userPlan }) => {
             const results = await updateTargetLanguages({
                 variables: {
                     selectedLanguagesIds,
-                    newAddedLanguages
+                    newAddedLanguages,
                 },
             });
 
@@ -707,8 +710,7 @@ const AppearanceComponent = ({ setPrevAppearance, userPlan }) => {
         }
     });
 
-    if (customizerLoading || upgradeLoading)
-        return <></>;
+    if (customizerLoading || upgradeLoading) return <></>;
 
     let customizer = customizerData ? customizerData.getUserCustomizer : null;
 
@@ -859,7 +861,6 @@ const CustomizerSidebar = ({ openLanguagesComponent, bannerVisible }) => {
 
     if (loading) return <></>;
 
-    console.log('prevAppearance', prevAppearance);
     return (
         <div className="customizer-sidebar-wrapper">
             <div className="go-back">

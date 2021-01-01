@@ -173,7 +173,7 @@ const TargetLanguagesStep = ({
     subscriptionData,
 }) => {
     const languagesList = getLanguagesList();
-    const userLanguages = getUserLangaugesList();
+    let userLanguages = getUserLangaugesList();
     const [currentSelected, setCurrentSelected] = useState(null);
 
     const changeHandler = (value) => {
@@ -196,6 +196,14 @@ const TargetLanguagesStep = ({
 
     useEffect(() => {
         if (userLanguages && userLanguages.length && userLanguages[0] && !currentSelected) {
+            // filter out the source/root languages
+            userLanguages = userLanguages.filter(
+                (l) => 
+                l.value !==
+                (sourceLanguage && sourceLanguage.length
+                    ? sourceLanguage[0].value
+                    : sourceLanguage.value)
+            );
             setCurrentSelected(userLanguages);
             setSelectedLanguages(userLanguages);
         } else if (selectedLanguages && selectedLanguages.length > 0) {
@@ -253,7 +261,6 @@ const Step2 = ({ currentStep, onboardingMutation, pageUrl, setPageUrl }) => {
             <div className="onboarding-step-title">Enter a valid URL of your Website</div>
             <div className="onboarding-step-description">
                 You need to validate in the next step this page. Make sure it is a valid one.
-
             </div>
             <div style={{ marginBottom: '26px', marginTop: '33px' }}>
                 <Input
@@ -306,7 +313,16 @@ const Step3 = ({
             <div className="onboarding-step-count last">{currentStep} out of 4</div>
             <div className="onboarding-step-title last">Finalize your setup</div>
             <div className="onboarding-step-description last">
-                Copy & paste the code snippet below and place it above the &lt;/body&gt; tag. You can find more information in the <a style={{ color: '#9966ff', textDecoration: 'underline'}} target="_blank" href="https://translatestack.gitbook.io/translatestack/">documentation guide</a>.
+                Copy & paste the code snippet below and place it above the &lt;/body&gt; tag. You
+                can find more information in the{' '}
+                <a
+                    style={{ color: '#9966ff', textDecoration: 'underline' }}
+                    target="_blank"
+                    href="https://translatestack.gitbook.io/translatestack/"
+                >
+                    documentation guide
+                </a>
+                .
             </div>
             <div className="onboarding-step-code-wrapper">
                 <div className="onboarding-step-code">
@@ -318,9 +334,8 @@ const Step3 = ({
             </div>
             <div className="onboarding-step-title">Test your setup</div>
             <div className="onboarding-step-description last">
-
-                Press the button below to validate if your snippet is placed correctly above the body tag in your project.
-                You are one click away to start translating.
+                Press the button below to validate if your snippet is placed correctly above the
+                body tag in your project. You are one click away to start translating.
             </div>
             <div>
                 <OnboardinButton
@@ -334,27 +349,33 @@ const Step3 = ({
                             sourceLanguage &&
                             pageUrl
                         ) {
-                            const results = await onboarding({
-                                variables: {
-                                    pageUrl,
-                                    translationLanguages: selectedLanguages.map(
-                                        (lang) => lang.value
-                                    ),
-                                    sourceLanguage:
-                                        sourceLanguage && sourceLanguage.length && sourceLanguage[0]
-                                            ? sourceLanguage[0].value
-                                            : sourceLanguage.value,
-                                },
-                            });
-
-                            if (results && results.data && results.data.onboarding) {
-                                message.success('Successfully added your page!');
-                                await updateUser({ variables: { isNew: false } });
-                                window.location.assign('/');
-                            } else {
-                                setHasError(true);
+                            try {
+                                const results = await onboarding({
+                                    variables: {
+                                        pageUrl,
+                                        translationLanguages: selectedLanguages.map(
+                                            (lang) => lang.value
+                                        ),
+                                        sourceLanguage:
+                                            sourceLanguage && sourceLanguage.length && sourceLanguage[0]
+                                                ? sourceLanguage[0].value
+                                                : sourceLanguage.value,
+                                    },
+                                });
+    
+                                if (results && results.data && results.data.onboarding) {
+                                    message.success('Successfully added your page!');
+                                    await updateUser({ variables: { isNew: false } });
+                                    window.location.assign('/');
+                                } else {
+                                    setHasError(true);
+                                    message.error(
+                                        'Ooops, it seems the snippet is still not installed. or this page is already used by another account'
+                                    );
+                                }
+                            } catch (e) {
                                 message.error(
-                                    'Ooops, it seems the snippet is still not installed. Try again.'
+                                    'An error occured during adding the page.'
                                 );
                             }
                         } else {

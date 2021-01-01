@@ -41,7 +41,6 @@ const InviteUser = ({ close }) => {
             validationSchema={inviteSchema}
             onSubmit={async (values, { setSubmitting }) => {
                 try {
-                    console.log('values', values);
                     const result = await inviteUser({
                         variables: { ...values, role: values.role.value },
                     });

@@ -29,8 +29,6 @@ export const getProjectTranslationsPercentage = (userPages, stringCount, languag
         });
     }
 
-    console.log("stringCount", stringCount);
-    console.log("translationsCount", translationsCount);
 
     percentage = (((translationsCount / languagesLen) / stringCount) * 100).toFixed(1);
 

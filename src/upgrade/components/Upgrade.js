@@ -469,7 +469,6 @@ const CustomStyle = (isFirst) => {
             height: isFirst ? '65px' : '100px',
         }),
         singleValue: (base, { isDisabled, selectProps: { width, height } }) => {
-            console.log('isDisabled', isDisabled);
             return {
                 ...base,
                 width: '100%',

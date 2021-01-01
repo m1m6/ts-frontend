@@ -169,8 +169,6 @@ const AddCreditCard = ({ setShowPopup }) => {
                                     const cardNumberValue = cardNumber.replaceAll(' ', '');
                                     const [expMonth, expYear] = expiryDate.split('/');
 
-                                    console.log(cardNumberValue, expMonth, expYear, cvc);
-
                                     const results = await addCreditCard({
                                         variables: {
                                             cardNumber: cardNumberValue,
